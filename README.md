@@ -17,8 +17,8 @@ Este repositorio está diseñado para que estudiantes, docentes e investigadores
 
 El repositorio se organiza en tres unidades:
 
-- **Unidad I — Análisis de datos ecológicos**
-- **Unidad II — Ecología de poblaciones**
+- **Unidad I   — Análisis de datos ecológicos**
+- **Unidad II  — Ecología de poblaciones**
 - **Unidad III — Ecología de comunidades**
 
 Cada unidad contiene:
@@ -83,7 +83,7 @@ Los resultados generados por los scripts se almacenan en:
 
 Puedes explorar este material de forma estructurada en la página del proyecto:
 
-👉 *https://javier-2712.github.io/libro_anvidea/* 
+👉 *https://javier-2712.github.io/libro_anvidea/*
 
 ---
 
@@ -124,4 +124,3 @@ Definir tipo de licencia (ej. MIT, CC-BY, etc.)
 ✔ Estructura base implementada  
 ✔ Scripts organizados por unidades  
 ✔ Material listo para uso educativo y reproducible  
-
