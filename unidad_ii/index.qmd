@@ -149,6 +149,50 @@ El script principal detendrá la ejecución si detecta archivos faltantes.
 Este comportamiento es intencional y ayuda a mantener la reproducibilidad del flujo de trabajo.
 :::
 
+
+## 📂 ## 📂 Acceso directo a capítulos
+
+Explora cada capítulo de la unidad con acceso directo a sus scripts, datos y resultados:
+
+### 🔹 Capítulo 4 — Modelos poblacionales
+
+- 📁 [Abrir carpeta del capítulo](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_ii/cap4-modelos-poblacionales)
+- 📄 Incluye:
+  - Modelo exponencial y logístico
+  - Simulación de crecimiento poblacional
+  - Exportación de resultados
+
+---
+
+### 🔹 Capítulo 5 — Tablas de vida y modelos matriciales
+
+- 📁 [Abrir carpeta del capítulo](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_ii/cap5-tablas-vida)
+- 📄 Incluye:
+  - Tablas de vida (cementerios y Gotelli)
+  - Modelo de Leslie
+  - Modelo de Lefkovitch
+
+---
+
+### 🔹 Capítulo 6 — Distribución espacial y estimación de densidad
+
+- 📁 [Abrir carpeta del capítulo](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_ii/cap6-distribucion-densidad)
+- 📄 Incluye:
+  - Patrones espaciales
+  - Métodos de estimación de densidad
+  - Análisis ecológico aplicado
+
+---
+
+## ▶️ Ejecución rápida
+
+Para ejecutar todos los análisis de la unidad:
+
+```r
+source("unidad_ii/run_unidad2.R")
+```  
+
+
 ## Datos y paquetes necesarios
 
 En términos generales, esta unidad utiliza:
