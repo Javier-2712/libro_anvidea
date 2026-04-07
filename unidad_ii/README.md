@@ -54,7 +54,7 @@ capX-nombre-del-capitulo/
 Archivo principal:
 
 ```r
-source("run_unidad2_final.R")
+source("run_unidad2.R")
 ```
 
 Este script ejecuta de forma secuencial:
