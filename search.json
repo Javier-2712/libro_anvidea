@@ -1,5 +1,180 @@
 [
   {
+    "objectID": "unidad_iii/index.html",
+    "href": "unidad_iii/index.html",
+    "title": "Unidad III — Ecología de comunidades",
+    "section": "",
+    "text": "La Unidad III integra herramientas modernas para el análisis de la biodiversidad, combinando enfoques taxonómicos, funcionales y filogenéticos en un marco cuantitativo y reproducible en R. Esta unidad marca la transición desde la descripción de ensamblajes biológicos hacia la comprensión de los mecanismos ecológicos que estructuran la biodiversidad."
+  },
+  {
+    "objectID": "unidad_iii/index.html#presentación",
+    "href": "unidad_iii/index.html#presentación",
+    "title": "Unidad III — Ecología de comunidades",
+    "section": "",
+    "text": "La Unidad III integra herramientas modernas para el análisis de la biodiversidad, combinando enfoques taxonómicos, funcionales y filogenéticos en un marco cuantitativo y reproducible en R. Esta unidad marca la transición desde la descripción de ensamblajes biológicos hacia la comprensión de los mecanismos ecológicos que estructuran la biodiversidad."
+  },
+  {
+    "objectID": "unidad_iii/index.html#propósito-de-la-unidad",
+    "href": "unidad_iii/index.html#propósito-de-la-unidad",
+    "title": "Unidad III — Ecología de comunidades",
+    "section": "Propósito de la unidad",
+    "text": "Propósito de la unidad\nEn esta unidad el usuario podrá desarrollar habilidades para:\n\nanalizar la diversidad biológica a múltiples escalas (α, β, γ)\ncomparar ensamblajes entre sitios o zonas\nintegrar abundancias, rasgos funcionales y relaciones filogenéticas\ninterpretar patrones de diversidad en contexto ecológico\ngenerar resultados reproducibles en R con enfoque aplicado"
+  },
+  {
+    "objectID": "unidad_iii/index.html#capítulos-incluidos",
+    "href": "unidad_iii/index.html#capítulos-incluidos",
+    "title": "Unidad III — Ecología de comunidades",
+    "section": "Capítulos incluidos",
+    "text": "Capítulos incluidos\n\nCapítulo 7 — Diversidad taxonómica\nCarpeta: cap7-diversidad-taxonomica/\nAborda la biodiversidad desde la identidad de las especies e incluye diversidad alfa (q = 0, 1, 2), curvas rango–abundancia (RAD), diversidad beta y gamma, disimilitud de Jaccard y contribución local a la diversidad beta (LCBD).\n\n\nCapítulo 8 — Diversidad funcional y filogenética\nCarpeta: cap8-diversidad-funcional-filogenetica/\nExtiende el análisis incorporando rasgos funcionales y relaciones evolutivas. Incluye CWM, métricas funcionales (FRic, FEve, FDiv, FDis), descomposición con Rao, iNEXT.3D, iNEXTbeta3D y procedimientos de alineación entre matrices de abundancia y árboles filogenéticos."
+  },
+  {
+    "objectID": "unidad_iii/index.html#estructura-general-de-la-unidad",
+    "href": "unidad_iii/index.html#estructura-general-de-la-unidad",
+    "title": "Unidad III — Ecología de comunidades",
+    "section": "Estructura general de la unidad",
+    "text": "Estructura general de la unidad\nCada capítulo sigue una estructura de trabajo como esta:\ncapX-nombre-del-capitulo/\n├── README.md\n├── R/\n│   ├── 00_setup.R\n│   ├── funciones_auxiliares.R\n│   └── scripts de casos\n├── data/\n│   └── raw/\n└── outputs/\n    ├── figuras/\n    └── tablas/"
+  },
+  {
+    "objectID": "unidad_iii/index.html#datos-esperados",
+    "href": "unidad_iii/index.html#datos-esperados",
+    "title": "Unidad III — Ecología de comunidades",
+    "section": "Datos esperados",
+    "text": "Datos esperados\nCada capítulo contiene sus propios archivos fuente en data/raw/:\n\n\n\n\n\n\n\nCapítulo\nArchivos esperados\n\n\n\n\nCapítulo 7\ndatos.c7.xlsx\n\n\nCapítulo 8\ndatos.c8.xlsx, arbol_filo_alfa.rds, arbol_filo_beta.rds"
+  },
+  {
+    "objectID": "unidad_iii/index.html#acceso-a-los-materiales",
+    "href": "unidad_iii/index.html#acceso-a-los-materiales",
+    "title": "Unidad III — Ecología de comunidades",
+    "section": "Acceso a los materiales",
+    "text": "Acceso a los materiales\nPara que los usuarios puedan trabajar con esta unidad, en el repositorio de GitHub deben estar cargadas no solo las páginas generadas en docs/, sino también las carpetas reales de la unidad con sus capítulos, scripts, datos y salidas.\n\nCarpeta principal de la unidad en GitHub\n👉 Abrir carpeta de la Unidad III\n\n\nAcceso por capítulos\n\n👉 Capítulo 7 — Diversidad taxonómica\n👉 Capítulo 8 — Diversidad funcional y filogenética\n\n\n\nDescarga del repositorio completo\n👉 Descargar material completo en ZIP"
+  },
+  {
+    "objectID": "unidad_iii/index.html#formas-de-uso",
+    "href": "unidad_iii/index.html#formas-de-uso",
+    "title": "Unidad III — Ecología de comunidades",
+    "section": "Formas de uso",
+    "text": "Formas de uso\n\nOpción 1 — Ejecutar toda la unidad\nDesde la carpeta unidad_iii/:\nsource(\"run_unidad3.R\")\nEste archivo ejecuta de forma secuencial el Capítulo 7 y el Capítulo 8.\n\n\nOpción 2 — Ejecutar por capítulos\nTambién puedes trabajar cada capítulo por separado.\n\nCapítulo 7\nsource(\"cap7-diversidad-taxonomica/R/01_casoA_TD_alfa_y_Hill.R\")\nsource(\"cap7-diversidad-taxonomica/R/02_casoB_TD_beta_y_recambio.R\")\n\n\nCapítulo 8\nsource(\"cap8-diversidad-funcional-filogenetica/R/01_casoA_FD_PD_alfa.R\")\nsource(\"cap8-diversidad-funcional-filogenetica/R/02_casoB_PD_beta_y_alineacion.R\")\nsource(\"cap8-diversidad-funcional-filogenetica/R/03_casoC_FD_beta.R\")"
+  },
+  {
+    "objectID": "unidad_iii/index.html#salidas-generadas",
+    "href": "unidad_iii/index.html#salidas-generadas",
+    "title": "Unidad III — Ecología de comunidades",
+    "section": "Salidas generadas",
+    "text": "Salidas generadas\nCada capítulo genera automáticamente:\n\noutputs/figuras/\noutputs/tablas/\n\nEstas salidas pueden utilizarse en docencia, informes, manuscritos científicos o integración con documentos en Quarto."
+  },
+  {
+    "objectID": "unidad_iii/index.html#enfoque-metodológico",
+    "href": "unidad_iii/index.html#enfoque-metodológico",
+    "title": "Unidad III — Ecología de comunidades",
+    "section": "Enfoque metodológico",
+    "text": "Enfoque metodológico\nLa Unidad III integra tres dimensiones principales de la biodiversidad:\n\n\n\nDimensión\nDescripción\n\n\n\n\nTaxonómica (TD)\nidentidad y abundancia de especies\n\n\nFuncional (FD)\nrasgos ecológicos y estrategias de vida\n\n\nFilogenética (PD)\nhistoria evolutiva compartida\n\n\n\nSe emplean enfoques complementarios como:\n\nnúmeros de Hill (q = 0, 1, 2)\ndescomposición de diversidad (α, β, γ)\nentropía cuadrática de Rao\nrarefacción y extrapolación (iNEXT)\nanálisis basado en cobertura"
+  },
+  {
+    "objectID": "unidad_iii/index.html#flujo-conceptual",
+    "href": "unidad_iii/index.html#flujo-conceptual",
+    "title": "Unidad III — Ecología de comunidades",
+    "section": "Flujo conceptual",
+    "text": "Flujo conceptual\nLa progresión general de la unidad puede resumirse así:\nDiversidad taxonómica (TD)\n            ↓\nDiversidad funcional (FD)\n            ↓\nDiversidad filogenética (PD)\npermitiendo una interpretación integral de la biodiversidad."
+  },
+  {
+    "objectID": "unidad_iii/index.html#recomendaciones-de-uso",
+    "href": "unidad_iii/index.html#recomendaciones-de-uso",
+    "title": "Unidad III — Ecología de comunidades",
+    "section": "Recomendaciones de uso",
+    "text": "Recomendaciones de uso\n\nEjecutar primero cada capítulo por separado\nVerificar las salidas antes de correr toda la unidad\nRevisar la coherencia entre datos de entrada y scripts\nUsar esta unidad como base para análisis propios más avanzados"
+  },
+  {
+    "objectID": "unidad_iii/index.html#nota-técnica",
+    "href": "unidad_iii/index.html#nota-técnica",
+    "title": "Unidad III — Ecología de comunidades",
+    "section": "Nota técnica",
+    "text": "Nota técnica\nLa Unidad III es metodológicamente más exigente que las anteriores, ya que integra múltiples tipos de datos (abundancia, rasgos y filogenia), estructuras complejas y métodos avanzados de análisis de diversidad. Se recomienda contar con bases previas en manipulación de datos en R, ecología de comunidades y conceptos de diversidad biológica."
+  },
+  {
+    "objectID": "unidad_iii/index.html#enlace-de-retorno",
+    "href": "unidad_iii/index.html#enlace-de-retorno",
+    "title": "Unidad III — Ecología de comunidades",
+    "section": "Enlace de retorno",
+    "text": "Enlace de retorno\n👉 Volver a la página principal del proyecto"
+  },
+  {
+    "objectID": "unidad_i/index.html",
+    "href": "unidad_i/index.html",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "",
+    "text": "Esta unidad introduce el flujo completo de análisis de datos ecológicos en R, integrando procesos de importación, limpieza, transformación, exploración gráfica y análisis de patrones climáticos. Corresponde a la primera parte del manual ANVIDEA y sienta las bases para los análisis de poblaciones y comunidades que se desarrollan en las unidades posteriores."
+  },
+  {
+    "objectID": "unidad_i/index.html#presentación",
+    "href": "unidad_i/index.html#presentación",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "",
+    "text": "Esta unidad introduce el flujo completo de análisis de datos ecológicos en R, integrando procesos de importación, limpieza, transformación, exploración gráfica y análisis de patrones climáticos. Corresponde a la primera parte del manual ANVIDEA y sienta las bases para los análisis de poblaciones y comunidades que se desarrollan en las unidades posteriores."
+  },
+  {
+    "objectID": "unidad_i/index.html#propósito-de-la-unidad",
+    "href": "unidad_i/index.html#propósito-de-la-unidad",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "Propósito de la unidad",
+    "text": "Propósito de la unidad\nEn esta unidad el usuario podrá desarrollar competencias para:\n\nestructurar bases de datos ecológicos\nmanipular datos con tidyverse\nexplorar patrones mediante visualización gráfica\ninterpretar variables climáticas en contexto ecológico"
+  },
+  {
+    "objectID": "unidad_i/index.html#capítulos-incluidos",
+    "href": "unidad_i/index.html#capítulos-incluidos",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "Capítulos incluidos",
+    "text": "Capítulos incluidos\n\nCapítulo 1 — Manipulación de datos\nCarpeta: cap1-datos/\nEn este capítulo se trabaja la organización y limpieza de bases de datos ecológicos, con énfasis en transformación de variables, filtrado, selección, renombrado y preparación de tablas para análisis posteriores.\n\n\nCapítulo 2 — Visualización exploratoria\nCarpeta: cap2-visualizacion-exploratoria/\nEste capítulo se orienta a la exploración gráfica de patrones en datos ecológicos, usando figuras que permiten resumir tendencias, contrastar grupos y reconocer relaciones entre variables.\n\n\nCapítulo 3 — Análisis climático\nCarpeta: cap3-clima/\nAquí se integran series climáticas, climatogramas y balance hídrico para interpretar patrones ambientales y su relación con el contexto ecológico."
+  },
+  {
+    "objectID": "unidad_i/index.html#bases-de-datos-utilizadas",
+    "href": "unidad_i/index.html#bases-de-datos-utilizadas",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "Bases de datos utilizadas",
+    "text": "Bases de datos utilizadas\n\n\n\nCapítulo\nArchivos esperados\n\n\n\n\nCapítulo 1\nplancton.xlsx, invert.xlsx\n\n\nCapítulo 2\nplancton.xlsx, invert.xlsx\n\n\nCapítulo 3\ndatos.xlsx, estaciones.xlsx, bal_hid.R"
+  },
+  {
+    "objectID": "unidad_i/index.html#estructura-general-de-la-unidad",
+    "href": "unidad_i/index.html#estructura-general-de-la-unidad",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "Estructura general de la unidad",
+    "text": "Estructura general de la unidad\nCada capítulo mantiene la siguiente organización:\ncapX-nombre-del-capitulo/\n├── README.md\n├── R/\n├── data/\n│   └── raw/\n└── outputs/\n    ├── figuras/\n    └── tablas/\nDentro de cada capítulo se incluyen:\n\nscripts en R/\narchivos fuente en data/raw/\nfiguras generadas en outputs/figuras/\ntablas exportadas en outputs/tablas/"
+  },
+  {
+    "objectID": "unidad_i/index.html#acceso-a-los-materiales",
+    "href": "unidad_i/index.html#acceso-a-los-materiales",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "Acceso a los materiales",
+    "text": "Acceso a los materiales\nPara que los usuarios puedan trabajar con esta unidad, en el repositorio de GitHub deben estar cargadas no solo las páginas generadas en docs/, sino también las carpetas reales de la unidad con sus capítulos, scripts, datos y salidas.\n\nCarpeta principal de la unidad en GitHub\n👉 Abrir carpeta de la Unidad I\n\n\nAcceso por capítulos\n\n👉 Capítulo 1 — Manipulación de datos\n👉 Capítulo 2 — Visualización exploratoria\n👉 Capítulo 3 — Análisis climático\n\n\n\nDescarga del repositorio completo\n👉 Descargar material completo en ZIP"
+  },
+  {
+    "objectID": "unidad_i/index.html#formas-de-uso",
+    "href": "unidad_i/index.html#formas-de-uso",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "Formas de uso",
+    "text": "Formas de uso\n\nOpción 1 — Ejecutar toda la unidad\nDesde la carpeta unidad_i/:\nsource(\"run_unidad1.R\")\nEste archivo ejecuta de forma secuencial los capítulos 1, 2 y 3, verificando previamente que los scripts principales existan.\n\n\nOpción 2 — Ejecutar por capítulo\nTambién puedes trabajar cada capítulo de manera independiente.\n\nCapítulo 1\nsource(\"cap1-datos/R/00_setup.R\")\nsource(\"cap1-datos/R/03_funciones_auxiliares.R\")\nsource(\"cap1-datos/R/01_casoA_mesozooplancton.R\")\nsource(\"cap1-datos/R/02_casoB_macroinvertebrados.R\")\n\n\nCapítulo 2\nsource(\"cap2-visualizacion-exploratoria/R/00_setup.R\")\nsource(\"cap2-visualizacion-exploratoria/R/03_funciones_auxiliares.R\")\nsource(\"cap2-visualizacion-exploratoria/R/01_casoA_plancton_exploracion.R\")\nsource(\"cap2-visualizacion-exploratoria/R/02_casoB_macroinvertebrados_exploracion.R\")\n\n\nCapítulo 3\nsource(\"cap3-clima/R/00_setup.R\")\nsource(\"cap3-clima/R/03_funciones_auxiliares.R\")\nsource(\"cap3-clima/R/01_casoA_series_climaticas.R\")\nsource(\"cap3-clima/R/02_casoB_climatogramas_balance_hidrico.R\")"
+  },
+  {
+    "objectID": "unidad_i/index.html#flujo-recomendado",
+    "href": "unidad_i/index.html#flujo-recomendado",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "Flujo recomendado",
+    "text": "Flujo recomendado\nSe recomienda avanzar en este orden:\n\nCapítulo 1 — estructuración y limpieza de datos\n\nCapítulo 2 — exploración gráfica\n\nCapítulo 3 — interpretación climática\n\nEste orden mantiene la lógica pedagógica de la unidad y facilita el aprovechamiento de los datos y scripts."
+  },
+  {
+    "objectID": "unidad_i/index.html#recomendaciones-de-uso",
+    "href": "unidad_i/index.html#recomendaciones-de-uso",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "Recomendaciones de uso",
+    "text": "Recomendaciones de uso\n\nEjecutar los scripts desde la carpeta de la unidad o del capítulo correspondiente\nMantener los nombres originales de archivos y carpetas\nNo modificar la estructura R/, data/raw/ y outputs/\nRevisar las salidas generadas en cada capítulo después de ejecutar los scripts"
+  },
+  {
+    "objectID": "unidad_i/index.html#enlace-de-retorno",
+    "href": "unidad_i/index.html#enlace-de-retorno",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "Enlace de retorno",
+    "text": "Enlace de retorno\n👉 Volver a la página principal del proyecto"
+  },
+  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "ANVIDEA — Material reproducible",
@@ -49,88 +224,11 @@
     "text": "📎 Repositorio\nAccede al código completo en GitHub:\n👉 (enlace al repositorio)"
   },
   {
-    "objectID": "index.html#autor",
-    "href": "index.html#autor",
-    "title": "ANVIDEA — Material reproducible",
-    "section": "👨‍🏫 Autor",
-    "text": "👨‍🏫 Autor\nJavier Rodríguez-Barrios"
-  },
-  {
     "objectID": "index.html#autores",
     "href": "index.html#autores",
     "title": "ANVIDEA — Material reproducible",
     "section": "👨‍🏫 Autores",
     "text": "👨‍🏫 Autores\nJavier Rodríguez-Barrios\nKenedith Méndez\nJavier de la Hoz"
-  },
-  {
-    "objectID": "unidad_i/index.html",
-    "href": "unidad_i/index.html",
-    "title": "Unidad I — Análisis de datos ecológicos",
-    "section": "",
-    "text": "Esta unidad introduce el flujo completo de análisis de datos ecológicos en R, integrando procesos de importación, limpieza, transformación, exploración gráfica y análisis de patrones climáticos. Corresponde a la primera parte del manual ANVIDEA y sienta las bases para los análisis de poblaciones y comunidades que se desarrollan en las unidades posteriores."
-  },
-  {
-    "objectID": "unidad_i/index.html#presentación",
-    "href": "unidad_i/index.html#presentación",
-    "title": "Unidad I — Análisis de datos ecológicos",
-    "section": "",
-    "text": "Esta unidad introduce el flujo completo de análisis de datos ecológicos en R, integrando procesos de importación, limpieza, transformación, exploración gráfica y análisis de patrones climáticos. Corresponde a la primera parte del manual ANVIDEA y sienta las bases para los análisis de poblaciones y comunidades que se desarrollan en las unidades posteriores."
-  },
-  {
-    "objectID": "unidad_i/index.html#propósito-de-la-unidad",
-    "href": "unidad_i/index.html#propósito-de-la-unidad",
-    "title": "Unidad I — Análisis de datos ecológicos",
-    "section": "Propósito de la unidad",
-    "text": "Propósito de la unidad\nEn esta unidad el usuario podrá desarrollar competencias para:\n\nestructurar bases de datos ecológicos\nmanipular datos con tidyverse\nexplorar patrones mediante visualización gráfica\ninterpretar variables climáticas en contexto ecológico"
-  },
-  {
-    "objectID": "unidad_i/index.html#capítulos-incluidos",
-    "href": "unidad_i/index.html#capítulos-incluidos",
-    "title": "Unidad I — Análisis de datos ecológicos",
-    "section": "Capítulos incluidos",
-    "text": "Capítulos incluidos\n\nCapítulo 1 — Manipulación de datos\nCarpeta: cap1-datos/\nEn este capítulo se trabaja la organización y limpieza de bases de datos ecológicos, con énfasis en transformación de variables, filtrado, selección, renombrado y preparación de tablas para análisis posteriores.\n\n\nCapítulo 2 — Visualización exploratoria\nCarpeta: cap2-visualizacion-exploratoria/\nEste capítulo se orienta a la exploración gráfica de patrones en datos ecológicos, usando figuras que permiten resumir tendencias, contrastar grupos y reconocer relaciones entre variables.\n\n\nCapítulo 3 — Análisis climático\nCarpeta: cap3-clima/\nAquí se integran series climáticas, climatogramas y balance hídrico para interpretar patrones ambientales y su relación con el contexto ecológico."
-  },
-  {
-    "objectID": "unidad_i/index.html#bases-de-datos-utilizadas",
-    "href": "unidad_i/index.html#bases-de-datos-utilizadas",
-    "title": "Unidad I — Análisis de datos ecológicos",
-    "section": "Bases de datos utilizadas",
-    "text": "Bases de datos utilizadas\n\n\n\nCapítulo\nArchivos esperados\n\n\n\n\nCapítulo 1\nplancton.xlsx, invert.xlsx\n\n\nCapítulo 2\nplancton.xlsx, invert.xlsx\n\n\nCapítulo 3\ndatos.xlsx, estaciones.xlsx, bal_hid.R"
-  },
-  {
-    "objectID": "unidad_i/index.html#estructura-general-de-la-unidad",
-    "href": "unidad_i/index.html#estructura-general-de-la-unidad",
-    "title": "Unidad I — Análisis de datos ecológicos",
-    "section": "Estructura general de la unidad",
-    "text": "Estructura general de la unidad\nCada capítulo mantiene la siguiente organización:\ncapX-nombre-del-capitulo/\n├── README.md\n├── R/\n├── data/\n│   └── raw/\n└── outputs/\n    ├── figuras/\n    └── tablas/\nDentro de cada capítulo se incluyen:\n\nscripts en R/\narchivos fuente en data/raw/\nfiguras generadas en outputs/figuras/\ntablas exportadas en outputs/tablas/"
-  },
-  {
-    "objectID": "unidad_i/index.html#formas-de-uso",
-    "href": "unidad_i/index.html#formas-de-uso",
-    "title": "Unidad I — Análisis de datos ecológicos",
-    "section": "Formas de uso",
-    "text": "Formas de uso\n\nOpción 1 — Ejecutar toda la unidad\nDesde la carpeta unidad_i/:\nsource(\"run_unidad1.R\")\nEste archivo ejecuta de forma secuencial los capítulos 1, 2 y 3, verificando previamente que los scripts principales existan.\n\n\nOpción 2 — Ejecutar por capítulo\nTambién puedes trabajar cada capítulo de manera independiente.\n\nCapítulo 1\nsource(\"cap1-datos/R/00_setup.R\")\nsource(\"cap1-datos/R/03_funciones_auxiliares.R\")\nsource(\"cap1-datos/R/01_casoA_mesozooplancton.R\")\nsource(\"cap1-datos/R/02_casoB_macroinvertebrados.R\")\n\n\nCapítulo 2\nsource(\"cap2-visualizacion-exploratoria/R/00_setup.R\")\nsource(\"cap2-visualizacion-exploratoria/R/03_funciones_auxiliares.R\")\nsource(\"cap2-visualizacion-exploratoria/R/01_casoA_plancton_exploracion.R\")\nsource(\"cap2-visualizacion-exploratoria/R/02_casoB_macroinvertebrados_exploracion.R\")\n\n\nCapítulo 3\nsource(\"cap3-clima/R/00_setup.R\")\nsource(\"cap3-clima/R/03_funciones_auxiliares.R\")\nsource(\"cap3-clima/R/01_casoA_series_climaticas.R\")\nsource(\"cap3-clima/R/02_casoB_climatogramas_balance_hidrico.R\")"
-  },
-  {
-    "objectID": "unidad_i/index.html#flujo-recomendado",
-    "href": "unidad_i/index.html#flujo-recomendado",
-    "title": "Unidad I — Análisis de datos ecológicos",
-    "section": "Flujo recomendado",
-    "text": "Flujo recomendado\nSe recomienda avanzar en este orden:\n\nCapítulo 1 — estructuración y limpieza de datos\n\nCapítulo 2 — exploración gráfica\n\nCapítulo 3 — interpretación climática\n\nEste orden mantiene la lógica pedagógica de la unidad y facilita el aprovechamiento de los datos y scripts."
-  },
-  {
-    "objectID": "unidad_i/index.html#recomendaciones-de-uso",
-    "href": "unidad_i/index.html#recomendaciones-de-uso",
-    "title": "Unidad I — Análisis de datos ecológicos",
-    "section": "Recomendaciones de uso",
-    "text": "Recomendaciones de uso\n\nEjecutar los scripts desde la carpeta de la unidad o del capítulo correspondiente\nMantener los nombres originales de archivos y carpetas\nNo modificar la estructura R/, data/raw/ y outputs/\nRevisar las salidas generadas en cada capítulo después de ejecutar los scripts"
-  },
-  {
-    "objectID": "unidad_i/index.html#enlace-de-retorno",
-    "href": "unidad_i/index.html#enlace-de-retorno",
-    "title": "Unidad I — Análisis de datos ecológicos",
-    "section": "Enlace de retorno",
-    "text": "Enlace de retorno\n👉 Volver a la página principal del proyecto"
   },
   {
     "objectID": "unidad_ii/index.html",
@@ -175,6 +273,13 @@
     "text": "Datos esperados\nCada capítulo utiliza sus propios insumos:\n\n\n\nCapítulo\nDatos esperados\n\n\n\n\nCapítulo 4\ndatos internos en scripts o simulación\n\n\nCapítulo 5\ndata/raw/datos.c5.xlsx\n\n\nCapítulo 6\ndata/raw/datos.c6.xlsx"
   },
   {
+    "objectID": "unidad_ii/index.html#acceso-a-los-materiales",
+    "href": "unidad_ii/index.html#acceso-a-los-materiales",
+    "title": "Unidad II — Ecología de poblaciones",
+    "section": "Acceso a los materiales",
+    "text": "Acceso a los materiales\nPara que los usuarios puedan trabajar con esta unidad, en el repositorio de GitHub deben estar cargadas no solo las páginas generadas en docs/, sino también las carpetas reales de la unidad con sus capítulos, scripts, datos y salidas.\n\nCarpeta principal de la unidad en GitHub\n👉 Abrir carpeta de la Unidad II\n\n\nAcceso por capítulos\n\n👉 Capítulo 4 — Modelos poblacionales\n👉 Capítulo 5 — Tablas de vida y modelos matriciales\n👉 Capítulo 6 — Patrones de distribución y densidad\n\n\n\nDescarga del repositorio completo\n👉 Descargar material completo en ZIP"
+  },
+  {
     "objectID": "unidad_ii/index.html#formas-de-uso",
     "href": "unidad_ii/index.html#formas-de-uso",
     "title": "Unidad II — Ecología de poblaciones",
@@ -206,97 +311,6 @@
     "objectID": "unidad_ii/index.html#enlace-de-retorno",
     "href": "unidad_ii/index.html#enlace-de-retorno",
     "title": "Unidad II — Ecología de poblaciones",
-    "section": "Enlace de retorno",
-    "text": "Enlace de retorno\n👉 Volver a la página principal del proyecto"
-  },
-  {
-    "objectID": "unidad_iii/index.html",
-    "href": "unidad_iii/index.html",
-    "title": "Unidad III — Ecología de comunidades",
-    "section": "",
-    "text": "La Unidad III integra herramientas modernas para el análisis de la biodiversidad, combinando enfoques taxonómicos, funcionales y filogenéticos en un marco cuantitativo y reproducible en R. Esta unidad marca la transición desde la descripción de ensamblajes biológicos hacia la comprensión de los mecanismos ecológicos que estructuran la biodiversidad."
-  },
-  {
-    "objectID": "unidad_iii/index.html#presentación",
-    "href": "unidad_iii/index.html#presentación",
-    "title": "Unidad III — Ecología de comunidades",
-    "section": "",
-    "text": "La Unidad III integra herramientas modernas para el análisis de la biodiversidad, combinando enfoques taxonómicos, funcionales y filogenéticos en un marco cuantitativo y reproducible en R. Esta unidad marca la transición desde la descripción de ensamblajes biológicos hacia la comprensión de los mecanismos ecológicos que estructuran la biodiversidad."
-  },
-  {
-    "objectID": "unidad_iii/index.html#propósito-de-la-unidad",
-    "href": "unidad_iii/index.html#propósito-de-la-unidad",
-    "title": "Unidad III — Ecología de comunidades",
-    "section": "Propósito de la unidad",
-    "text": "Propósito de la unidad\nEn esta unidad el usuario podrá desarrollar habilidades para:\n\nanalizar la diversidad biológica a múltiples escalas (α, β, γ)\ncomparar ensamblajes entre sitios o zonas\nintegrar abundancias, rasgos funcionales y relaciones filogenéticas\ninterpretar patrones de diversidad en contexto ecológico\ngenerar resultados reproducibles en R con enfoque aplicado"
-  },
-  {
-    "objectID": "unidad_iii/index.html#capítulos-incluidos",
-    "href": "unidad_iii/index.html#capítulos-incluidos",
-    "title": "Unidad III — Ecología de comunidades",
-    "section": "Capítulos incluidos",
-    "text": "Capítulos incluidos\n\nCapítulo 7 — Diversidad taxonómica\nCarpeta: cap7-diversidad-taxonomica/\nAborda la biodiversidad desde la identidad de las especies e incluye diversidad alfa (q = 0, 1, 2), curvas rango–abundancia (RAD), diversidad beta y gamma, disimilitud de Jaccard y contribución local a la diversidad beta (LCBD).\n\n\nCapítulo 8 — Diversidad funcional y filogenética\nCarpeta: cap8-diversidad-funcional-filogenetica/\nExtiende el análisis incorporando rasgos funcionales y relaciones evolutivas. Incluye CWM, métricas funcionales (FRic, FEve, FDiv, FDis), descomposición con Rao, iNEXT.3D, iNEXTbeta3D y procedimientos de alineación entre matrices de abundancia y árboles filogenéticos."
-  },
-  {
-    "objectID": "unidad_iii/index.html#estructura-general-de-la-unidad",
-    "href": "unidad_iii/index.html#estructura-general-de-la-unidad",
-    "title": "Unidad III — Ecología de comunidades",
-    "section": "Estructura general de la unidad",
-    "text": "Estructura general de la unidad\nCada capítulo sigue una estructura de trabajo como esta:\ncapX-nombre-del-capitulo/\n├── README.md\n├── R/\n│   ├── 00_setup.R\n│   ├── funciones_auxiliares.R\n│   └── scripts de casos\n├── data/\n│   └── raw/\n└── outputs/\n    ├── figuras/\n    └── tablas/"
-  },
-  {
-    "objectID": "unidad_iii/index.html#datos-esperados",
-    "href": "unidad_iii/index.html#datos-esperados",
-    "title": "Unidad III — Ecología de comunidades",
-    "section": "Datos esperados",
-    "text": "Datos esperados\nCada capítulo contiene sus propios archivos fuente en data/raw/:\n\n\n\n\n\n\n\nCapítulo\nArchivos esperados\n\n\n\n\nCapítulo 7\ndatos.c7.xlsx\n\n\nCapítulo 8\ndatos.c8.xlsx, arbol_filo_alfa.rds, arbol_filo_beta.rds"
-  },
-  {
-    "objectID": "unidad_iii/index.html#formas-de-uso",
-    "href": "unidad_iii/index.html#formas-de-uso",
-    "title": "Unidad III — Ecología de comunidades",
-    "section": "Formas de uso",
-    "text": "Formas de uso\n\nOpción 1 — Ejecutar toda la unidad\nDesde la carpeta unidad_iii/:\nsource(\"run_unidad3.R\")\nEste archivo ejecuta de forma secuencial el Capítulo 7 y el Capítulo 8.\n\n\nOpción 2 — Ejecutar por capítulos\nTambién puedes trabajar cada capítulo por separado.\n\nCapítulo 7\nsource(\"cap7-diversidad-taxonomica/R/01_casoA_TD_alfa_y_Hill.R\")\nsource(\"cap7-diversidad-taxonomica/R/02_casoB_TD_beta_y_recambio.R\")\n\n\nCapítulo 8\nsource(\"cap8-diversidad-funcional-filogenetica/R/01_casoA_FD_PD_alfa.R\")\nsource(\"cap8-diversidad-funcional-filogenetica/R/02_casoB_PD_beta_y_alineacion.R\")\nsource(\"cap8-diversidad-funcional-filogenetica/R/03_casoC_FD_beta.R\")"
-  },
-  {
-    "objectID": "unidad_iii/index.html#salidas-generadas",
-    "href": "unidad_iii/index.html#salidas-generadas",
-    "title": "Unidad III — Ecología de comunidades",
-    "section": "Salidas generadas",
-    "text": "Salidas generadas\nCada capítulo genera automáticamente:\n\noutputs/figuras/\noutputs/tablas/\n\nEstas salidas pueden utilizarse en docencia, informes, manuscritos científicos o integración con documentos en Quarto."
-  },
-  {
-    "objectID": "unidad_iii/index.html#enfoque-metodológico",
-    "href": "unidad_iii/index.html#enfoque-metodológico",
-    "title": "Unidad III — Ecología de comunidades",
-    "section": "Enfoque metodológico",
-    "text": "Enfoque metodológico\nLa Unidad III integra tres dimensiones principales de la biodiversidad:\n\n\n\nDimensión\nDescripción\n\n\n\n\nTaxonómica (TD)\nidentidad y abundancia de especies\n\n\nFuncional (FD)\nrasgos ecológicos y estrategias de vida\n\n\nFilogenética (PD)\nhistoria evolutiva compartida\n\n\n\nSe emplean enfoques complementarios como:\n\nnúmeros de Hill (q = 0, 1, 2)\ndescomposición de diversidad (α, β, γ)\nentropía cuadrática de Rao\nrarefacción y extrapolación (iNEXT)\nanálisis basado en cobertura"
-  },
-  {
-    "objectID": "unidad_iii/index.html#flujo-conceptual",
-    "href": "unidad_iii/index.html#flujo-conceptual",
-    "title": "Unidad III — Ecología de comunidades",
-    "section": "Flujo conceptual",
-    "text": "Flujo conceptual\nLa progresión general de la unidad puede resumirse así:\nDiversidad taxonómica (TD)\n            ↓\nDiversidad funcional (FD)\n            ↓\nDiversidad filogenética (PD)\npermitiendo una interpretación integral de la biodiversidad."
-  },
-  {
-    "objectID": "unidad_iii/index.html#recomendaciones-de-uso",
-    "href": "unidad_iii/index.html#recomendaciones-de-uso",
-    "title": "Unidad III — Ecología de comunidades",
-    "section": "Recomendaciones de uso",
-    "text": "Recomendaciones de uso\n\nEjecutar primero cada capítulo por separado\nVerificar las salidas antes de correr toda la unidad\nRevisar la coherencia entre datos de entrada y scripts\nUsar esta unidad como base para análisis propios más avanzados"
-  },
-  {
-    "objectID": "unidad_iii/index.html#nota-técnica",
-    "href": "unidad_iii/index.html#nota-técnica",
-    "title": "Unidad III — Ecología de comunidades",
-    "section": "Nota técnica",
-    "text": "Nota técnica\nLa Unidad III es metodológicamente más exigente que las anteriores, ya que integra múltiples tipos de datos (abundancia, rasgos y filogenia), estructuras complejas y métodos avanzados de análisis de diversidad. Se recomienda contar con bases previas en manipulación de datos en R, ecología de comunidades y conceptos de diversidad biológica."
-  },
-  {
-    "objectID": "unidad_iii/index.html#enlace-de-retorno",
-    "href": "unidad_iii/index.html#enlace-de-retorno",
-    "title": "Unidad III — Ecología de comunidades",
     "section": "Enlace de retorno",
     "text": "Enlace de retorno\n👉 Volver a la página principal del proyecto"
   }
