@@ -83,7 +83,7 @@ Los resultados generados por los scripts se almacenan en:
 
 Puedes explorar este material de forma estructurada en la página del proyecto:
 
-👉 *https://javier-2712.github.io/libro_anvidea/*
+👉 *[Ir a enlace ANVIDEA](https://javier-2712.github.io/libro_anvidea/)*
 
 ---
 
