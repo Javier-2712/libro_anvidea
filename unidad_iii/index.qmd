@@ -1,0 +1,190 @@
+---
+title: "Unidad III — Ecología de comunidades"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+---
+
+## Presentación
+
+La Unidad III integra herramientas modernas para el análisis de la biodiversidad, combinando enfoques taxonómicos, funcionales y filogenéticos en un marco cuantitativo y reproducible en **R**. Esta unidad marca la transición desde la descripción de ensamblajes biológicos hacia la comprensión de los mecanismos ecológicos que estructuran la biodiversidad.
+
+---
+
+## Propósito de la unidad
+
+En esta unidad el usuario podrá desarrollar habilidades para:
+
+- analizar la diversidad biológica a múltiples escalas (`α`, `β`, `γ`)
+- comparar ensamblajes entre sitios o zonas
+- integrar abundancias, rasgos funcionales y relaciones filogenéticas
+- interpretar patrones de diversidad en contexto ecológico
+- generar resultados reproducibles en **R** con enfoque aplicado
+
+---
+
+## Capítulos incluidos
+
+### Capítulo 7 — Diversidad taxonómica
+
+Carpeta: `cap7-diversidad-taxonomica/`
+
+Aborda la biodiversidad desde la identidad de las especies e incluye diversidad alfa (`q = 0, 1, 2`), curvas rango–abundancia (RAD), diversidad beta y gamma, disimilitud de Jaccard y contribución local a la diversidad beta (LCBD).
+
+### Capítulo 8 — Diversidad funcional y filogenética
+
+Carpeta: `cap8-diversidad-funcional-filogenetica/`
+
+Extiende el análisis incorporando rasgos funcionales y relaciones evolutivas. Incluye CWM, métricas funcionales (`FRic`, `FEve`, `FDiv`, `FDis`), descomposición con Rao, iNEXT.3D, iNEXTbeta3D y procedimientos de alineación entre matrices de abundancia y árboles filogenéticos.
+
+---
+
+## Estructura general de la unidad
+
+Cada capítulo sigue una estructura de trabajo como esta:
+
+```text
+capX-nombre-del-capitulo/
+├── README.md
+├── R/
+│   ├── 00_setup.R
+│   ├── funciones_auxiliares.R
+│   └── scripts de casos
+├── data/
+│   └── raw/
+└── outputs/
+    ├── figuras/
+    └── tablas/
+```
+
+---
+
+## Datos esperados
+
+Cada capítulo contiene sus propios archivos fuente en `data/raw/`:
+
+| Capítulo | Archivos esperados |
+|---|---|
+| Capítulo 7 | `datos.c7.xlsx` |
+| Capítulo 8 | `datos.c8.xlsx`, `arbol_filo_alfa.rds`, `arbol_filo_beta.rds` |
+
+---
+
+## Acceso a los materiales
+
+Para que los usuarios puedan trabajar con esta unidad, en el repositorio de GitHub deben estar cargadas no solo las páginas generadas en `docs/`, sino también las carpetas reales de la unidad con sus capítulos, scripts, datos y salidas.
+
+### Carpeta principal de la unidad en GitHub
+
+👉 [Abrir carpeta de la Unidad III](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii)
+
+### Acceso por capítulos
+
+- 👉 [Capítulo 7 — Diversidad taxonómica](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii/cap7-diversidad-taxonomica)
+- 👉 [Capítulo 8 — Diversidad funcional y filogenética](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii/cap8-diversidad-funcional-filogenetica)
+
+### Descarga del repositorio completo
+
+👉 [Descargar material completo en ZIP](https://github.com/Javier-2712/libro_anvidea/archive/refs/heads/main.zip)
+
+---
+
+## Formas de uso
+
+### Opción 1 — Ejecutar toda la unidad
+
+Desde la carpeta `unidad_iii/`:
+
+```r
+source("run_unidad3.R")
+```
+
+Este archivo ejecuta de forma secuencial el Capítulo 7 y el Capítulo 8.
+
+### Opción 2 — Ejecutar por capítulos
+
+También puedes trabajar cada capítulo por separado.
+
+#### Capítulo 7
+
+```r
+source("cap7-diversidad-taxonomica/R/01_casoA_TD_alfa_y_Hill.R")
+source("cap7-diversidad-taxonomica/R/02_casoB_TD_beta_y_recambio.R")
+```
+
+#### Capítulo 8
+
+```r
+source("cap8-diversidad-funcional-filogenetica/R/01_casoA_FD_PD_alfa.R")
+source("cap8-diversidad-funcional-filogenetica/R/02_casoB_PD_beta_y_alineacion.R")
+source("cap8-diversidad-funcional-filogenetica/R/03_casoC_FD_beta.R")
+```
+
+---
+
+## Salidas generadas
+
+Cada capítulo genera automáticamente:
+
+- `outputs/figuras/`
+- `outputs/tablas/`
+
+Estas salidas pueden utilizarse en docencia, informes, manuscritos científicos o integración con documentos en Quarto.
+
+---
+
+## Enfoque metodológico
+
+La Unidad III integra tres dimensiones principales de la biodiversidad:
+
+| Dimensión | Descripción |
+|---|---|
+| **Taxonómica (TD)** | identidad y abundancia de especies |
+| **Funcional (FD)** | rasgos ecológicos y estrategias de vida |
+| **Filogenética (PD)** | historia evolutiva compartida |
+
+Se emplean enfoques complementarios como:
+
+- números de Hill (`q = 0, 1, 2`)
+- descomposición de diversidad (`α`, `β`, `γ`)
+- entropía cuadrática de Rao
+- rarefacción y extrapolación (`iNEXT`)
+- análisis basado en cobertura
+
+---
+
+## Flujo conceptual
+
+La progresión general de la unidad puede resumirse así:
+
+```text
+Diversidad taxonómica (TD)
+            ↓
+Diversidad funcional (FD)
+            ↓
+Diversidad filogenética (PD)
+```
+
+permitiendo una interpretación integral de la biodiversidad.
+
+---
+
+## Recomendaciones de uso
+
+- Ejecutar primero cada capítulo por separado
+- Verificar las salidas antes de correr toda la unidad
+- Revisar la coherencia entre datos de entrada y scripts
+- Usar esta unidad como base para análisis propios más avanzados
+
+---
+
+## Nota técnica
+
+La Unidad III es metodológicamente más exigente que las anteriores, ya que integra múltiples tipos de datos (abundancia, rasgos y filogenia), estructuras complejas y métodos avanzados de análisis de diversidad. Se recomienda contar con bases previas en manipulación de datos en **R**, ecología de comunidades y conceptos de diversidad biológica.
+
+---
+
+## Enlace de retorno
+
+👉 [Volver a la página principal del proyecto](../index.qmd)
