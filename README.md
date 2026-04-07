@@ -122,6 +122,7 @@ Este proyecto distingue entre el código y los contenidos académicos:
 
 Esto permite la reutilización académica y docente del material, evitando su uso comercial sin autorización del autor.
 
+
 ---
 
 ## 🚀 Estado del proyecto
