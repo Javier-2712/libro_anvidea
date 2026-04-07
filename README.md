@@ -113,9 +113,14 @@ El repositorio sigue la misma lógica del libro:
 
 ---
 
-## 📌 Licencia
+## 📄 Licencia
 
-Definir tipo de licencia (ej. MIT, CC-BY, etc.)
+Este proyecto distingue entre el código y los contenidos académicos:
+
+- 💻 Código en R: Licenciado bajo MIT License
+- 📘 Contenidos del libro y material pedagógico: Licenciados bajo Creative Commons CC BY-NC 4.0
+
+Esto permite la reutilización académica y docente del material, evitando su uso comercial sin autorización del autor.
 
 ---
 
