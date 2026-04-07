@@ -1,167 +1,166 @@
 ---
-title: "Unidad I — Análisis de datos ecológicos"
-format:
+title: "Unidad I"
+subtitle: "Análisis de datos ecológicos"
+format: 
   html:
     toc: true
     toc-depth: 2
+    theme: cosmo
+    css: ../styles.css
+    number-sections: false
 ---
 
-## Presentación
+# Unidad I: Análisis de datos ecológicos
 
-Esta unidad introduce el flujo completo de análisis de datos ecológicos en **R**, integrando procesos de importación, limpieza, transformación, exploración gráfica y análisis de patrones climáticos. Corresponde a la primera parte del manual **ANVIDEA** y sienta las bases para los análisis de poblaciones y comunidades que se desarrollan en las unidades posteriores.
+Esta unidad introduce el flujo de trabajo para el análisis de datos ecológicos en **R**, integrando manipulación, exploración gráfica y síntesis inicial de patrones ambientales y biológicos. Su propósito es acompañar la lectura del libro **ANVIDEA** con scripts reproducibles, bases de datos de ejemplo y una secuencia clara de trabajo por capítulos.
 
----
+::: {.callout-note}
+## ¿Qué encontrarás aquí?
+
+En esta sección del portal podrás:
+
+- comprender el propósito general de la unidad;
+- identificar los prerrequisitos mínimos para usar los scripts;
+- seguir un orden recomendado de estudio;
+- acceder al código fuente en GitHub;
+- descargar los archivos para trabajar localmente;
+- revisar qué capítulos conforman la unidad;
+- anticipar paquetes, datos y recomendaciones técnicas de ejecución.
+:::
 
 ## Propósito de la unidad
 
-En esta unidad el usuario podrá desarrollar competencias para:
+La Unidad I busca fortalecer competencias en el **manejo, organización y exploración de datos ecológicos y ambientales**, usando flujos de trabajo reproducibles en R. A lo largo de esta unidad, el usuario aprenderá a importar, depurar, transformar y visualizar bases de datos reales, como paso previo a análisis más avanzados de ecología de poblaciones y comunidades.
 
-- estructurar bases de datos ecológicos
-- manipular datos con `tidyverse`
-- explorar patrones mediante visualización gráfica
-- interpretar variables climáticas en contexto ecológico
+## Prerrequisitos
 
----
+Antes de iniciar esta unidad, se recomienda que el usuario tenga:
 
-## Capítulos incluidos
+- conocimientos básicos de R y RStudio;
+- nociones elementales de manejo de objetos, scripts y directorios de trabajo;
+- familiaridad básica con archivos `.csv` y `.xlsx`;
+- instalación previa de R y de los paquetes necesarios para ejecutar los scripts.
 
-### Capítulo 1 — Manipulación de datos
+::: {.callout-tip}
+## Recomendación
 
-Carpeta: `cap1-datos/`
+Si esta es tu primera aproximación al repositorio, conviene trabajar primero desde el **portal web**, revisar la estructura de la unidad, y luego descargar el código para ejecutarlo localmente.
+:::
 
-En este capítulo se trabaja la organización y limpieza de bases de datos ecológicos, con énfasis en transformación de variables, filtrado, selección, renombrado y preparación de tablas para análisis posteriores.
+## Orden recomendado de trabajo
 
-### Capítulo 2 — Visualización exploratoria
+Se sugiere desarrollar la unidad en el siguiente orden:
 
-Carpeta: `cap2-visualizacion-exploratoria/`
+1. **Capítulo 1. Fundamentos de manipulación de datos**  
+   Organización, limpieza y transformación de datos ecológicos con `tidyverse`.
 
-Este capítulo se orienta a la exploración gráfica de patrones en datos ecológicos, usando figuras que permiten resumir tendencias, contrastar grupos y reconocer relaciones entre variables.
+2. **Capítulo 2. Visualización gráfica exploratoria**  
+   Construcción e interpretación de gráficos para explorar patrones en bases biológicas y ambientales.
 
-### Capítulo 3 — Análisis climático
+3. **Capítulo 3. Visualización gráfica de patrones climáticos**  
+   Representación y análisis de variables climáticas mediante enfoques gráficos reproducibles.
 
-Carpeta: `cap3-clima/`
+## Acceso al código
 
-Aquí se integran series climáticas, climatogramas y balance hídrico para interpretar patrones ambientales y su relación con el contexto ecológico.
+<div style="margin-top: 0.5em; margin-bottom: 1em;">
+  <a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i" target="_blank" style="display:inline-block; padding:0.6em 1em; margin-right:0.6em; background:#2b8cbe; color:white; text-decoration:none; border-radius:8px;">Ver código en GitHub</a>
+  <a href="https://github.com/Javier-2712/libro_anvidea/archive/refs/heads/main.zip" target="_blank" style="display:inline-block; padding:0.6em 1em; background:#238b45; color:white; text-decoration:none; border-radius:8px;">Descargar repositorio (ZIP)</a>
+</div>
 
----
+## Capítulos de la unidad
 
-## Bases de datos utilizadas
+### Capítulo 1. Fundamentos de manipulación de datos
 
-| Capítulo | Archivos esperados |
-|---|---|
-| Capítulo 1 | `plancton.xlsx`, `invert.xlsx` |
-| Capítulo 2 | `plancton.xlsx`, `invert.xlsx` |
-| Capítulo 3 | `datos.xlsx`, `estaciones.xlsx`, `bal_hid.R` |
+Este capítulo introduce procedimientos para importar, inspeccionar, depurar y transformar datos ecológicos, con énfasis en estructuras tabulares comunes en estudios de biodiversidad y ambiente.
 
----
+**Temas principales:**
+- importación de datos;
+- selección y renombrado de variables;
+- filtrado y ordenamiento;
+- creación de nuevas variables;
+- resumen y reorganización de tablas.
 
-## Estructura general de la unidad
+### Capítulo 2. Visualización gráfica exploratoria
 
-Cada capítulo mantiene la siguiente organización:
+Este capítulo desarrolla herramientas para explorar datos mediante gráficos, favoreciendo la identificación de patrones, tendencias, contrastes entre grupos y posibles anomalías.
 
-```text
-capX-nombre-del-capitulo/
-├── README.md
-├── R/
-├── data/
-│   └── raw/
-└── outputs/
-    ├── figuras/
-    └── tablas/
-```
+**Temas principales:**
+- histogramas;
+- diagramas de caja y bigotes;
+- gráficos de dispersión;
+- paneles comparativos;
+- interpretación ecológica de patrones gráficos.
 
-Dentro de cada capítulo se incluyen:
+### Capítulo 3. Visualización gráfica de patrones climáticos
 
-- scripts en `R/`
-- archivos fuente en `data/raw/`
-- figuras generadas en `outputs/figuras/`
-- tablas exportadas en `outputs/tablas/`
+Este capítulo integra datos climáticos para representar variaciones temporales y espaciales de variables ambientales, con énfasis en su utilidad para estudios ecológicos.
 
----
+**Temas principales:**
+- síntesis climática;
+- climatogramas;
+- comparación entre localidades;
+- interpretación de estacionalidad;
+- apoyo gráfico para caracterización ecológica.
 
-## Acceso a los materiales
+## Recomendaciones de ejecución
 
-Para que los usuarios puedan trabajar con esta unidad, en el repositorio de GitHub deben estar cargadas no solo las páginas generadas en `docs/`, sino también las carpetas reales de la unidad con sus capítulos, scripts, datos y salidas.
+Antes de correr los scripts de esta unidad, ten en cuenta lo siguiente:
 
-### Carpeta principal de la unidad en GitHub
+- ejecuta primero el archivo `00_setup.R`, si está disponible;
+- trabaja desde el directorio raíz del proyecto para evitar errores de rutas;
+- verifica que las carpetas de datos y salidas conserven la estructura original;
+- confirma que los paquetes requeridos estén instalados;
+- revisa el `README.md` de la unidad para detalles específicos.
 
-👉 [Abrir carpeta de la Unidad I](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i)
+::: {.callout-warning}
+## Advertencia técnica
 
-### Acceso por capítulos
+Algunos errores frecuentes no se deben al código en sí, sino a:
 
-- 👉 [Capítulo 1 — Manipulación de datos](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap1-datos)
-- 👉 [Capítulo 2 — Visualización exploratoria](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap2-visualizacion-exploratoria)
-- 👉 [Capítulo 3 — Análisis climático](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap3-clima)
+- nombres de carpetas modificados;
+- archivos de datos movidos de ubicación;
+- paquetes no instalados;
+- ejecución de scripts desde un directorio distinto al esperado.
+:::
 
-### Descarga del repositorio completo
+## Datos y paquetes necesarios
 
-👉 [Descargar material completo en ZIP](https://github.com/Javier-2712/libro_anvidea/archive/refs/heads/main.zip)
+En términos generales, esta unidad utiliza:
 
----
+**Paquetes frecuentes**
+- `tidyverse`
+- `readxl`
+- `ggplot2`
+- `dplyr`
+- `tidyr`
 
-## Formas de uso
+**Tipos de archivos de datos**
+- `.csv`
+- `.xlsx`
 
-### Opción 1 — Ejecutar toda la unidad
+**Carpetas usuales**
+- `R/`
+- `data/raw/`
+- `outputs/figuras/`
+- `outputs/tablas/`
 
-Desde la carpeta `unidad_i/`:
+## Relación con el libro ANVIDEA
 
-```r
-source("run_unidad1.R")
-```
+Esta unidad está diseñada para acompañar la lectura correspondiente del libro **ANVIDEA**, permitiendo que el lector pase de la explicación conceptual a la implementación práctica en R. El portal no reemplaza el capítulo del libro, sino que lo complementa con una ruta de trabajo reproducible y organizada.
 
-Este archivo ejecuta de forma secuencial los capítulos 1, 2 y 3, verificando previamente que los scripts principales existan.
+## Siguiente paso sugerido
 
-### Opción 2 — Ejecutar por capítulo
+Una vez revisada esta página, se recomienda:
 
-También puedes trabajar cada capítulo de manera independiente.
-
-#### Capítulo 1
-
-```r
-source("cap1-datos/R/00_setup.R")
-source("cap1-datos/R/03_funciones_auxiliares.R")
-source("cap1-datos/R/01_casoA_mesozooplancton.R")
-source("cap1-datos/R/02_casoB_macroinvertebrados.R")
-```
-
-#### Capítulo 2
-
-```r
-source("cap2-visualizacion-exploratoria/R/00_setup.R")
-source("cap2-visualizacion-exploratoria/R/03_funciones_auxiliares.R")
-source("cap2-visualizacion-exploratoria/R/01_casoA_plancton_exploracion.R")
-source("cap2-visualizacion-exploratoria/R/02_casoB_macroinvertebrados_exploracion.R")
-```
-
-#### Capítulo 3
-
-```r
-source("cap3-clima/R/00_setup.R")
-source("cap3-clima/R/03_funciones_auxiliares.R")
-source("cap3-clima/R/01_casoA_series_climaticas.R")
-source("cap3-clima/R/02_casoB_climatogramas_balance_hidrico.R")
-```
-
----
-
-## Flujo recomendado
-
-Se recomienda avanzar en este orden:
-
-1. Capítulo 1 — estructuración y limpieza de datos  
-2. Capítulo 2 — exploración gráfica  
-3. Capítulo 3 — interpretación climática  
-
-Este orden mantiene la lógica pedagógica de la unidad y facilita el aprovechamiento de los datos y scripts.
+1. leer el capítulo correspondiente en el libro;
+2. descargar el código;
+3. abrir la carpeta de la unidad en RStudio;
+4. ejecutar el script principal o los scripts por capítulo en el orden sugerido.
 
 ---
 
-## Recomendaciones de uso
-
-- Ejecutar los scripts desde la carpeta de la unidad o del capítulo correspondiente
-- Mantener los nombres originales de archivos y carpetas
-- No modificar la estructura `R/`, `data/raw/` y `outputs/`
-- Revisar las salidas generadas en cada capítulo después de ejecutar los scripts
+**Repositorio general:** [libro_anvidea](https://github.com/Javier-2712/libro_anvidea)  
+**Portal web:** [ANVIDEA](https://javier-2712.github.io/libro_anvidea)
 
 ---
 
