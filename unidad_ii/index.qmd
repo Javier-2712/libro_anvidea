@@ -1,182 +1,190 @@
 ---
-title: "Unidad II — Ecología de poblaciones"
-format:
+title: "Unidad II"
+subtitle: "Ecología de poblaciones"
+format: 
   html:
     toc: true
     toc-depth: 2
+    theme: cosmo
+    css: ../styles.css
+    number-sections: false
 ---
 
-## Presentación
+# Unidad II: Ecología de poblaciones
 
-Esta unidad integra herramientas cuantitativas para el análisis de la dinámica poblacional, abordando procesos de crecimiento, estructura demográfica y organización espacial. En conjunto, los capítulos permiten pasar desde la descripción del cambio en el tiempo hasta la interpretación de la estructura por edades, estados y patrones espaciales.
+Esta unidad desarrolla herramientas conceptuales y reproducibles para analizar la dinámica de las poblaciones biológicas en **R**, integrando modelos de crecimiento, tablas de vida, enfoques matriciales y patrones espaciales. Su propósito es acompañar la lectura del libro **ANVIDEA** con scripts organizados por capítulos, casos guiados y una ruta clara de ejecución.
 
----
+::: {.callout-note}
+## ¿Qué encontrarás aquí?
+
+En esta sección del portal podrás:
+
+- comprender el propósito general de la unidad;
+- identificar los prerrequisitos mínimos para usar los scripts;
+- seguir un orden recomendado de estudio;
+- acceder al código fuente en GitHub;
+- descargar los archivos para trabajar localmente;
+- revisar qué capítulos conforman la unidad;
+- ejecutar la unidad completa desde un script principal;
+- anticipar paquetes, datos y recomendaciones técnicas de ejecución.
+:::
 
 ## Propósito de la unidad
 
-En esta unidad el usuario podrá:
+La Unidad II busca fortalecer la comprensión de la **ecología de poblaciones** mediante flujos de trabajo reproducibles en R. A lo largo de esta unidad, el usuario podrá explorar cómo cambian las poblaciones en el tiempo, cómo se estructuran por edades o estados, y cómo se distribuyen en el espacio, integrando interpretación ecológica y análisis cuantitativo.
 
-- analizar modelos de crecimiento poblacional
-- interpretar parámetros demográficos en contextos ecológicos
-- trabajar con estructuras por edades y por estados
-- explorar patrones espaciales y métodos de estimación de densidad
+## Prerrequisitos
 
----
+Antes de iniciar esta unidad, se recomienda que el usuario tenga:
 
-## Capítulos incluidos
+- conocimientos básicos de R y RStudio;
+- manejo elemental de scripts y directorios de trabajo;
+- familiaridad con objetos, funciones y lectura de datos;
+- conocimientos introductorios sobre crecimiento poblacional, tablas de vida y análisis ecológico básico;
+- instalación previa de R y de los paquetes requeridos para ejecutar los scripts.
 
-### Capítulo 4 — Modelos poblacionales
+::: {.callout-tip}
+## Recomendación
 
-Carpeta: `cap4-modelos-poblacionales/`
+Si esta es tu primera aproximación a esta unidad, conviene revisar primero la estructura general del portal, leer el capítulo correspondiente en el libro y luego ejecutar el script principal de la unidad.
+:::
 
-Incluye el estudio del crecimiento exponencial y logístico, así como la interpretación ecológica de parámetros como `r`, `λ` y `K`.
+## Orden recomendado de trabajo
 
-### Capítulo 5 — Tablas de vida y modelos matriciales
+Se sugiere desarrollar la unidad en el siguiente orden:
 
-Carpeta: `cap5-tablas-vida-modelos-matriciales/`
+1. **Capítulo 4. Modelos poblacionales**  
+   Modelos exponenciales y logísticos para comprender trayectorias de crecimiento y regulación poblacional.
 
-Desarrolla tablas de vida por edades, parámetros demográficos (`R₀`, `T`, `r`, `λ`) y modelos matriciales de Leslie y Lefkovitch.
+2. **Capítulo 5. Tablas de vida y modelos matriciales**  
+   Análisis demográfico mediante tablas de vida, matrices de Leslie y matrices de Lefkovitch.
 
-### Capítulo 6 — Patrones de distribución y densidad
+3. **Capítulo 6. Distribución y estimación de densidad**  
+   Evaluación de patrones espaciales y aproximaciones para estimar la densidad poblacional.
 
-Carpeta: `cap6-distribucion-densidad/`
+## Acceso al código
 
-Aborda patrones espaciales, ajuste a distribuciones teóricas, índices de dispersión y métodos de estimación de densidad basados en distancias.
+<div style="margin-top: 0.5em; margin-bottom: 1em;">
+  <a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_ii" target="_blank" style="display:inline-block; padding:0.6em 1em; margin-right:0.6em; background:#2b8cbe; color:white; text-decoration:none; border-radius:8px;">Ver código en GitHub</a>
+  <a href="https://github.com/Javier-2712/libro_anvidea/archive/refs/heads/main.zip" target="_blank" style="display:inline-block; padding:0.6em 1em; background:#238b45; color:white; text-decoration:none; border-radius:8px;">Descargar repositorio (ZIP)</a>
+</div>
 
----
+## Ejecución de la unidad
 
-## Estructura general de la unidad
-
-Cada capítulo sigue esta organización:
-
-```text
-capX-nombre-del-capitulo/
-├── README.md
-├── R/
-│   ├── 00_setup.R
-│   ├── funciones_auxiliares.R
-│   └── scripts de casos
-├── data/
-│   └── raw/
-└── outputs/
-    ├── figuras/
-    └── tablas/
-```
-
----
-
-## Datos esperados
-
-Cada capítulo utiliza sus propios insumos:
-
-| Capítulo | Datos esperados |
-|---|---|
-| Capítulo 4 | datos internos en scripts o simulación |
-| Capítulo 5 | `data/raw/datos.c5.xlsx` |
-| Capítulo 6 | `data/raw/datos.c6.xlsx` |
-
----
-
-## Acceso a los materiales
-
-Para que los usuarios puedan trabajar con esta unidad, en el repositorio de GitHub deben estar cargadas no solo las páginas generadas en `docs/`, sino también las carpetas reales de la unidad con sus capítulos, scripts, datos y salidas.
-
-### Carpeta principal de la unidad en GitHub
-
-👉 [Abrir carpeta de la Unidad II](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_ii)
-
-### Acceso por capítulos
-
-- 👉 [Capítulo 4 — Modelos poblacionales](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_ii/cap4-modelos-poblacionales)
-- 👉 [Capítulo 5 — Tablas de vida y modelos matriciales](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_ii/cap5-tablas-vida-modelos-matriciales)
-- 👉 [Capítulo 6 — Patrones de distribución y densidad](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_ii/cap6-distribucion-densidad)
-
-### Descarga del repositorio completo
-
-👉 [Descargar material completo en ZIP](https://github.com/Javier-2712/libro_anvidea/archive/refs/heads/main.zip)
-
----
-
-## Formas de uso
-
-### Opción 1 — Ejecutar toda la unidad
-
-Desde la carpeta `unidad_ii/`:
+La Unidad II puede ejecutarse de forma completa mediante el script principal:
 
 ```r
-source("run_unidad2.R")
+source("run_unidad2_ajustado.R")
 ```
 
-El archivo de ejecución verifica primero que existan los scripts requeridos y luego corre secuencialmente los capítulos 4, 5 y 6.
+Este archivo permite ejecutar de manera secuencial los capítulos:
 
-### Opción 2 — Ejecutar por capítulo
+- **Capítulo 4** – Modelos poblacionales
+- **Capítulo 5** – Tablas de vida y modelos matriciales
+- **Capítulo 6** – Distribución y estimación de densidad
 
-También puedes ejecutar cada capítulo de forma independiente.
+El script incluye:
 
-#### Capítulo 4
+- verificación automática de la estructura de archivos;
+- validación de rutas requeridas;
+- ejecución ordenada de los casos de estudio;
+- mensajes de progreso en consola.
 
-```r
-source("cap4-modelos-poblacionales/R/00_setup.R")
-source("cap4-modelos-poblacionales/R/03_funciones_auxiliares.R")
-source("cap4-modelos-poblacionales/R/01_casoA_modelo_exponencial.R")
-source("cap4-modelos-poblacionales/R/02_casoB_modelo_logistico.R")
-```
+::: {.callout-tip}
+## Recomendación
 
-#### Capítulo 5
+Para una primera exploración, se recomienda ejecutar la unidad completa con este script.  
+Para un aprendizaje más detallado, cada capítulo también puede ejecutarse de forma independiente.
+:::
 
-```r
-source("cap5-tablas-vida-modelos-matriciales/R/00_setup.R")
-source("cap5-tablas-vida-modelos-matriciales/R/05_funciones_auxiliares.R")
-source("cap5-tablas-vida-modelos-matriciales/R/01_casoA1_tabla_vida_edad.R")
-source("cap5-tablas-vida-modelos-matriciales/R/02_casoA2_tabla_vida_gotelli.R")
-source("cap5-tablas-vida-modelos-matriciales/R/03_casoB_modelo_leslie.R")
-source("cap5-tablas-vida-modelos-matriciales/R/04_casoC_modelo_lefkovitch.R")
-```
+## Capítulos de la unidad
 
-#### Capítulo 6
+### Capítulo 4. Modelos poblacionales
 
-```r
-source("cap6-distribucion-densidad/R/00_setup.R")
-source("cap6-distribucion-densidad/R/03_funciones_auxiliares.R")
-source("cap6-distribucion-densidad/R/01_casoA_patrones_distribucion.R")
-source("cap6-distribucion-densidad/R/02_casoB_estimacion_densidad.R")
-```
+Este capítulo introduce modelos de crecimiento poblacional que permiten comprender cómo cambia el tamaño de una población bajo diferentes supuestos ecológicos.
+
+**Temas principales:**
+- modelo exponencial continuo;
+- modelo exponencial discreto;
+- modelo logístico;
+- capacidad de carga;
+- interpretación ecológica de trayectorias de crecimiento.
+
+### Capítulo 5. Tablas de vida y modelos matriciales
+
+Este capítulo desarrolla herramientas demográficas para describir supervivencia, fecundidad, estructura por edades y dinámica poblacional mediante matrices.
+
+**Temas principales:**
+- tablas de vida por edades;
+- supervivencia y fecundidad;
+- tablas de vida modificadas;
+- matriz de Leslie;
+- matriz de Lefkovitch;
+- interpretación demográfica de poblaciones estructuradas.
+
+### Capítulo 6. Distribución y estimación de densidad
+
+Este capítulo examina cómo se distribuyen los organismos en el espacio y cómo puede estimarse su densidad a partir de diferentes aproximaciones.
+
+**Temas principales:**
+- patrones de distribución espacial;
+- agregación, aleatoriedad y uniformidad;
+- estimación de densidad;
+- interpretación ecológica de patrones espaciales.
+
+## Recomendaciones de ejecución
+
+Antes de ejecutar los scripts de esta unidad, ten en cuenta lo siguiente:
+
+- asegúrate de estar ubicado en el directorio raíz del proyecto;
+- verifica que la estructura de carpetas no haya sido modificada;
+- ejecuta preferiblemente el archivo `run_unidad2_ajustado.R`;
+- confirma que los paquetes requeridos estén instalados;
+- revisa los archivos `00_setup.R` de cada capítulo si deseas una ejecución por separado.
+
+::: {.callout-warning}
+## Advertencia técnica
+
+El script principal detendrá la ejecución si detecta archivos faltantes.  
+Este comportamiento es intencional y ayuda a mantener la reproducibilidad del flujo de trabajo.
+:::
+
+## Datos y paquetes necesarios
+
+En términos generales, esta unidad utiliza:
+
+**Paquetes frecuentes**
+- `tidyverse`
+- `ggplot2`
+- `dplyr`
+- `readxl`
+- `popbio`
+- `plotrix`
+
+**Tipos de archivos de datos**
+- `.csv`
+- `.xlsx`
+
+**Carpetas usuales**
+- `R/`
+- `data/raw/`
+- `outputs/figuras/`
+- `outputs/tablas/`
+
+## Relación con el libro ANVIDEA
+
+Esta unidad está diseñada para acompañar la sección correspondiente del libro **ANVIDEA**, permitiendo que el lector pase de la formulación conceptual a la implementación práctica en R. El portal no reemplaza el capítulo del libro, sino que lo complementa con una ruta de trabajo reproducible, organizada y pensada para el aprendizaje progresivo.
+
+## Siguiente paso sugerido
+
+Una vez revisada esta página, se recomienda:
+
+1. leer el capítulo correspondiente en el libro;
+2. descargar el código;
+3. abrir la carpeta de la unidad en RStudio;
+4. ejecutar `run_unidad2_ajustado.R` o avanzar capítulo por capítulo en el orden sugerido.
 
 ---
 
-## Flujo recomendado
-
-Se recomienda avanzar en este orden:
-
-1. Capítulo 4 — crecimiento poblacional  
-2. Capítulo 5 — estructura por edades y estados  
-3. Capítulo 6 — distribución espacial y densidad  
-
-Esta secuencia mantiene la progresión conceptual de la unidad:
-
-**Tiempo → Estructura → Espacio**
-
----
-
-## Recomendaciones de uso
-
-- Ejecutar los scripts desde la carpeta de la unidad o del capítulo correspondiente
-- Mantener sin cambios los nombres de archivos y carpetas usados en los scripts
-- Conservar la estructura `R/`, `data/raw/` y `outputs/`
-- Revisar las figuras y tablas generadas tras cada ejecución
-
----
-
-## Estado de la unidad
-
-- Capítulo 4 validado
-- Capítulo 5 validado
-- Capítulo 6 validado
-
-Unidad II lista para ejecución completa.
-
----
-
-## Enlace de retorno
-
-👉 [Volver a la página principal del proyecto](../index.qmd)
+**Repositorio general:** [libro_anvidea](https://github.com/Javier-2712/libro_anvidea)  
+**Portal web:** [ANVIDEA](https://javier-2712.github.io/libro_anvidea)
