@@ -1,0 +1,65 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "ANVIDEA — Material reproducible",
+    "section": "",
+    "text": "Este portal reúne los materiales reproducibles del libro:\nAnálisis y Visualización de Datos Ecológicos y Ambientales — ANVIDEA\nAquí puedes acceder a los scripts, datos y flujos de trabajo organizados por unidades y capítulos."
+  },
+  {
+    "objectID": "index.html#bienvenido",
+    "href": "index.html#bienvenido",
+    "title": "ANVIDEA — Material reproducible",
+    "section": "",
+    "text": "Este portal reúne los materiales reproducibles del libro:\nAnálisis y Visualización de Datos Ecológicos y Ambientales — ANVIDEA\nAquí puedes acceder a los scripts, datos y flujos de trabajo organizados por unidades y capítulos."
+  },
+  {
+    "objectID": "index.html#unidades-del-libro",
+    "href": "index.html#unidades-del-libro",
+    "title": "ANVIDEA — Material reproducible",
+    "section": "📘 Unidades del libro",
+    "text": "📘 Unidades del libro\n\nUnidad I — Análisis de datos ecológicos\n\nManipulación de datos\n\nVisualización exploratoria\n\nAnálisis climático\n\n👉 Ir a Unidad I\n\n\n\nUnidad II — Ecología de poblaciones\n\nModelos de crecimiento\n\nTablas de vida\n\nModelos matriciales\n\nDistribución y densidad\n\n👉 Ir a Unidad II\n\n\n\nUnidad III — Ecología de comunidades\n\nDiversidad taxonómica\n\nDiversidad funcional\n\nDiversidad filogenética\n\n👉 Ir a Unidad III"
+  },
+  {
+    "objectID": "index.html#cómo-usar-el-material",
+    "href": "index.html#cómo-usar-el-material",
+    "title": "ANVIDEA — Material reproducible",
+    "section": "▶️ Cómo usar el material",
+    "text": "▶️ Cómo usar el material\n\nEjecutar una unidad completa\nsource(\"unidad_i/run_unidad1.R\")\n\n\nEjecutar un capítulo\nsource(\"R/00_setup.R\")"
+  },
+  {
+    "objectID": "index.html#organización",
+    "href": "index.html#organización",
+    "title": "ANVIDEA — Material reproducible",
+    "section": "📂 Organización",
+    "text": "📂 Organización\nCada capítulo contiene:\n\nScripts en R/\n\nDatos en data/raw/\n\nResultados en outputs/"
+  },
+  {
+    "objectID": "index.html#propósito",
+    "href": "index.html#propósito",
+    "title": "ANVIDEA — Material reproducible",
+    "section": "🧠 Propósito",
+    "text": "🧠 Propósito\nEste material permite:\n\nReproducir los análisis del libro\n\nAprender flujos de trabajo en R\n\nAplicar técnicas ecológicas a nuevos datos"
+  },
+  {
+    "objectID": "index.html#repositorio",
+    "href": "index.html#repositorio",
+    "title": "ANVIDEA — Material reproducible",
+    "section": "📎 Repositorio",
+    "text": "📎 Repositorio\nAccede al código completo en GitHub:\n👉 (enlace al repositorio)"
+  },
+  {
+    "objectID": "index.html#autor",
+    "href": "index.html#autor",
+    "title": "ANVIDEA — Material reproducible",
+    "section": "👨‍🏫 Autor",
+    "text": "👨‍🏫 Autor\nJavier Rodríguez-Barrios"
+  },
+  {
+    "objectID": "index.html#autores",
+    "href": "index.html#autores",
+    "title": "ANVIDEA — Material reproducible",
+    "section": "👨‍🏫 Autores",
+    "text": "👨‍🏫 Autores\nJavier Rodríguez-Barrios\nKenedith Méndez\nJavier de la Hoz"
+  }
+]
