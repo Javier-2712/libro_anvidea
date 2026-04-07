@@ -119,6 +119,41 @@ Los errores más frecuentes al ejecutar los scripts suelen deberse a:
 - desajustes entre matrices de abundancia, rasgos y filogenia.
 :::
 
+## 📂 Acceso directo a capítulos
+
+Explora cada capítulo de la unidad con acceso directo a sus scripts, datos y resultados:
+
+### 🔹 Capítulo 7 — Diversidad taxonómica
+
+- 📁 [Abrir carpeta del capítulo](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii/cap7-diversidad-taxonomica)
+- 📄 Incluye:
+  - Diversidad alfa (q = 0, 1, 2)
+  - Curvas rango–abundancia (RAD)
+  - Diversidad beta y gamma
+  - Disimilitud de Jaccard
+  - LCBD e interpretación ecológica
+
+---
+
+### 🔹 Capítulo 8 — Diversidad funcional y filogenética
+
+- 📁 [Abrir carpeta del capítulo](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii/cap8-diversidad-funcional-filogenetica)
+- 📄 Incluye:
+  - Métricas funcionales (FRic, FEve, FDiv, FDis)
+  - Community Weighted Means (CWM)
+  - Diversidad filogenética
+  - iNEXT.3D e iNEXTbeta3D
+  - Integración rasgos–filogenia–abundancia
+  
+  
+## ▶️ Ejecución rápida
+
+Para ejecutar los análisis de la unidad:
+
+```r
+source("unidad_iii/run_unidad3.R")
+```
+
 ## Datos y paquetes necesarios
 
 En términos generales, esta unidad utiliza:
