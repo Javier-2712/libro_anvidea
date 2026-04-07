@@ -1,0 +1,6 @@
+Coloque aquí los archivos originales usados en el capítulo:
+
+- plancton.xlsx
+- invert.xlsx
+
+No se incluyen en este paquete para respetar su organización editorial.

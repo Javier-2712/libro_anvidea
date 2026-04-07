@@ -1,0 +1,5 @@
+Ubique aquí los archivos de entrada para ejecutar los scripts del capítulo 1.
+
+Archivos esperados:
+- plancton.xlsx  (hoja: Riqueza)
+- invert.xlsx    (hojas: Taxones1, Taxones2, fquímicos)
