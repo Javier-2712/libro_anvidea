@@ -226,7 +226,7 @@ Una vez revisada esta página, se recomienda:
 1. leer el capítulo correspondiente en el libro;
 2. descargar el código;
 3. abrir la carpeta de la unidad en RStudio;
-4. ejecutar `run_unidad2_ajustado.R` o avanzar capítulo por capítulo en el orden sugerido.
+4. ejecutar `run_unidad2.R` o avanzar capítulo por capítulo en el orden sugerido.
 
 ---
 
