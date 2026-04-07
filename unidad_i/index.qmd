@@ -1,100 +1,150 @@
 ---
-title: "ANVIDEA — Material reproducible"
+title: "Unidad I — Análisis de datos ecológicos"
 format:
   html:
-    toc: false
-    theme: cosmo
+    toc: true
+    toc-depth: 2
 ---
 
-## Bienvenido
+## Presentación
 
-Este portal reúne los **materiales reproducibles** del libro:
-
-**Análisis y Visualización de Datos Ecológicos y Ambientales — ANVIDEA**
-
-Aquí puedes acceder a los scripts, datos y flujos de trabajo organizados por unidades y capítulos.
+Esta unidad introduce el flujo completo de análisis de datos ecológicos en **R**, integrando procesos de importación, limpieza, transformación, exploración gráfica y análisis de patrones climáticos. Corresponde a la primera parte del manual **ANVIDEA** y sienta las bases para los análisis de poblaciones y comunidades que se desarrollan en las unidades posteriores.
 
 ---
 
-## 📘 Unidades del libro
+## Propósito de la unidad
 
-### Unidad I — Análisis de datos ecológicos
+En esta unidad el usuario podrá desarrollar competencias para:
 
-- Manipulación de datos  
-- Visualización exploratoria  
-- Análisis climático  
-
-👉 [Ir a Unidad I](unidad_i/index.qmd)
-
----
-
-### Unidad II — Ecología de poblaciones
-
-- Modelos de crecimiento  
-- Tablas de vida  
-- Modelos matriciales  
-- Distribución y densidad  
-
-👉 [Ir a Unidad II](unidad_ii//index.qmd)
+- estructurar bases de datos ecológicos
+- manipular datos con `tidyverse`
+- explorar patrones mediante visualización gráfica
+- interpretar variables climáticas en contexto ecológico
 
 ---
 
-### Unidad III — Ecología de comunidades
+## Capítulos incluidos
 
-- Diversidad taxonómica  
-- Diversidad funcional  
-- Diversidad filogenética  
+### Capítulo 1 — Manipulación de datos
 
-👉 [Ir a Unidad III](unidad_iii/index.qmd)
+Carpeta: `cap1-datos/`
+
+En este capítulo se trabaja la organización y limpieza de bases de datos ecológicos, con énfasis en transformación de variables, filtrado, selección, renombrado y preparación de tablas para análisis posteriores.
+
+### Capítulo 2 — Visualización exploratoria
+
+Carpeta: `cap2-visualizacion-exploratoria/`
+
+Este capítulo se orienta a la exploración gráfica de patrones en datos ecológicos, usando figuras que permiten resumir tendencias, contrastar grupos y reconocer relaciones entre variables.
+
+### Capítulo 3 — Análisis climático
+
+Carpeta: `cap3-clima/`
+
+Aquí se integran series climáticas, climatogramas y balance hídrico para interpretar patrones ambientales y su relación con el contexto ecológico.
 
 ---
 
-## ▶️ Cómo usar el material
+## Bases de datos utilizadas
 
-### Ejecutar una unidad completa
+| Capítulo | Archivos esperados |
+|---|---|
+| Capítulo 1 | `plancton.xlsx`, `invert.xlsx` |
+| Capítulo 2 | `plancton.xlsx`, `invert.xlsx` |
+| Capítulo 3 | `datos.xlsx`, `estaciones.xlsx`, `bal_hid.R` |
 
-```r
-source("unidad_i/run_unidad1.R")
+---
+
+## Estructura general de la unidad
+
+Cada capítulo mantiene la siguiente organización:
+
+```text
+capX-nombre-del-capitulo/
+├── README.md
+├── R/
+├── data/
+│   └── raw/
+└── outputs/
+    ├── figuras/
+    └── tablas/
 ```
 
-### Ejecutar un capítulo
+Dentro de cada capítulo se incluyen:
+
+- scripts en `R/`
+- archivos fuente en `data/raw/`
+- figuras generadas en `outputs/figuras/`
+- tablas exportadas en `outputs/tablas/`
+
+---
+
+## Formas de uso
+
+### Opción 1 — Ejecutar toda la unidad
+
+Desde la carpeta `unidad_i/`:
 
 ```r
-source("R/00_setup.R")
+source("run_unidad1.R")
+```
+
+Este archivo ejecuta de forma secuencial los capítulos 1, 2 y 3, verificando previamente que los scripts principales existan.
+
+### Opción 2 — Ejecutar por capítulo
+
+También puedes trabajar cada capítulo de manera independiente.
+
+#### Capítulo 1
+
+```r
+source("cap1-datos/R/00_setup.R")
+source("cap1-datos/R/03_funciones_auxiliares.R")
+source("cap1-datos/R/01_casoA_mesozooplancton.R")
+source("cap1-datos/R/02_casoB_macroinvertebrados.R")
+```
+
+#### Capítulo 2
+
+```r
+source("cap2-visualizacion-exploratoria/R/00_setup.R")
+source("cap2-visualizacion-exploratoria/R/03_funciones_auxiliares.R")
+source("cap2-visualizacion-exploratoria/R/01_casoA_plancton_exploracion.R")
+source("cap2-visualizacion-exploratoria/R/02_casoB_macroinvertebrados_exploracion.R")
+```
+
+#### Capítulo 3
+
+```r
+source("cap3-clima/R/00_setup.R")
+source("cap3-clima/R/03_funciones_auxiliares.R")
+source("cap3-clima/R/01_casoA_series_climaticas.R")
+source("cap3-clima/R/02_casoB_climatogramas_balance_hidrico.R")
 ```
 
 ---
 
-## 📂 Organización
+## Flujo recomendado
 
-Cada capítulo contiene:
+Se recomienda avanzar en este orden:
 
-- Scripts en `R/`  
-- Datos en `data/raw/`  
-- Resultados en `outputs/`  
+1. Capítulo 1 — estructuración y limpieza de datos  
+2. Capítulo 2 — exploración gráfica  
+3. Capítulo 3 — interpretación climática  
 
----
-
-## 🧠 Propósito
-
-Este material permite:
-
-- Reproducir los análisis del libro  
-- Aprender flujos de trabajo en R  
-- Aplicar técnicas ecológicas a nuevos datos  
+Este orden mantiene la lógica pedagógica de la unidad y facilita el aprovechamiento de los datos y scripts.
 
 ---
 
-## 📎 Repositorio
+## Recomendaciones de uso
 
-Accede al código completo en GitHub:
-
-👉 *(enlace al repositorio)*
+- Ejecutar los scripts desde la carpeta de la unidad o del capítulo correspondiente
+- Mantener los nombres originales de archivos y carpetas
+- No modificar la estructura `R/`, `data/raw/` y `outputs/`
+- Revisar las salidas generadas en cada capítulo después de ejecutar los scripts
 
 ---
 
-## 👨‍🏫 Autores
+## Enlace de retorno
 
-Javier Rodríguez-Barrios  
-Kenedith Méndez  
-Javier de la Hoz
+👉 [Volver a la página principal del proyecto](../index.qmd)

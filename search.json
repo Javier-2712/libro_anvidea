@@ -61,5 +61,75 @@
     "title": "ANVIDEA — Material reproducible",
     "section": "👨‍🏫 Autores",
     "text": "👨‍🏫 Autores\nJavier Rodríguez-Barrios\nKenedith Méndez\nJavier de la Hoz"
+  },
+  {
+    "objectID": "unidad_i/index.html",
+    "href": "unidad_i/index.html",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "",
+    "text": "Esta unidad introduce el flujo completo de análisis de datos ecológicos en R, integrando procesos de importación, limpieza, transformación, exploración gráfica y análisis de patrones climáticos. Corresponde a la primera parte del manual ANVIDEA y sienta las bases para los análisis de poblaciones y comunidades que se desarrollan en las unidades posteriores."
+  },
+  {
+    "objectID": "unidad_i/index.html#presentación",
+    "href": "unidad_i/index.html#presentación",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "",
+    "text": "Esta unidad introduce el flujo completo de análisis de datos ecológicos en R, integrando procesos de importación, limpieza, transformación, exploración gráfica y análisis de patrones climáticos. Corresponde a la primera parte del manual ANVIDEA y sienta las bases para los análisis de poblaciones y comunidades que se desarrollan en las unidades posteriores."
+  },
+  {
+    "objectID": "unidad_i/index.html#propósito-de-la-unidad",
+    "href": "unidad_i/index.html#propósito-de-la-unidad",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "Propósito de la unidad",
+    "text": "Propósito de la unidad\nEn esta unidad el usuario podrá desarrollar competencias para:\n\nestructurar bases de datos ecológicos\nmanipular datos con tidyverse\nexplorar patrones mediante visualización gráfica\ninterpretar variables climáticas en contexto ecológico"
+  },
+  {
+    "objectID": "unidad_i/index.html#capítulos-incluidos",
+    "href": "unidad_i/index.html#capítulos-incluidos",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "Capítulos incluidos",
+    "text": "Capítulos incluidos\n\nCapítulo 1 — Manipulación de datos\nCarpeta: cap1-datos/\nEn este capítulo se trabaja la organización y limpieza de bases de datos ecológicos, con énfasis en transformación de variables, filtrado, selección, renombrado y preparación de tablas para análisis posteriores.\n\n\nCapítulo 2 — Visualización exploratoria\nCarpeta: cap2-visualizacion-exploratoria/\nEste capítulo se orienta a la exploración gráfica de patrones en datos ecológicos, usando figuras que permiten resumir tendencias, contrastar grupos y reconocer relaciones entre variables.\n\n\nCapítulo 3 — Análisis climático\nCarpeta: cap3-clima/\nAquí se integran series climáticas, climatogramas y balance hídrico para interpretar patrones ambientales y su relación con el contexto ecológico."
+  },
+  {
+    "objectID": "unidad_i/index.html#bases-de-datos-utilizadas",
+    "href": "unidad_i/index.html#bases-de-datos-utilizadas",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "Bases de datos utilizadas",
+    "text": "Bases de datos utilizadas\n\n\n\nCapítulo\nArchivos esperados\n\n\n\n\nCapítulo 1\nplancton.xlsx, invert.xlsx\n\n\nCapítulo 2\nplancton.xlsx, invert.xlsx\n\n\nCapítulo 3\ndatos.xlsx, estaciones.xlsx, bal_hid.R"
+  },
+  {
+    "objectID": "unidad_i/index.html#estructura-general-de-la-unidad",
+    "href": "unidad_i/index.html#estructura-general-de-la-unidad",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "Estructura general de la unidad",
+    "text": "Estructura general de la unidad\nCada capítulo mantiene la siguiente organización:\ncapX-nombre-del-capitulo/\n├── README.md\n├── R/\n├── data/\n│   └── raw/\n└── outputs/\n    ├── figuras/\n    └── tablas/\nDentro de cada capítulo se incluyen:\n\nscripts en R/\narchivos fuente en data/raw/\nfiguras generadas en outputs/figuras/\ntablas exportadas en outputs/tablas/"
+  },
+  {
+    "objectID": "unidad_i/index.html#formas-de-uso",
+    "href": "unidad_i/index.html#formas-de-uso",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "Formas de uso",
+    "text": "Formas de uso\n\nOpción 1 — Ejecutar toda la unidad\nDesde la carpeta unidad_i/:\nsource(\"run_unidad1.R\")\nEste archivo ejecuta de forma secuencial los capítulos 1, 2 y 3, verificando previamente que los scripts principales existan.\n\n\nOpción 2 — Ejecutar por capítulo\nTambién puedes trabajar cada capítulo de manera independiente.\n\nCapítulo 1\nsource(\"cap1-datos/R/00_setup.R\")\nsource(\"cap1-datos/R/03_funciones_auxiliares.R\")\nsource(\"cap1-datos/R/01_casoA_mesozooplancton.R\")\nsource(\"cap1-datos/R/02_casoB_macroinvertebrados.R\")\n\n\nCapítulo 2\nsource(\"cap2-visualizacion-exploratoria/R/00_setup.R\")\nsource(\"cap2-visualizacion-exploratoria/R/03_funciones_auxiliares.R\")\nsource(\"cap2-visualizacion-exploratoria/R/01_casoA_plancton_exploracion.R\")\nsource(\"cap2-visualizacion-exploratoria/R/02_casoB_macroinvertebrados_exploracion.R\")\n\n\nCapítulo 3\nsource(\"cap3-clima/R/00_setup.R\")\nsource(\"cap3-clima/R/03_funciones_auxiliares.R\")\nsource(\"cap3-clima/R/01_casoA_series_climaticas.R\")\nsource(\"cap3-clima/R/02_casoB_climatogramas_balance_hidrico.R\")"
+  },
+  {
+    "objectID": "unidad_i/index.html#flujo-recomendado",
+    "href": "unidad_i/index.html#flujo-recomendado",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "Flujo recomendado",
+    "text": "Flujo recomendado\nSe recomienda avanzar en este orden:\n\nCapítulo 1 — estructuración y limpieza de datos\n\nCapítulo 2 — exploración gráfica\n\nCapítulo 3 — interpretación climática\n\nEste orden mantiene la lógica pedagógica de la unidad y facilita el aprovechamiento de los datos y scripts."
+  },
+  {
+    "objectID": "unidad_i/index.html#recomendaciones-de-uso",
+    "href": "unidad_i/index.html#recomendaciones-de-uso",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "Recomendaciones de uso",
+    "text": "Recomendaciones de uso\n\nEjecutar los scripts desde la carpeta de la unidad o del capítulo correspondiente\nMantener los nombres originales de archivos y carpetas\nNo modificar la estructura R/, data/raw/ y outputs/\nRevisar las salidas generadas en cada capítulo después de ejecutar los scripts"
+  },
+  {
+    "objectID": "unidad_i/index.html#enlace-de-retorno",
+    "href": "unidad_i/index.html#enlace-de-retorno",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "Enlace de retorno",
+    "text": "Enlace de retorno\n👉 Volver a la página principal del proyecto"
   }
 ]
