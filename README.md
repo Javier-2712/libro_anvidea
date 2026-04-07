@@ -42,9 +42,9 @@ Cada capítulo contiene:
 ### Opción 1 — Ejecutar por unidad
 
 ```r
-source("Unidad_I/run_unidad1.R")
-source("Unidad_II/run_unidad2.R")
-source("Unidad_III/run_unidad3.R")
+source("Unidad_i/run_unidad1.R")
+source("Unidad_ii/run_unidad2.R")
+source("Unidad_iii/run_unidad3.R")
 ```
 
 ### Opción 2 — Ejecutar por capítulo
@@ -121,7 +121,6 @@ Este proyecto distingue entre el código y los contenidos académicos:
 - 📘 Contenidos del libro y material pedagógico: Licenciados bajo Creative Commons CC BY-NC 4.0
 
 Esto permite la reutilización académica y docente del material, evitando su uso comercial sin autorización del autor.
-
 
 ---
 
