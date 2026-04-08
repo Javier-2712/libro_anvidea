@@ -12,114 +12,51 @@ format:
 
 # Unidad III: Ecología de comunidades
 
-Esta unidad integra herramientas modernas para el análisis de la **biodiversidad** desde una perspectiva taxonómica, funcional y filogenética. Su propósito es acompañar la lectura del libro **ANVIDEA** con scripts reproducibles, bases de datos de ejemplo y una secuencia clara de trabajo por capítulos.
+Material reproducible del libro **ANVIDEA** para trabajar en R.
+
+---
+
+## 🚀 Empezar aquí
+
+1. Descarga el repositorio  
+2. Abre la carpeta en RStudio  
+3. Ejecuta:
+
+```r
+source("unidad_iii/run_unidad3.R")
+```
+
+---
+
+## 💻 ¿Cómo usar este material?
 
 ::: {.callout-note}
-## ¿Qué encontrarás aquí?
 
-En esta sección del portal podrás:
+Este portal no ejecuta código directamente.
 
-- comprender el propósito general de la unidad;
-- identificar los prerrequisitos mínimos para usar los scripts;
-- seguir un orden recomendado de estudio;
-- acceder al código fuente en GitHub;
-- descargar el material del repositorio;
-- revisar los capítulos que conforman la unidad;
-- anticipar datos, paquetes y recomendaciones técnicas de ejecución.
+Para trabajar con los análisis de esta unidad:
+
+1. Descarga el repositorio o abre la carpeta en GitHub  
+2. Guarda los archivos en tu computador  
+3. Abre la carpeta en RStudio  
+4. Ejecuta el script principal (`run_unidad3.R`)  
+
+👉 Todos los análisis se realizan de forma local en R
+
 :::
 
-## Propósito de la unidad
+---
 
-La Unidad III busca fortalecer competencias para **analizar e interpretar la biodiversidad a múltiples escalas**. A lo largo de esta unidad, el usuario podrá comparar ensamblajes biológicos entre sitios, integrar abundancias, rasgos funcionales y relaciones filogenéticas, y generar resultados reproducibles en R con enfoque aplicado a ecología de comunidades.
-
-## Prerrequisitos
-
-Antes de iniciar esta unidad, se recomienda que el usuario tenga:
-
-- conocimientos básicos de R y RStudio;
-- manejo elemental de objetos, scripts y directorios de trabajo;
-- nociones introductorias de diversidad alfa, beta y gamma;
-- familiaridad básica con archivos `.xlsx`, `.rds` y con instalación de paquetes en R.
-
-::: {.callout-tip}
-## Recomendación
-
-Si esta es tu primera aproximación al material, conviene revisar primero el capítulo correspondiente del libro y luego ejecutar los scripts en el orden sugerido en esta página.
-:::
-
-## Orden recomendado de trabajo
-
-Se sugiere desarrollar la unidad en el siguiente orden:
-
-1. **Capítulo 7. Diversidad taxonómica**  
-   Identidad y abundancia de especies, diversidad alfa, beta y gamma, y patrones de recambio entre ensamblajes.
-
-2. **Capítulo 8. Diversidad funcional y filogenética**  
-   Rasgos ecológicos, relaciones evolutivas y descomposición multidimensional de la biodiversidad.
-
-La progresión conceptual de la unidad puede resumirse así:
-
-**Taxonomía → Función → Filogenia**
-
-## Acceso al código
+## 📂 Acceso al código
 
 <div style="margin-top: 0.5em; margin-bottom: 1em;">
   <a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii" target="_blank" style="display:inline-block; padding:0.6em 1em; margin-right:0.6em; background:#2b8cbe; color:white; text-decoration:none; border-radius:8px;">Ver código en GitHub</a>
   <a href="https://github.com/Javier-2712/libro_anvidea/archive/refs/heads/main.zip" target="_blank" style="display:inline-block; padding:0.6em 1em; background:#238b45; color:white; text-decoration:none; border-radius:8px;">Descargar repositorio (ZIP)</a>
 </div>
 
-## Capítulos de la unidad
+---
 
-### Capítulo 7. Diversidad taxonómica
-
-Carpeta: `cap7-diversidad-taxonomica/`
-
-Este capítulo aborda la diversidad desde la identidad y abundancia de las especies. Integra enfoques clásicos y modernos para describir y comparar ensamblajes biológicos en términos de riqueza, equidad, diversidad efectiva y recambio composicional.
-
-**Temas principales:**
-- diversidad alfa con `q = 0, 1, 2`;
-- curvas rango–abundancia (RAD);
-- diversidad beta y gamma;
-- disimilitud de Jaccard;
-- contribución local a la diversidad beta (LCBD);
-- interpretación ecológica del recambio entre sitios.
-
-### Capítulo 8. Diversidad funcional y filogenética
-
-Carpeta: `cap8-diversidad-funcional-filogenetica/`
-
-Este capítulo amplía el análisis al incorporar **rasgos funcionales** y **relaciones evolutivas**. Se trabaja con métricas funcionales, diversidad filogenética y enfoques modernos de rarefacción y extrapolación para interpretar la biodiversidad en un marco multidimensional.
-
-**Temas principales:**
-- CWM (*Community Weighted Means*);
-- métricas funcionales (`FRic`, `FEve`, `FDiv`, `FDis`);
-- descomposición de diversidad con Rao;
-- `iNEXT.3D` para FD y PD;
-- `iNEXTbeta3D` para diversidad beta funcional y filogenética;
-- alineación entre matrices de abundancia y árboles filogenéticos.
-
-## Recomendaciones de ejecución
-
-Antes de correr los scripts de esta unidad, ten en cuenta lo siguiente:
-
-- ejecuta primero el archivo `00_setup.R` de cada capítulo, cuando esté disponible;
-- trabaja desde el directorio raíz de la unidad o del capítulo correspondiente;
-- conserva sin cambios la estructura de carpetas `R/`, `data/raw/` y `outputs/`;
-- confirma que los paquetes requeridos estén instalados;
-- revisa el `README.md` de la unidad y de cada capítulo para detalles puntuales.
-
-::: {.callout-warning}
-## Advertencia técnica
-
-Los errores más frecuentes al ejecutar los scripts suelen deberse a:
-
-- rutas alteradas por mover carpetas o archivos;
-- nombres de archivos modificados;
-- paquetes no instalados;
-- desajustes entre matrices de abundancia, rasgos y filogenia.
-:::
-
-## 📂 Acceso directo a capítulos
+## 📘 Selecciona un capítulo
 
 Explora cada capítulo de la unidad con acceso directo a sus scripts, datos y resultados:
 
@@ -144,21 +81,77 @@ Explora cada capítulo de la unidad con acceso directo a sus scripts, datos y re
   - Diversidad filogenética
   - iNEXT.3D e iNEXTbeta3D
   - Integración rasgos–filogenia–abundancia
-  
-  
-## ▶️ Ejecución rápida
 
-Para ejecutar los análisis de la unidad:
+---
+
+## ▶️ Ejecución rápida
 
 ```r
 source("unidad_iii/run_unidad3.R")
 ```
 
+::: {.callout-tip}
+
+Esta unidad avanza desde la diversidad taxonómica hacia enfoques funcionales y filogenéticos.  
+Se recomienda ejecutar primero el Capítulo 7 y luego el Capítulo 8.
+
+:::
+
+---
+
+# 🔽 Información de la unidad
+
+## Propósito
+
+Esta unidad integra herramientas modernas para el análisis de la **biodiversidad** desde una perspectiva taxonómica, funcional y filogenética. Su propósito es acompañar la lectura del libro **ANVIDEA** con scripts reproducibles, bases de datos de ejemplo y una secuencia clara de trabajo por capítulos.
+
+
+---
+
+## Prerrequisitos
+
+- conocimientos básicos de R y RStudio  
+- manejo elemental de objetos, scripts y directorios de trabajo  
+- nociones introductorias de diversidad alfa, beta y gamma  
+- familiaridad básica con archivos `.xlsx` y `.rds`  
+
+---
+
+## Orden recomendado de trabajo
+
+1. Capítulo 7 — Diversidad taxonómica  
+2. Capítulo 8 — Diversidad funcional y filogenética  
+
+La progresión conceptual de la unidad puede resumirse así:
+
+**Taxonomía → Función → Filogenia**
+
+---
+
+## Recomendaciones de ejecución
+
+- Ejecuta primero el archivo `00_setup.R` de cada capítulo, cuando esté disponible  
+- Trabaja desde el directorio raíz de la unidad o del capítulo correspondiente  
+- Conserva sin cambios la estructura de carpetas `R/`, `data/raw/` y `outputs/`  
+- Confirma que los paquetes requeridos estén instalados  
+
+::: {.callout-warning}
+
+Los errores más frecuentes al ejecutar los scripts suelen deberse a:
+
+- rutas alteradas por mover carpetas o archivos  
+- nombres de archivos modificados  
+- paquetes no instalados  
+- desajustes entre matrices de abundancia, rasgos y filogenia  
+
+:::
+
+---
+
 ## Datos y paquetes necesarios
 
-En términos generales, esta unidad utiliza:
-
 **Paquetes frecuentes**
+
 - `tidyverse`
 - `readxl`
 - `vegan`
@@ -168,29 +161,25 @@ En términos generales, esta unidad utiliza:
 - `iNEXTbeta3D`
 
 **Archivos de datos esperados**
-- Capítulo 7: `data/raw/datos.c7.xlsx`;
-- Capítulo 8: `data/raw/datos.c8.xlsx`, `arbol_filo_alfa.rds` y `arbol_filo_beta.rds`.
+
+- Capítulo 7: `data/raw/datos.c7.xlsx`
+- Capítulo 8: `data/raw/datos.c8.xlsx`, `arbol_filo_alfa.rds` y `arbol_filo_beta.rds`
 
 **Carpetas usuales**
+
 - `R/`
 - `data/raw/`
 - `outputs/figuras/`
 - `outputs/tablas/`
 
+---
+
 ## Relación con el libro ANVIDEA
 
-Esta unidad acompaña la sección del libro dedicada a la **ecología de comunidades**, permitiendo pasar de la interpretación de la diversidad taxonómica a un enfoque más integrador basado en funciones ecológicas e historia evolutiva. El portal complementa el libro con una ruta de trabajo ordenada y reproducible.
-
-## Siguiente paso sugerido
-
-Una vez revisada esta página, se recomienda:
-
-1. leer el capítulo correspondiente en el libro;
-2. descargar el código;
-3. abrir la carpeta de la unidad en RStudio;
-4. ejecutar los scripts por capítulo en el orden sugerido.
+Esta unidad acompaña la sección del libro dedicada a la **ecología de comunidades**, permitiendo pasar de la diversidad taxonómica a un enfoque más integrador basado en funciones ecológicas e historia evolutiva.
 
 ---
 
-**Repositorio general:** [libro_anvidea](https://github.com/Javier-2712/libro_anvidea)  
-**Portal web:** [ANVIDEA](https://javier-2712.github.io/libro_anvidea)
+## Enlace de retorno
+
+👉 [Volver a la página principal](../index.html)
