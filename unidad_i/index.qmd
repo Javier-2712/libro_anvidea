@@ -1,6 +1,5 @@
 ---
 title: "Unidad I. Análisis de datos ecológicos"
-subtitle: "Análisis de datos ecológicos"
 format: 
   html:
     toc: true
