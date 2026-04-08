@@ -2,7 +2,7 @@
   <img src="Logo_GIEN.png" alt="GIEN - Grupo de Investigación en Ecología Neotropical" width="250">
 </p>
 
-# Unidad I — Análisis de datos ecológicos
+# 🌿 Unidad I — Análisis de datos ecológicos
 
 Esta unidad introduce el flujo completo de análisis de datos ecológicos en R, integrando:
 
