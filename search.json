@@ -1,10 +1,10 @@
 [
   {
-    "objectID": "index.html",
-    "href": "index.html",
+    "objectID": "index.html#bienvenido",
+    "href": "index.html#bienvenido",
     "title": "ANVIDEA — Material reproducible",
-    "section": "",
-    "text": "Este portal reúne los materiales reproducibles del libro:\nAnálisis y Visualización de Datos Ecológicos y Ambientales — ANVIDEA\nMaterial complementario para la ejecución práctica del libro en R\nAquí puedes acceder a los scripts, datos y flujos de trabajo organizados por unidades y capítulos.\n\n\n\n\n\n\n⚠️ Importante\n\n\n\nEste portal es un espacio de navegación y consulta.\nLos códigos en R no se ejecutan aquí en la web.\nPara trabajar con el material es necesario:\n\nDescargar el repositorio o los archivos del capítulo\nAbrirlos en RStudio o Quarto\nEjecutar los scripts de forma local"
+    "section": "Bienvenido",
+    "text": "Bienvenido\nEste portal reúne los materiales reproducibles del libro:\nAnálisis y Visualización de Datos Ecológicos y Ambientales — ANVIDEA\nMaterial complementario para la ejecución práctica del libro en R\nAquí puedes acceder a los scripts, datos y flujos de trabajo organizados por unidades y capítulos.\n\n\n\n\n\n\n⚠️ Importante\n\n\n\nEste portal es un espacio de navegación y consulta.\nLos códigos en R no se ejecutan aquí en la web.\nPara trabajar con el material es necesario:\n\nDescargar el repositorio o los archivos del capítulo\nAbrirlos en RStudio o Quarto\nEjecutar los scripts de forma local"
   },
   {
     "objectID": "index.html#unidades-del-libro",
