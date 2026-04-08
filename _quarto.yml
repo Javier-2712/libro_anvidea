@@ -27,7 +27,6 @@ website:
 
 format:
   html:
-    cover-image: Logo_GIEN.png
     theme: cosmo
     css: styles.css
     toc: false
