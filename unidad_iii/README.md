@@ -1,3 +1,8 @@
+<p align="left">
+  <img src="Logo_GIEN.png" alt="GIEN - Grupo de Investigación en Ecología Neotropical" width="250">
+</p>
+
+
 # 🌿 Unidad III — Ecología de comunidades
 
 La Unidad III integra herramientas modernas para el análisis de la biodiversidad, combinando enfoques taxonómicos, funcionales y filogenéticos en un marco cuantitativo y reproducible en R.
