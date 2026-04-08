@@ -1,5 +1,5 @@
 ---
-title: "Unidad I"
+title: "Unidad I. Análisis de datos ecológicos"
 subtitle: "Análisis de datos ecológicos"
 format: 
   html:
@@ -12,8 +12,6 @@ editor:
   markdown: 
     wrap: 72
 ---
-
-# Unidad I: Análisis de datos ecológicos
 
 Material reproducible del libro **ANVIDEA** para trabajar en R.
 
