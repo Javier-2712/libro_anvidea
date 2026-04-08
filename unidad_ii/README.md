@@ -1,133 +1,157 @@
-# Unidad II — Ecología de poblaciones
+<p align="center">
+  <img src="Logo_GIEN.png" alt="GIEN - Grupo de Investigación en Ecología Neotropical" width="300">
+</p>
 
-Esta unidad integra herramientas cuantitativas para el análisis de la dinámica poblacional, abordando procesos de crecimiento, estructura demográfica y organización espacial.
+# ANVIDEA — Material reproducible
 
-Incluye tres capítulos articulados:
+Repositorio oficial de materiales reproducibles asociados al libro:
 
-- Modelos de crecimiento poblacional  
-- Estructura por edades y estados  
-- Patrones espaciales y estimación de densidad  
+**“Análisis y Visualización de Datos Ecológicos y Ambientales — ANVIDEA”**
+
+# ANVIDEA — Material reproducible
+
+Repositorio oficial de materiales reproducibles asociados al libro:
+
+**“Análisis y Visualización de Datos Ecológicos y Ambientales — ANVIDEA”**
+
+Este repositorio está diseñado para que estudiantes, docentes e investigadores puedan:
+
+- Reproducir los análisis presentados en el libro  
+- Explorar los datos utilizados en los casos guiados  
+- Ejecutar scripts organizados por unidades y capítulos  
+- Adaptar los flujos de trabajo a sus propios datos  
 
 ---
 
-## 🎯 Propósito de la unidad
 
-Desarrollar competencias para:
 
-- modelar el crecimiento poblacional  
-- interpretar parámetros demográficos (r, λ, K)  
-- analizar la estructura poblacional por edades y estados  
-- evaluar patrones espaciales y estimar densidad  
+## 📁 Estructura general
 
----
+El repositorio se organiza en tres unidades:
 
-## 📁 Estructura de la unidad
+- **Unidad I   — Análisis de datos ecológicos**
+- **Unidad II  — Ecología de poblaciones**
+- **Unidad III — Ecología de comunidades**
 
-- **cap4-modelos-poblacionales/**  
-  Modelos de crecimiento poblacional  
+Cada unidad contiene:
 
-- **cap5-tablas-vida/**  
-  Estructura demográfica y modelos matriciales  
-
-- **cap6-distribucion-densidad/**  
-  Patrones espaciales y estimación de densidad  
+- `README.md` → descripción de la unidad  
+- `run_unidadX.R` → ejecución completa de la unidad  
+- carpetas por capítulo  
 
 Cada capítulo contiene:
 
-- `README.md` → explicación del capítulo  
+- `README.md` → explicación del contenido  
 - `R/` → scripts del análisis  
 - `data/raw/` → datos de entrada  
-- `outputs/` → resultados generados  
+- `outputs/figuras/` → gráficos generados  
+- `outputs/tablas/` → tablas exportadas  
 
 ---
 
-## ⚠️ Uso del material
+## ▶️ Cómo usar este material
 
-Los scripts en R **no se ejecutan desde GitHub ni desde el portal web**.
+Este repositorio contiene los materiales reproducibles del libro ANVIDEA.
 
-👉 Este material está diseñado para trabajarse en un entorno local.
+Los códigos en R no se ejecutan directamente desde GitHub ni desde el portal web.
 
-Para utilizarlo:
+👉 Este material está diseñado para ser utilizado en un entorno local (RStudio o Quarto).
 
-1. Descarga la carpeta de la unidad o el repositorio completo  
-2. Ábrelo en RStudio o Quarto  
-3. Ejecuta los scripts en tu computador  
+Para trabajar con el contenido:
 
----
+1. Descarga el repositorio (ZIP) o clónalo  
+2. Descomprímelo en tu computador  
+3. Abre la carpeta en RStudio  
+4. Ejecuta los scripts desde R  
 
-## ▶️ Formas de ejecución
 
-### 🔹 Opción 1 — Ejecutar toda la unidad
+### Opción 1 — Ejecutar el material por unidad
 
 ```r
-source("run_unidad2.R")
+source("unidad_i/run_unidad1.R")
+source("unidad_ii/run_unidad2.R")
+source("unidad_iii/run_unidad3.R")
+```
+
+### Opción 2 — Ejecutar el material por capítulo
+
+Ubícate dentro del capítulo y ejecuta:
+
+```r
+source("R/00_setup.R")
+source("R/01_casoA_*.R")
 ```
 
 ---
 
-### 🔹 Opción 2 — Ejecutar por capítulo
+## 📊 Datos
 
-#### Capítulo 4
-```r
-source("cap4-modelos-poblacionales/R/01_casoA_modelo_exponencial.R")
-source("cap4-modelos-poblacionales/R/02_casoB_modelo_logistico.R")
+Cada capítulo incluye sus propios datos en:
+
+```text
+data/raw/
 ```
 
-#### Capítulo 5
-```r
-source("cap5-tablas-vida/R/01_casoA1_tabla_vida_edad.R")
-source("cap5-tablas-vida/R/02_casoA2_tabla_vida_gotelli.R")
-source("cap5-tablas-vida/R/03_casoB_modelo_leslie.R")
-source("cap5-tablas-vida/R/04_casoC_modelo_lefkovitch.R")
-```
-
-#### Capítulo 6
-```r
-source("cap6-distribucion-densidad/R/01_casoA_patrones_distribucion.R")
-source("cap6-distribucion-densidad/R/02_casoB_estimacion_densidad.R")
-```
+Estos archivos deben mantenerse sin modificaciones para garantizar la reproducibilidad.
 
 ---
 
-## 📊 Datos utilizados
+## 📤 Salidas
 
-- Capítulo 4: simulaciones o datos generados en script  
-- Capítulo 5: `data/raw/datos.c5.xlsx`  
-- Capítulo 6: `data/raw/datos.c6.xlsx`  
+Los resultados generados por los scripts se almacenan en:
+
+- `outputs/figuras/`
+- `outputs/tablas/`
 
 ---
 
-## 💡 Recomendaciones
+## 🌐 Portal web
 
-- Ejecuta los capítulos en el orden propuesto  
-- No modifiques los nombres de archivos de datos  
-- Mantén la estructura de carpetas (`R/`, `data/raw/`, `outputs/`)  
-- Verifica que los paquetes necesarios estén instalados  
+Puedes explorar este material de forma estructurada en la página del proyecto:
+
+👉 *[Ir a enlace ANVIDEA](https://javier-2712.github.io/libro_anvidea/)*
 
 ---
 
 ## 🧠 Enfoque pedagógico
 
-La unidad sigue una progresión conceptual:
+El repositorio sigue la misma lógica del libro:
 
-1. **Tiempo** → crecimiento poblacional  
-2. **Estructura** → organización por edades y estados  
-3. **Espacio** → distribución y densidad  
-
-Esto permite integrar modelos matemáticos con interpretación ecológica en diferentes escalas.
+1. **Unidad I** → manipulación y exploración de datos  
+2. **Unidad II** → dinámica y estructura poblacional  
+3. **Unidad III** → diversidad y organización de comunidades  
 
 ---
 
-## 🔗 Relación con el libro
+## ⚠️ Recomendaciones
 
-Esta unidad corresponde al componente de **ecología de poblaciones** del libro ANVIDEA, conectando los fundamentos analíticos con aplicaciones ecológicas reales.
+- Ejecutar los scripts en el orden sugerido  
+- No modificar los nombres de archivos de datos  
+- Verificar que los paquetes requeridos estén instalados  
 
 ---
 
-## ⬅️ Navegación
+## 👨‍🏫 Autores
 
-👉 Volver al repositorio principal:  
-https://github.com/Javier-2712/libro_anvidea  
+**Javier Rodríguez-Barrios**  
+**Kenedith Méndez**  
+**Javier de la Hoz**
 
-👉 Volver al portal web:  
-https://javier-2712.github.io/libro_anvidea/
+---
+
+## 📄 Licencia
+
+Este proyecto distingue entre el código y los contenidos académicos:
+
+- 💻 Código en R: Licenciado bajo MIT License
+- 📘 Contenidos del libro y material pedagógico: Licenciados bajo Creative Commons CC BY-NC 4.0
+
+Esto permite la reutilización académica y docente del material, evitando su uso comercial sin autorización del autor.
+
+---
+
+## 🚀 Estado del proyecto
+
+✔ Estructura base implementada  
+✔ Scripts organizados por unidades  
+✔ Material listo para uso educativo y reproducible  
