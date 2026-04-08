@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="Logo_GIEN.png" alt="GIEN - Grupo de Investigación en Ecología Neotropical" width="200">
+</p>
+
 # Unidad I — Análisis de datos ecológicos
 
 Esta unidad introduce el flujo completo de análisis de datos ecológicos en R, integrando:
@@ -103,6 +107,17 @@ Esta unidad corresponde a la base metodológica del libro ANVIDEA, donde se cons
 - análisis de datos (Unidad I)  
 - modelos poblacionales (Unidad II)  
 - análisis de comunidades (Unidad III)  
+
+---
+
+## 📄 Licencia
+
+Este proyecto distingue entre el código y los contenidos académicos:
+
+- 💻 Código en R: Licenciado bajo MIT License
+- 📘 Contenidos del libro y material pedagógico: Licenciados bajo Creative Commons CC BY-NC 4.0
+
+Esto permite la reutilización académica y docente del material, evitando su uso comercial sin autorización del autor.
 
 ---
 
