@@ -1,5 +1,5 @@
-<p align="center">
-  <img src="Logo_GIEN.png" alt="GIEN - Grupo de Investigación en Ecología Neotropical" width="200">
+<p align="left">
+  <img src="Logo_GIEN.png" alt="GIEN - Grupo de Investigación en Ecología Neotropical" width="250">
 </p>
 
 # Unidad I — Análisis de datos ecológicos
