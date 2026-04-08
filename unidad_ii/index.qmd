@@ -74,7 +74,7 @@ Se sugiere desarrollar la unidad en el siguiente orden:
 La Unidad II puede ejecutarse de forma completa mediante el script principal:
 
 ```r
-source("run_unidad2_ajustado.R")
+source("run_unidad2.R")
 ```
 
 Este archivo permite ejecutar de manera secuencial los capítulos:
@@ -138,7 +138,7 @@ Antes de ejecutar los scripts de esta unidad, ten en cuenta lo siguiente:
 
 - asegúrate de estar ubicado en el directorio raíz del proyecto;
 - verifica que la estructura de carpetas no haya sido modificada;
-- ejecuta preferiblemente el archivo `run_unidad2_ajustado.R`;
+- ejecuta preferiblemente el archivo `run_unidad2.R`;
 - confirma que los paquetes requeridos estén instalados;
 - revisa los archivos `00_setup.R` de cada capítulo si deseas una ejecución por separado.
 
