@@ -12,7 +12,24 @@ Este portal reúne los **materiales reproducibles** del libro:
 
 **Análisis y Visualización de Datos Ecológicos y Ambientales — ANVIDEA**
 
+*Material complementario para la ejecución práctica del libro en R*
+
 Aquí puedes acceder a los scripts, datos y flujos de trabajo organizados por unidades y capítulos.
+
+
+::: {.callout-warning}
+## ⚠️ Importante
+
+Este portal es un espacio de navegación y consulta.
+
+Los códigos en R **no se ejecutan aquí en la web**.
+
+Para trabajar con el material es necesario:
+
+1. Descargar el repositorio o los archivos del capítulo
+2. Abrirlos en RStudio o Quarto
+3. Ejecutar los scripts de forma local
+:::
 
 ---
 
@@ -35,7 +52,7 @@ Aquí puedes acceder a los scripts, datos y flujos de trabajo organizados por un
 - Modelos matriciales  
 - Distribución y densidad  
 
-👉 [Ir a Unidad II](unidad_ii//index.qmd)
+👉 [Ir a Unidad II](unidad_ii/index.qmd)
 
 ---
 
@@ -89,7 +106,7 @@ Este material permite:
 
 Accede al código completo en GitHub:
 
-👉 *[Enlace_repositorio_ANVIDEA](https://github.com/Javier-2712/libro_anvidea)*
+👉 *[Ver_repositorio_ANVIDEA](https://github.com/Javier-2712/libro_anvidea)*
 
 
 ---

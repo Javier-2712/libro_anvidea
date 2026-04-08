@@ -13,6 +13,8 @@ Este repositorio está diseñado para que estudiantes, docentes e investigadores
 
 ---
 
+
+
 ## 📁 Estructura general
 
 El repositorio se organiza en tres unidades:
@@ -37,17 +39,31 @@ Cada capítulo contiene:
 
 ---
 
-## ▶️ Cómo usar este repositorio
+## ▶️ Cómo usar este material
 
-### Opción 1 — Ejecutar por unidad
+Este repositorio contiene los materiales reproducibles del libro ANVIDEA.
+
+Los códigos en R no se ejecutan directamente desde GitHub ni desde el portal web.
+
+👉 Este material está diseñado para ser utilizado en un entorno local (RStudio o Quarto).
+
+Para trabajar con el contenido:
+
+1. Descarga el repositorio (ZIP) o clónalo  
+2. Descomprímelo en tu computador  
+3. Abre la carpeta en RStudio  
+4. Ejecuta los scripts desde R  
+
+
+### Opción 1 — Ejecutar el material por unidad
 
 ```r
-source("Unidad_i/run_unidad1.R")
-source("Unidad_ii/run_unidad2.R")
-source("Unidad_iii/run_unidad3.R")
+source("unidad_i/run_unidad1.R")
+source("unidad_ii/run_unidad2.R")
+source("unidad_iii/run_unidad3.R")
 ```
 
-### Opción 2 — Ejecutar por capítulo
+### Opción 2 — Ejecutar el material por capítulo
 
 Ubícate dentro del capítulo y ejecuta:
 
