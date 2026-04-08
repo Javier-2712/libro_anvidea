@@ -1,6 +1,5 @@
 ---
-title: "Unidad III"
-subtitle: "Ecología de comunidades"
+title: "Unidad III. Ecología de comunidades"
 format:
   html:
     toc: true
@@ -9,8 +8,6 @@ format:
     css: ../styles.css
     number-sections: false
 ---
-
-# Unidad III: Ecología de comunidades
 
 Material reproducible del libro **ANVIDEA** para trabajar en R.
 
