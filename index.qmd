@@ -6,6 +6,10 @@ format:
     theme: cosmo
 ---
 
+<div style="text-align: center; margin-top: 10px; margin-bottom: 20px;">
+  <img src="../Logo_GIEN.png" alt="GIEN - Grupo de Investigación en Ecología Neotropical" width="220">
+</div>
+
 ## Bienvenido
 
 Este portal reúne los **materiales reproducibles** del libro:
