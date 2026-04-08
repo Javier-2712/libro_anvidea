@@ -1,6 +1,5 @@
 ---
-title: "Unidad II"
-subtitle: "Ecología de poblaciones"
+title: "Unidad II. Ecología de poblaciones"
 format: 
   html:
     toc: true
@@ -9,8 +8,6 @@ format:
     css: ../styles.css
     number-sections: false
 ---
-
-# Unidad II: Ecología de poblaciones
 
 Material reproducible del libro **ANVIDEA** para trabajar en R.
 
