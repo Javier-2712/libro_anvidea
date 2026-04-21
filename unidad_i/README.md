@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="Logos.png" width="500">
+  <img src="Logos.png" width="400">
 </p>
 
 # 🌿 Unidad I — Análisis de datos ecológicos
