@@ -1,0 +1,794 @@
+
+## Caso guiado: Diversidad funcional y filogenética de peces en ríos de México
+
+## B. Diversidad taxonómica, funcional y filogenética con números efectivos q = 0, 1 y 2
+
+### B.1 iNEXT.3D (2021) Diversidad alfa: taxonómica (TD), filogenética (PD) y funcional (FD).
+
+
+#### B.1.1 Diversidad alfa taxonómica (TD)
+
+#### B.1.2 Diversidad alfa filogenética (PD)
+
+##### 1) Construir la matriz de abundancias (Especies × Sitios)
+
+```{r}
+#| label: biolPD-1-base
+#| message: FALSE
+#| warning: FALSE
+#| echo: false
+
+library(readxl); 
+library(dplyr); 
+library(tidyr)
+library(iNEXT.3D)      # Números de Hill en 3 dimensiones (TD/FD/PD)
+library(iNEXT.beta3D) # Extensión para beta-diversidad (TD/FD/PD)
+
+
+# (1) Crear dataframe biol_PD
+biol_PD <- read_xlsx("datos.c8.xlsx", sheet = "tax") %>%
+  dplyr::select(-1) %>%         # descarta la 1ra col. (IDs)
+  
+  pivot_longer(-Sites1, 
+               names_to = "Especies", 
+               values_to = "Abundancia") %>%
+  group_by(Sites1, Especies) %>%
+  summarise(Abundance = sum(Abundancia, na.rm = TRUE), 
+            .groups = "drop") %>%
+  
+  pivot_wider(names_from = Sites1, 
+              values_from = Abundance, 
+              values_fill = 0) %>%
+  tibble::column_to_rownames("Especies") %>%
+  
+# (2) (opcional) excluir especie no reconocida por la base filogenética:
+  { .[rownames(.) != "Notropis aguirrepequenoi", 
+      , drop = FALSE] } %>%
+  # limpieza básica
+  mutate(across(everything(),
+                ~ suppressWarnings(as.numeric(.)))) %>%
+  { .[, colSums(.) > 0, drop = FALSE] } %>%
+  { .[rowSums(.) > 0 & !is.na(rownames(.)), , drop = FALSE] }
+
+# Vista rápida
+# biol_PD %>% 
+#   head()
+
+```
+
+##### 2) Armonizar nombres y alinear con el árbol (LatinName exacto)
+
+```{r}
+#| label: biolPD-2-alinear
+#| message: FALSE
+#| warning: FALSE
+#| echo: false
+
+# función de normalización mínima (espacios, guiones bajos, minúsculas)
+.fix <- function(x) {
+  x <- trimws(gsub("_", " ", x))
+  x <- gsub("\\s+", " ", x)
+  tolower(x)
+}
+
+# Cargar el árbol filogenético
+arbol_filo_alfa <- readRDS("arbol_filo_alfa.rds")
+
+# normalizar nombres en matriz y árbol
+rownames(biol_PD) <- .fix(rownames(biol_PD))
+arbol_filo_alfa$tip.label <- .fix(arbol_filo_alfa$tip.label)
+
+# conservar únicamente las especies en común y ordenar como el árbol
+comunes <- intersect(rownames(biol_PD), 
+                     arbol_filo_alfa$tip.label)
+stopifnot(length(comunes) > 0)  # garantía: debe haber intersección
+
+# podar árbol a comunes y reordenar matriz al orden del árbol
+arbol_filo_alfa <- 
+  ape::drop.tip(arbol_filo_alfa, 
+                setdiff(arbol_filo_alfa$tip.label, comunes))
+biol_PD <- 
+  biol_PD[match(arbol_filo_alfa$tip.label, rownames(biol_PD)), 
+          , drop = FALSE]
+
+# (Opcional) Comprobación rápida y lista para PD
+# deben coincidir número de filas (especies) y tips del árbol
+# nrow(biol_PD); 
+# length(arbol_filo_alfa$tip.label)
+```
+
+##### 3) Calculo de la diversidad filogenética (PD)
+
+```{r, echo=FALSE}
+#| message: false
+#| warning: false
+
+# 5) iNEXT3D con PD
+library(iNEXT.3D)
+
+# Ejecuttar la diversidad filogenética
+salida_abun2 <- 
+  iNEXT3D(
+  biol_PD,
+  diversity = "PD",
+  q = c(0, 1, 2),
+  datatype = "abundance",
+  nboot = 20,
+  PDtree = arbol_filo_alfa,
+  PDtype = "meanPD"
+)
+```
+
+```{r}
+#| label: tbl-c8-20
+#| tbl-cap: "Resumen de la diversidad filogenética (PD), para los ensamblajes M, P y RM."
+#| message: false
+#| warning: false
+
+salida_abun2$PDInfo%>%
+  head() %>%
+  dplyr::select(1:9) %>%   
+  kbl(booktabs = TRUE, digits = 2,
+      longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+##### 4) Estimaciones estandarizadas de diversidad filogenética
+
+```{r}
+#| label: tbl-c8-21
+#| tbl-cap: "Resumen de las estimaciones tamaño-dependientes (size-based) de la diversidad filogenética (qPD) para las tres zonas comparadas."
+#| message: false
+#| warning: false
+#| echo: false
+
+salida_abun2$PDiNextEst$size_based %>%
+  head() %>%
+  kbl(booktabs = TRUE, digits = 2,
+      longtable = TRUE) %>%
+  kable_classic(full_width = FALSE) 
+```
+
+##### 5) Estimaciones de diversidad filogenética estandarizadas por cobertura
+
+```{r}
+#| label: tbl-c8-22
+#| tbl-cap: "Resumen de las estimaciones basadas en cobertura (coverage based) de la diversidad filogenética (qPD)."
+#| echo: false
+
+salida_abun2$PDiNextEst$coverage_based %>%
+  head() %>%
+  kbl(booktabs = TRUE, digits = 2,
+      longtable = TRUE) %>%
+  kable_classic(full_width = FALSE) 
+```
+
+
+##### 6) Estimaciones observadas y asintóticas de la diversidad filogenética
+
+```{r}
+#| label: tbl-c8-23
+#| tbl-cap: "Resumen de los estimadores asintóticos de diversidad filogenética (PD), para los órdenes q = 0, 1 y 2."
+#| message: false
+#| warning: false
+#| echo: false
+
+salida_abun2$PDAsyEst %>%
+  head() %>%
+  kbl(booktabs = TRUE, digits = 2) %>%
+  kable_classic(full_width = FALSE) 
+```
+
+
+**1. Curvas de rarefacción y extrapolación por orden de diversidad**
+
+```{r}
+#| label: fig-c8-11
+#| fig-cap: "Curvas de rarefacción y extrapolación de la diversidad filogenética media (meanPD) en función del tamaño de muestra, separadas por ensamblaje (M, P y RM) y diferenciadas por orden de diversidad (q = 0, 1 y 2)."
+#| message: false
+#| warning: false
+#| fig-pos: 'H'
+#| fig-height: 5
+
+ggiNEXT3D(salida_abun2, type = 1, facet.var = "Assemblage") +
+  labs(
+    title = "",
+    x = "Número de individuos",
+    y = "Diversidad filogenética media",
+    color = "Ensamblaje",
+    shape = "Ensamblaje",
+    linetype = "Tipo de curva"
+  )
+```
+
+
+**2. Curvas de rarefacción y extrapolación por orden de diversidad**
+
+```{r}
+#| label: fig-c8-12
+#| fig-cap: "Curvas de rarefacción y extrapolación de la diversidad filogenética media (meanPD), basadas en el tamaño de muestra y separadas por el orden de diversidad (q = 0, 1 y 2)."
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-pos: 'H'
+#| fig-height: 5
+
+ggiNEXT3D(salida_abun2, type = 1, facet.var = "Order.q") +
+  labs(
+    title = "",
+    x = "Número de individuos",
+    y = "Diversidad filogenética media",
+    color = "Orden de diversidad (q)",
+    shape = "Orden de diversidad (q)",
+    linetype = "Tipo de curva"
+  )
+```
+
+**3. Curvas de completitud de muestra (Sample completeness curve)**
+
+```{r}
+#| label: fig-c8-13
+#| fig-cap: "Curvas de completitud de la muestra para los tres ensamblajes (M, P y RM), basadas en el tamaño de muestra (n). Se muestran los niveles de cobertura alcanzados a lo largo de la rarefacción y extrapolación."
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-pos: 'H'
+#| fig-height: 5
+
+# Sample completeness curves for abundance data, separating by "Assemblage"
+ggiNEXT3D(salida_abun2, type = 2, color.var = "Assemblage") +
+  labs(
+    x = "Cobertura de la muestra",
+    y = "Diversidad filogenética media",
+    color = "Ensamblaje",
+    shape = "Ensamblaje",
+    linetype = "Tipo de curva"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+```
+
+
+**4. Curvas de diversidad filogenética estandarizadas por cobertura**
+
+```{r}
+#| label: fig-c8-14
+#| fig-cap: "Curvas de rarefacción y extrapolación basadas en cobertura para la diversidad filogenética media (meanPD), separadas por ensamblaje (M, P y RM). Se incluyen los resultados para los órdenes de diversidad q = 0, 1 y 2."
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-pos: 'H'
+#| fig-height: 5
+
+# PD coverage-based R/E curves, separating by "Assemblage"
+ggiNEXT3D(salida_abun2, type = 3, facet.var = "Assemblage") +
+  labs(
+    x = "Cobertura de la muestra",
+    y = "Diversidad filogenética media",
+    color = "Ensamblaje",
+    shape = "Ensamblaje",
+    linetype = "Tipo de curva"
+  )
+
+```
+
+```{r}
+#| label: fig-c8-15
+#| fig-cap: "Curvas de rarefacción y extrapolación basadas en cobertura para la diversidad filogenética media (meanPD), separadas por el orden de diversidad (q = 0, 1 y 2)."
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-pos: 'H'
+#| fig-height: 5
+
+# PD coverage-based R/E curves, separating by "Order.q"
+ggiNEXT3D(salida_abun2, type = 3, facet.var = "Order.q") +
+ labs(
+    x = "Cobertura de la muestra",
+    y = "Diversidad filogenética media",
+    color = "Ensamblaje",
+    shape = "Ensamblaje",
+    linetype = "Tipo de curva"
+  )
+
+```
+
+##### 7) Perfiles tau de diversidad filogenética con datos de abundancia
+
+```{r}
+#| label: tbl-c8-24
+#| tbl-cap: "Estimaciones observadas y asintóticas de la diversidad filogenética (qPD) para los órdenes q = 0, 1 y 2. Se incluyen los intervalos de confianza, errores estándar y los tiempos de referencia empleados."
+#| message: false
+#| warning: false
+#| echo: false
+
+salida_abun2 <- ObsAsy3D(biol_PD,
+                         diversity = 'PD', 
+                         q = c(0, 1, 2), 
+                         PDreftime = seq(0.01, 400, 
+                                         length.out = 20),
+                         datatype = "abundance", 
+                         nboot = 20, 
+                         PDtree = arbol_filo_alfa)
+#
+salida_abun2 %>% 
+  head() %>%
+  kbl(digits = 2,
+      booktabs = TRUE, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+```
+
+**1. Interpretación de los perfiles tau de diversidad filogenética**
+
+```{r}
+#| label: fig-c8-16
+#| fig-cap: "Perfiles de diversidad filogenética media (meanPD) en función del tiempo de referencia, para los órdenes de diversidad q = 0, 1 y 2. Se muestran los valores observados y las estimaciones asintóticas para los ensamblajes M, P y RM."
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-pos: 'H'
+#| fig-height: 5
+
+ggObsAsy3D(salida_abun2, profile = "time") +
+  labs(
+    x = "Tiempo de referencia",
+    y = "Diversidad filogenética media",
+    color = "Ensamblaje",
+    fill  = "Ensamblaje",
+    shape = "Ensamblaje",
+    linetype = "Tipo de curva"
+  ) +
+  scale_linetype_discrete(labels = c(
+    "Asintótica", 
+    "Observada"
+  ))
+```
+
+#### B.1.3 Diversidad alfa funcional (FD)
+
+
+##### 1) Matriz de distancias de Gower
+
+```{r}
+#| message: false
+#| warning: false
+#| echo: false
+
+suppressPackageStartupMessages({
+  library(readxl)
+  library(dplyr)
+  library(tidyr)
+  library(stringr)
+  library(FD)       # gowdis()
+})
+
+# --- 1) Leer rasgos ---
+rasgos <- read_xlsx("datos.c8.xlsx", sheet = "rasgos")
+
+# --- 2) Definir variables ---
+vars_cont <- c("TrophicLevel", "BodyLength", "BodyLengthMax", "ShapeFactor")
+vars_bin  <- c("omnivory","detritivory","herbivory","invertivory","piscivory","carnivory")
+
+# --- 3) Limpiar y tipar (continuas numéricas, binarias 0/1) ---
+rasgos2 <- rasgos %>%
+  mutate(
+    across(all_of(vars_cont), as.numeric),
+    across(all_of(vars_bin), ~ case_when(
+      .x %in% c("Sí","Si","sí","si","yes","TRUE","True","true","1") ~ 1,
+      .x %in% c("No","no","FALSE","False","false","0","")          ~ 0,
+      TRUE ~ suppressWarnings(as.numeric(.x))
+    ))
+  ) %>%
+  # 5) quitar filas con NA en alguna de las variables elegidas
+  drop_na(all_of(c(vars_cont, vars_bin))) %>%
+  # 6) usar LatinName como rownames
+  tibble::column_to_rownames("LatinName")
+
+# (Opcional) 4) escalar continuas si lo prefieres (comentado):
+# rasgos2[vars_cont] <- lapply(rasgos2[vars_cont], scales::rescale)  # a [0,1]
+
+# --- 7) Distancia Gower (especies x especies) ---
+biol.dist.alfa <- FD::gowdis(rasgos2[, c(vars_cont, vars_bin)]) %>% as.matrix()
+
+# --- 8) (Opcional) Alinear con 'biol' si lo usarás junto a abundancias ---
+# stopifnot(exists("biol"))
+# spp_keep <- intersect(rownames(biol), rownames(biol.dist.alfa))
+# biol.dist.alfa <- biol.dist.alfa[spp_keep, spp_keep, drop = FALSE]
+
+# --- 9) Chequeos útiles ---
+stopifnot(is.matrix(biol.dist.alfa), isSymmetric(biol.dist.alfa))
+stopifnot(identical(rownames(biol.dist.alfa), colnames(biol.dist.alfa)))
+
+```
+
+##### 2) Base de abundancia por cada zona comparada (M, P y RM)
+
+```{r}
+#| label: tbl-c8-25
+#| tbl-cap: "Resumen de la matriz de abundancia de especies por cada ensamblaje (M, P y RM), generada a partir de la hoja tax luego de depurar nombres, estandarizar valores y alinear las especies con la matriz funcional (biol.dist.alfa)."
+#| message: false
+#| warning: false
+#| echo: false
+
+suppressPackageStartupMessages({
+  library(readxl)
+  library(dplyr)
+  library(tidyr)
+  library(stringr)
+  library(tibble)
+})
+
+tax <- read_xlsx("datos.c8.xlsx", sheet = "tax")
+
+# limpiar espacios al final en encabezados
+names(tax) <- str_replace(names(tax), "\\s+$", "")
+
+# detectar columna de sitio
+site_col <- dplyr::first(intersect(c("Sites1","Sites","Sitio","Station","Site"), names(tax)))
+stopifnot(!is.null(site_col))
+
+# construir biol: filas = Especies, columnas = sitios
+biol <- tax %>%
+  dplyr::rename(Site = !!site_col) %>%
+  pivot_longer(
+    cols = where(is.numeric),      # solo columnas numéricas (especies)
+    names_to = "Especies",
+    values_to = "Abundancia"
+  ) %>%
+  mutate(Abundancia = suppressWarnings(as.numeric(Abundancia))) %>%
+  group_by(Especies, Site) %>%
+  summarise(Abundancia = sum(Abundancia, na.rm = TRUE), .groups = "drop") %>%
+  pivot_wider(names_from = Site, values_from = Abundancia, values_fill = 0) %>%
+  column_to_rownames("Especies") %>%
+  as.data.frame()
+
+# chequeo rápido
+stopifnot(nrow(biol) > 0, ncol(biol) > 0)
+
+# asegurar alineación especies ↔ distancias
+spp_keep <- intersect(rownames(biol), rownames(biol.dist.alfa))
+stopifnot(length(spp_keep) > 0)
+
+biol <- biol[spp_keep, , drop = FALSE]
+biol.dist.alfa <- biol.dist.alfa[spp_keep, spp_keep, drop = FALSE]
+
+# por seguridad, mismo orden
+biol <- biol[rownames(biol.dist.alfa), , drop = FALSE]
+
+# Vista rápida
+biol %>%
+  head() %>%
+  kbl(booktabs = TRUE, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+##### 3) Estimación general de la diversidad funcional (FD) en ensamblajes de especies
+
+```{r}
+#| label: tbl-c8-26
+#| tbl-cap: "Resumen de la diversidad funcional (FD) para los ensamblajes M, P y RM."
+#| message: false
+#| warning: false
+#| echo: false
+
+library(iNEXT.3D)
+
+# Procedimiento un poco acelerado
+set.seed(1)
+salida_abun3 <- iNEXT3D(biol,
+                     diversity = "FD",
+                     q = c(0, 1, 2),         
+                     datatype = "abundance",
+                     nboot = 5,              # bootstrap reducido (acelera el cálculo)
+                     knots = 20,             # menos puntos en las curvas
+                     endpoint = NULL,        # o un endpoint menor: p.ej. 1.2 * n
+                     FDdistM = biol.dist.alfa,  # matriz especie x especie en [0,1]
+                     FDtype = "AUC"
+                     )
+
+# 
+salida_abun3$FDInfo %>%
+  kbl(booktabs = TRUE, digits = 2, 
+      longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+##### 4) Estimaciones estandarizadas de diversidad funcional (FD)
+
+```{r}
+#| label: tbl-c8-27
+#| tbl-cap: "Resumen de las estimaciones tamaño-dependientes (size based) de la diversidad funcional (qFD) para los ensamblajes M, P y RM."
+#| message: false
+#| warning: false
+#| echo: false
+
+salida_abun3$FDiNextEst$size_based%>%
+  head() %>%
+  kbl(booktabs = TRUE, digits = 2,
+      longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+
+##### 5) Diversidad funcional estandarizada por cobertura muestral
+
+```{r}
+#| label: tbl-c8-28
+#| tbl-cap: "Resumen de estimaciones basadas en cobertura (coverage based) de la diversidad funcional (qFD) para los ensamblajes M, P y RM."
+#| message: false
+#| warning: false
+#| echo: false
+
+salida_abun3$FDiNextEst$coverage_based %>%
+  head() %>%
+  kbl(booktabs = TRUE, digits = 2) %>%
+  kable_classic(full_width = FALSE) 
+```
+
+
+##### 6) Estimaciones asintóticas de diversidad funcional (FDAsyEst)
+
+```{r}
+#| label: tbl-c8-29
+#| tbl-cap: "Estimadores asintóticos de la diversidad funcional (qFD) para los ensamblajes M, P y RM."
+#| message: false
+#| warning: false
+#| echo: false
+ 
+salida_abun3$FDAsyEst %>%
+  head() %>%
+  kbl(booktabs = TRUE, digits = 2,
+      longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+
+**1. Curvas de rarefacción/extrapolación basadas en el tamaño de muestra (FD)**
+
+```{r}
+#| label: fig-c8-17
+#| fig-cap: "Curvas de rarefacción y extrapolación de la diversidad funcional (FD), basadas en el tamaño de muestra y separadas por ensamblaje."
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-pos: 'H'
+#| fig-height: 5
+
+ggiNEXT3D(salida_abun3, type = 1, facet.var = "Assemblage") +
+  labs(
+    title = "",
+    x = "Número de individuos",
+    y = "Diversidad funcional (AUC)",
+    color = "Orden q",
+    shape = "Orden q",
+    fill  = "Orden q",
+    linetype = "Tipo de curva"
+  ) +
+  scale_linetype_discrete(labels = c("Rarefacción", "Extrapolación"))
+
+```
+
+**2. Curvas de rarefacción/extrapolación por orden de diversidad (FD)**
+
+```{r}
+#| label: fig-c8-18
+#| fig-cap: "Curvas de rarefacción y extrapolación de la diversidad funcional (FD), basadas en el tamaño de muestra y separadas por orden de diversidad q."
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-pos: 'H'
+#| fig-height: 5
+
+ggiNEXT3D(salida_abun3, type = 1, facet.var = "Order.q") +
+  labs(
+    title = "",
+    x = "Número de individuos",
+    y = "Diversidad funcional (AUC)",
+    color = "Ensamblaje",
+    shape = "Ensamblaje",
+    fill  = "Ensamblaje",
+    linetype = "Tipo de curva"
+  ) +
+  scale_linetype_discrete(labels = c("Rarefacción", "Extrapolación"))
+
+```
+
+**3. Curvas de completitud muestral (FD)**
+
+```{r}
+#| label: fig-c8-19
+#| fig-cap: "Curvas de completitud de la muestra para los ensamblajes M, P y RM, basadas en el número de individuos muestreados."
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-pos: 'H'
+#| fig-height: 5
+
+ggiNEXT3D(salida_abun3, type = 2, color.var = "Assemblage") +
+  labs(
+    title = "",
+    x = "Número de individuos",
+    y = "Cobertura de la muestra",
+    color = "Ensamblaje",
+    shape = "Ensamblaje",
+    fill  = "Ensamblaje",
+    linetype = "Tipo de curva"
+  ) +
+  scale_linetype_discrete(labels = c("Rarefacción", "Extrapolación"))
+
+```
+
+**4. Curvas de rarefacción y extrapolación basadas en cobertura (FD)**
+
+```{r}
+#| label: fig-c8-20
+#| fig-cap: "Curvas de rarefacción y extrapolación de la diversidad funcional (FD) basadas en la cobertura de la muestra, separadas por ensamblaje."
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-pos: 'H'
+#| fig-height: 5
+
+ggiNEXT3D(salida_abun3, type = 3, facet.var = "Assemblage") +
+  labs(
+    title = "",
+    x = "Cobertura de la muestra",
+    y = "Diversidad funcional (AUC)",
+    color = "Orden q",
+    shape = "Orden q",
+    fill  = "Orden q",
+    linetype = "Tipo de curva"
+  ) +
+  scale_linetype_discrete(labels = c("Rarefacción", "Extrapolación"))
+
+```
+
+**5. Curvas de cobertura estandarizada y comparación entre ensamblajes**
+
+```{r}
+#| label: fig-c8-21
+#| fig-cap: "Curvas de rarefacción y extrapolación de la diversidad funcional (FD) basadas en la cobertura de la muestra, separadas por orden de diversidad q."
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-pos: 'H'
+#| fig-height: 5
+
+ggiNEXT3D(salida_abun3, type = 3, facet.var = "Order.q") +
+  labs(
+    title = "",
+    x = "Cobertura de la muestra",
+    y = "Diversidad funcional (AUC)",
+    color = "Ensamblaje",
+    shape = "Ensamblaje",
+    fill  = "Ensamblaje",
+    linetype = "Tipo de curva"
+  ) +
+  scale_linetype_discrete(labels = c("Rarefacción", "Extrapolación"))
+
+```
+
+##### 7) Perfiles de diversidad funcional (FD) según el orden de diversidad (q-profiles)
+
+```{r}
+#| label: tbl-c8-30
+#| tbl-cap: "Estimaciones observadas y asintóticas de la diversidad funcional (FD) para los órdenes de diversidad q = 0, 1 y 2, obtenidas mediante perfiles tau. La tabla muestra valores qFD, errores estándar, intervalos de confianza y el valor de tau correspondiente para cada ensamblaje."
+#| message: false
+#| warning: false
+#| echo: false
+
+# Cálculo de perfiles q de diversidad funcional (FD)
+# ObsAsy3D calcula diversidad observada y asintótica para distintos valores de q y $\tau$
+
+salida_abun3a <- ObsAsy3D(
+  biol,                     # Matriz de abundancias
+  diversity = 'FD',         # Dimensión funcional
+  q = c(0, 1, 2),           # Órdenes de diversidad (riqueza, Shannon y Simpson)
+  datatype = "abundance",   # Datos de tipo abundancia
+  nboot = 5,                # Número de remuestreos bootstrap
+  FDdistM = biol.dist.alfa, # Matriz de distancias funcionales (Gower)
+  FDtype = 'tau_values',    # Tipo de cálculo: perfil $\tau$ discreto
+  FDtau = seq(0, 1, 0.05)   # Secuencia de valores de $\tau$ (de 0 a 1 cada 0.05)
+)
+
+# Visualización de los primeros resultados
+# Incluye ensamblaje, orden q, valor de FD, error estándar y límites de confianza
+salida_abun3a %>% 
+  head() %>%
+  kbl(digits = 2, booktabs = TRUE,
+      longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+**1. perfiles de distintividad funcional (**$\tau$-profiles)
+
+```{r}
+#| label: fig-c8-22
+#| fig-cap: "Perfiles tau ($\tau$) de diversidad funcional, mostrando las estimaciones observadas y asintóticas para los órdenes de diversidad q = 0, 1 y 2."
+#| message: false
+#| warning: false
+#| echo: false
+
+ggObsAsy3D(salida_abun3a, profile = "tau") +
+  labs(
+    title = "",
+    x = "Tau ($\tau$)",
+    y = "Diversidad funcional",
+    linetype = "Tipo de estimación",
+    color = "Ensamblaje",
+    shape = "Ensamblaje",
+    fill  = "Ensamblaje"
+  ) +
+  scale_linetype_discrete(labels = c("Asintótica", "Observada"))
+
+```
+
+##### 8) Estimación de la diversidad funcional (FD) basada en los números de Hill
+
+```{r}
+#| label: tbl-c8-31
+#| tbl-cap: "Estimaciones observadas y asintóticas de la diversidad funcional (FD) para los ensamblajes M, P y RM, calculadas mediante el método AUC en distintos órdenes de diversidad (q 0, 0.5, 1, 1.5 y 2)."
+#| message: false
+#| warning: false
+#| echo: false
+
+# --- Estimación observada y asintótica de diversidad funcional (FD) ---
+
+# Carga la función principal del paquete iNEXT.3D
+# ObsAsy3D calcula la diversidad funcional observada y asintótica
+# para distintos órdenes de diversidad q, empleando la matriz de distancias funcionales.
+
+salida_abun3b <- 
+  ObsAsy3D(
+  biol,                   # Matriz de abundancias (especies x sitios)
+  diversity = 'FD',       # Diversidad funcional
+  q = seq(0, 2, 0.5),     # Valores de q (riqueza, Shannon y Simpson)
+  datatype = "abundance", # Tipo de datos: abundancias
+  nboot = 5,              # Número de remuestreos bootstrap para IC
+  FDdistM = biol.dist.alfa, # Matriz de distancias funcionales (Gower)
+  FDtype = 'AUC'          # Método AUC: integra todo el perfil $\tau$ (tau-profile)
+)
+
+# --- Visualización de resultados iniciales ---
+# Muestra las primeras filas de la salida, incluyendo:
+# ensamblaje, orden q, valor de FD, error estándar e intervalos de confianza.
+
+salida_abun3b %>% 
+  head() %>%
+  kbl(digits = 2, booktabs = TRUE,
+      longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+```
+
+**1. Perfil-q de diversidad funcional**
+
+```{r}
+#| label: fig-c8-23
+#| fig-cap: "Perfiles de diversidad funcional (q.profiles) que comparan los valores observados y asintóticos de FD para los ensamblajes M, P y RM en distintos órdenes de diversidad (q)."
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-pos: 'H'
+#| fig-height: 5
+
+ggObsAsy3D(salida_abun3b, profile = "q") +
+  labs(
+    title = "",
+    x = "Orden q",
+    y = "Diversidad funcional (AUC)",
+    linetype = "Tipo de estimación",
+    color = "Ensamblaje",
+    fill  = "Ensamblaje",
+    shape = "Ensamblaje"
+  ) +
+  scale_linetype_discrete(labels = c("Asintótica", "Observada"))
+
+```
+
+
+
+
+

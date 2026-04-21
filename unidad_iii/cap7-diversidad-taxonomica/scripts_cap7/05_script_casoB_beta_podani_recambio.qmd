@@ -1,0 +1,666 @@
+
+## B. Caso guiado: Diversidad beta y gamma con peces en ríos de México
+
+```{r}
+#| warning: false
+#| message: false
+
+library(knitr) 
+library(purrr)
+library(tibble)
+library(tidyverse)    # Para diferentes operaciones
+library(readxl)       # Para la lectura de archivos de Excel
+library(corrplot)     # Para las figuras de elipses
+library(vegan)        # Estimadores de diversidad
+library(ggrepel)      # Rótulos a los puntos de figuras en ggplot2
+library(kableExtra)   # Edición de las tablas
+
+# Diversidad beta
+library(betapart)   # Para diversidad beta de Baselga
+library(adespatial) # Para diversidad beta de Podani
+library(ggplot2)    # Para la edición de figuras
+library(caret)      # Para convertir datos a binarios
+library(factoextra) # Para los dendogramas
+library(gridExtra)  # Proyecta varias imágenes en un solo panel 
+
+library(iNEXT.beta3D)
+library(iNEXT)
+```
+
+
+### 3. Diversidad beta en sus componentes de reemplazo o recambio, diferencia de riqueza.
+
+#### a. Beta general con datos binarios (Podani & Schmera, 2011)
+
+```{r results='hide'}
+#| label: beta-podani-binario
+#| echo: false
+#| message: false
+#| warning: false
+
+
+library(dplyr)
+library(tidyr)
+
+# biol1: datos con una columna de zona (Sites1) y luego especies (abundancias)
+# Nos quedamos SOLO con columnas numéricas (abundancias) y limpiamos NA/Inf
+biol3 <- 
+  biol1 %>%
+  dplyr::select(where(is.numeric)) %>% 
+  mutate(across(everything(), ~as.numeric(.x))) %>%
+  mutate(across(everything(), ~tidyr::replace_na(.x, 0))) %>%
+  as.data.frame()
+
+biol3[!is.finite(as.matrix(biol3))] <- 0
+
+# Abundancia -> binario
+biol.bin <- (as.matrix(biol3) > 0) * 1
+
+# Jaccard Podani (datos binarios)
+beta.pod <- beta.div.comp(biol.bin, coef = "J", quant = FALSE)
+
+summary(beta.pod)
+
+```
+
+```{r}
+#| label: beta-podani-binario1
+#| warning: false
+#| message: false
+#| echo: false
+
+# Estadísticos generados
+round(beta.pod$part, 3)
+```
+
+
+```{r}
+#| label: fig-c7-16
+#| fig-cap: "Patrón espacial de diferencias de riqueza de especies respecto al sitio de referencia- 42"
+#| warning: false
+#| message: false
+#| echo: false
+#| fig-pos: 'H'
+
+# Extracción de la matriz de diferencias de riquezas 
+peces.riq <- as.matrix(beta.pod$rich)
+
+# Extraer las diferencias de riqueza de todos los sitios respecto al sitio 42 (referencia)
+peces.riq.42 <- peces.riq[42, -42] 
+
+# Genera la secuencia de sitios (1–41)
+site.names   <- (1:42)[-42]  
+
+# Data frame para ggplot2
+df <- data.frame(Sitio = site.names, DifRiqueza = peces.riq.42)
+
+# Visualización con ggplot2
+ggplot(df, aes(x = Sitio, y = DifRiqueza)) +
+  geom_line(color = "red", linewidth = 1) +
+  geom_point(shape = 21, size = 3, fill = "red") +
+  annotate("text", x = 3, y = 0.42, label = "Montañas", 
+           color = "darkgreen", size = 5, fontface = "italic") +
+  annotate("text", x = 17, y = 0.9, label = "planicies", 
+           color = "darkgreen", size = 5, fontface = "italic") +
+  annotate("text", x = 33, y = 0.2, label = "Desembocadura", 
+           color = "darkgreen", size = 5, fontface = "italic") +
+  scale_x_continuous(breaks = seq(1, 41, by = 2)) +
+  labs(title = "Diferencias de riqueza respecto al sitio 42 (referencia)",
+       x = "Sitios", y = "Diferencia de Riqueza (Jaccard - Podani)") +
+  theme_bw(base_size = 10) +
+  theme(panel.grid.minor = element_blank())
+```
+
+```{r}
+#| label: fig-c7-17
+#| fig-cap: "Patrón espacial de diferencias de los componentes de recambio y diferencia de especies respecto al sitio de referencia- 42"
+#| warning: false
+#| message: false
+#| echo: false
+#| fig-pos: 'H'
+#| fig-width: 7
+#| fig-height: 5
+
+# Sitio de referencia: 42 (43RM)
+ref <- 42
+
+# Convertir los objetos 'dist' a matrices M.
+M.rec <- as.matrix(beta.pod$repl)   # Recambio - M.rec
+M.riq <- as.matrix(beta.pod$rich)   # Diferencia de riqueza - M.riq
+M.beta <- if (!is.null(beta.pod$beta)) as.matrix(beta.pod$beta) else M.rec + M.riq
+
+# Dataframe (incluye el sitio 42 con valor 0)
+datos <- tibble(
+  Sitio    = factor(seq_len(nrow(M.rec))),
+  Beta     = as.numeric(M.beta[ref, ]),
+  Recambio = as.numeric(M.rec[ref, ]),
+  Dif.Riq = as.numeric(M.riq[ref, ])
+) %>% 
+  mutate(across(-Sitio, ~ ifelse(Sitio == ref, 0, .))) %>% 
+  pivot_longer(-Sitio, names_to = "Parameters", values_to = "valores") %>% 
+  mutate(Parameters = factor(Parameters, 
+                             levels = c("Dif.Riq","Recambio","Beta"),
+                             ordered = TRUE))
+
+# Paleta y figura apilada
+colores <- c("Beta"="#525252","Recambio"="#969696","Dif.Riq"="#cccccc")
+
+ggplot(datos, aes(x = Sitio, y = valores, fill = Parameters)) +
+  geom_col(position = "stack", width = 0.8) +
+  scale_fill_manual(values = colores) +
+  scale_x_discrete(breaks = levels(datos$Sitio)[seq(1, nlevels(datos$Sitio), by = 2)]) +
+  labs(title = sprintf("Componentes Podani (Jaccard) respecto al sitio 42", ref),
+       x = "Sitios", y = "Fracción ($\beta$, recambio, dif. riqueza)", fill = "Parámetros") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+#### b. Beta por parejas de sitios (Familia Podani & Schmera, 2011)
+
+```{r}
+#| label: fig-c7-18
+#| fig-cap: "Patrón espacial de diferencias de los componentes de recambio y diferencia de especies respecto al sitio de referencia- 42"
+#| warning: false
+#| message: false
+#| echo: false
+#| fig-pos: 'H'
+
+# Matrices desde beta.pod
+M.rec <- as.matrix(beta.pod$repl)      # Recambio
+M.riq <- as.matrix(beta.pod$rich)      # Diferencia de riqueza
+M.beta <- if (is.null(beta.pod$beta)) M.rec +
+          M.riq else as.matrix(beta.pod$beta)
+
+# Parejas vecinas: (1-2, 2-3, ..., n-1 - n)
+n    <- nrow(M.rec)
+idx  <- cbind(1:(n-1), 2:n)
+pares <- paste0(idx[,1], "-", idx[,2])
+
+# Datos en formato largo
+datos_parejas <- tibble(
+  Pareja   = factor(pares, levels = pares),
+  Beta     = M.beta[idx],
+  Recambio = M.rec[idx],
+  Dif.Riq = M.riq[idx]) %>% 
+  pivot_longer(-Pareja, 
+               names_to = "Parameters", 
+               values_to = "valores") %>% 
+  mutate(Parameters = factor(Parameters, 
+                             levels = c("Dif.Riq","Recambio","Beta"), 
+                             ordered = TRUE))
+
+# Paleta y figura apilada
+colores <- c("Beta"="#525252","Recambio"="#969696","Dif.Riq"="#cccccc")
+
+# Figura
+ggplot(datos_parejas, aes(x = Pareja, y = valores, fill = Parameters)) +
+  geom_col(position = "stack", width = 0.8) +
+  scale_fill_manual(values = colores) +
+  labs(title = "$\beta$ de Jaccard, diferencia de riqueza y recambio por sitios vecinos",
+       x = "Parejas de sitios", y = "Indices de Podani ($\beta$, recambio, dif. riqueza)", 
+       fill = "Parámetros") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+```
+
+#### c. Graficos triangulares o símpex (Legendre 2014)
+
+```{r}
+#| label: fig-c7-19
+#| fig-cap: "Graficos triangulares de diversidad beta. (a) beta con Jaccard, (b) beta con Sorensen, (c) beta cuantitativa con Ruzicka, (c) beta cuantitativa con porcentaje de diferencias"
+#| warning: false
+#| message: false
+#| echo: false
+#| fig-pos: 'H'
+
+# Librería requerida
+library(ade4)
+
+# Diversidad beta con cuatro índices de disimilitud
+# Jaccard
+beta.pod.J <- beta.div.comp(biol.bin, coef = "J", quant = FALSE)
+# Sorensen
+beta.pod.S <- beta.div.comp(biol.bin, coef = "S", quant = FALSE)
+# Ruzicka
+beta.pod.qJ <- beta.div.comp(biol.bin, coef = "J", quant = TRUE)
+# Porcentaje de diferencias
+beta.pod.qS <- beta.div.comp(biol.bin, coef = "S", quant = TRUE)
+
+#---
+# Data frames para los graficos triangulares
+beta.pod.J.3 <- cbind((1 - beta.pod.J$D),
+                      beta.pod.J$repl,
+                      beta.pod.J$rich)
+colnames(beta.pod.J.3) <- c("Similarity", "Repl", "RichDiff")
+beta.pod.S.3 <- cbind((1 - beta.pod.S$D),
+                      beta.pod.S$repl,
+                      beta.pod.S$rich)
+colnames(beta.pod.S.3) <- c("Similarity", "Repl", "RichDiff")
+beta.pod.qJ.3 <- cbind((1 - beta.pod.qJ$D),
+                       beta.pod.qJ$repl,
+                       beta.pod.qJ$rich)
+colnames(beta.pod.qJ.3) <- c("Similarity", "Repl", "AbDiff")
+beta.pod.qS.3 <- cbind((1 - beta.pod.qS$D),
+                       beta.pod.qS$repl,
+                       beta.pod.qS$rich)
+colnames(beta.pod.qS.3) <- c("Similarity", "Repl", "AbDiff")
+
+
+#---
+# Figuras de los 4 triángulos
+
+# Pánel de 2 x 2 figuras
+par(mfrow = c(2, 2))
+
+# Triangulo 1
+triangle.plot(
+  as.data.frame(beta.pod.J.3[, c(3, 1, 2)]),
+  show = FALSE,
+  labeltriangle = FALSE,
+  addmean = TRUE
+)
+text(-0.45, 0.55, "Dif.Riq", cex = 1)
+text(0.4, 0.55, "Reempl", cex = 1)
+text(0, -0.6, "Similitud de Jaccard", cex = 1)
+
+# Triangulo 2
+triangle.plot(
+  as.data.frame(beta.pod.S.3[, c(3, 1, 2)]),
+  show = FALSE,
+  labeltriangle = FALSE,
+  addmean = TRUE
+)
+text(-0.45, 0.55, "Dif.Riq", cex = 1)
+text(0.4, 0.55, "Reempl", cex = 1)
+text(0, -0.6, "Similitud de Sørensen", cex = 1)
+
+# Triangulo 3
+triangle.plot(
+  as.data.frame(beta.pod.qJ.3[, c(3, 1, 2)]),
+  show = FALSE,
+  labeltriangle = FALSE,
+  addmean = TRUE
+)
+text(-0.45, 0.55, "Dif.Ab", cex = 1)
+text(0.4, 0.55, "Reempl", cex = 1)
+text(0, -0.6, "S = 1 – Ružička D", cex = 1)
+
+# Triangulo 4
+triangle.plot(
+  as.data.frame(beta.pod.qS.3[, c(3, 1, 2)]),
+  show = FALSE,
+  labeltriangle = FALSE,
+  addmean = TRUE
+)
+text(-0.45, 0.55, "Dif.Ab", cex = 1)
+text(0.4, 0.55, "Reempl", cex = 1)
+text(0, -0.6, "S = 1 – Porcentaje de diferencia", cex = 1)
+
+# Valores promedio de los puntos medios en los triángulos
+# colMeans(beta.pod.J.3[, c(3, 1, 2)])
+# colMeans(beta.pod.S.3[, c(3, 1, 2)])
+# colMeans(beta.pod.qJ.3[, c(3, 1, 2)])
+# colMeans(beta.pod.qS.3[, c(3, 1, 2)])
+```
+
+#### d. Clasificación de zonas por componentes de beta (Familia Podani & Schmera, 2011)
+
+```{r}
+#| label: fig-c7-20
+#| fig-cap: Clasificación de las localidades de acuerdo a su diversidad beta general, por recambio y por anidamiento. 
+#| warning: false
+#| message: false
+#| echo: false
+#| fig-pos: 'H'
+
+# --- 1) Construir matriz binaria e imponer rótulos desde biol2[,1] ---
+# biol2: primera columna = nombres de zonas (o sitios), resto = especies/rasgos
+labs <- make.unique(as.character(biol2[[1]]))  # garantiza caracteres y unicidad
+
+# Eliminar NAs de la base original (biol3)
+biol.bin2 <- 
+  biol2[,-1] %>%
+  mutate(across(everything(), ~ as.numeric(.x))) %>%
+  tidyr::replace_na(list()) %>%    # no cambia numéricos; por seguridad
+  as.data.frame()
+
+# reemplazar Inf/NA por 0 si hubiera
+biol.bin2[!is.finite(as.matrix(biol.bin2))] <- 0   
+
+# Poner nombres de fila = zonas/sitios
+rownames(biol.bin2) <- labs
+
+# Conversión de datos de abundancia a datos binarios
+biol.bin2 = (as.matrix(biol.bin2) > 0) * 1
+
+# Matriz de similitud de Jaccard según Podani, con datos binarios
+beta.pod <- beta.div.comp(biol.bin2, coef = "J", quant = FALSE)
+
+# Dendogramas con método UPGMA
+Cl.upgma1 = hclust(beta.pod$D, method="average")
+Cl.upgma2 = hclust(beta.pod$rich, method="average")
+Cl.upgma3 = hclust(beta.pod$repl, method="average")
+
+# Clasificación del dendograma en dos Groups (negro y rojo)
+f1 <- fviz_dend(Cl.upgma1, k = 2,       # k Groups (opcionales)
+          cex = 0.7,                    # tamaño del texto de las ramas
+          ylab = "Distancia Jaccard",  # Rotulo de la distancia
+          xlab = "Beta Total",
+          main = "(a)")  
+
+f2 <- fviz_dend(Cl.upgma2, k = 2,        # k Groups (opcionales)
+          cex = 0.7,                    # tamaño del texto de las ramas
+          ylab = "Distancia Jaccard",  # Rotulo de la distancia
+          xlab = "Dif. Riqueza",
+          main = "(b)")  
+
+f3 <- fviz_dend(Cl.upgma3, k = 2,        # k Groups (opcionales)
+          cex = 0.7,                    # tamaño del texto de las ramas
+          ylab = "Distancia Jaccard",  # Rotulo de la distancia
+          xlab = "Recambio",
+          main = "(c)")  
+
+
+grid.arrange(f1,f2,f3, ncol = 3)
+```
+
+#### e. Clasificación de sitios por componentes de beta (Familia Podani & Schmera, 2011)
+
+```{r}
+#| label: fig-c7-21a
+#| fig-cap: Clasificación de las localidades de acuerdo a su diversidad beta general, por recambio y por anidamiento. 
+#| warning: false
+#| message: false
+#| echo: false
+#| fig-pos: 'H'
+#| fig-width: 9
+#| fig-height: 6
+
+# --- 1) Construir matriz binaria e imponer rótulos desde biol2[,1] ---
+# biol2: primera columna = nombres de zonas (o sitios), resto = especies
+labs1 <- make.unique(as.character(biol[[1]]))  # garantiza caracteres y unicidad
+
+# Eliminar NAs de la base original (biol1)
+biol4 <- 
+  biol1[,-1] %>%
+  mutate(across(everything(), ~ as.numeric(.x))) %>%
+  tidyr::replace_na(list()) %>%    # no cambia numéricos; por seguridad
+  as.data.frame()
+
+# reemplazar Inf/NA por 0 si hubiera
+biol4[!is.finite(as.matrix(biol4))] <- 0   
+
+# Conversión de datos de abundancia a datos binarios
+biol.bin = (as.matrix(biol4) > 0) * 1
+
+# Poner nombres de fila = zonas/sitios
+rownames(biol.bin) <- labs1
+
+# Matriz de similitud de Jaccard según Podani, con datos binarios
+beta.pod <- beta.div.comp(biol.bin, coef = "J", quant = FALSE)
+
+# Dendogramas con método UPGMA
+Cl.upgma1 = hclust(beta.pod$D, method="average")
+Cl.upgma2 = hclust(beta.pod$rich, method="average")
+Cl.upgma3 = hclust(beta.pod$repl, method="average")
+
+# Clasificación del dendograma en dos Groups (negro y rojo)
+f1 <- fviz_dend(Cl.upgma1, k = 3,       # k Groups (opcionales)
+          margins = c(5,12), 
+          cex = 0.6,                    # tamaño del texto de las ramas
+          ylab = "Distancia Jaccard",   # Rotulo de la distancia
+          xlab = "Beta Total",
+          main = "(a)")  
+
+f2 <- fviz_dend(Cl.upgma2, k = 3,        # k Groups (opcionales)
+          margins = c(5,12), 
+          cex = 0.6,                     # tamaño del texto de las ramas
+          ylab = "Distancia Jaccard",    # Rotulo de la distancia
+          xlab = "Dif. Riqueza",
+          main = "(b)")  
+
+f3 <- fviz_dend(Cl.upgma3, k = 3,        # k Groups (opcionales)
+          margins = c(5,12), 
+          cex = 0.6,                     # tamaño del texto de las ramas
+          ylab = "Distancia Jaccard",    # Rotulo de la distancia
+          xlab = "Recambio",
+          main = "(c)")  
+
+
+grid.arrange(f1,f2,f3, ncol = 3)
+```
+
+
+```{r}
+#| label: fig-c7-21
+#| fig-cap: Clasificación no jerárquica de las localidades de acuerdo a su diversidad beta general, por recambio y por anidamiento. 
+#| warning: false
+#| message: false
+#| echo: false
+#| fig-pos: 'H'
+
+# Paquetes
+suppressPackageStartupMessages({
+  library(ade4)        # beta.div.comp
+  library(cluster)     # pam
+  library(factoextra)  # fviz_cluster
+  library(ggplot2)
+  library(patchwork)   # panel de figuras
+})
+
+# Rótulos de filas
+rownames(biol.bin) <- labs1
+
+# Componentes beta de Podani (Jaccard binario)
+beta.pod <- beta.div.comp(biol.bin, coef = "J", quant = FALSE)
+#   beta.pod$D     -> beta total (disimilitud)
+#   beta.pod$rich  -> diferencia de riqueza
+#   beta.pod$repl  -> recambio (reemplazo)
+
+# Estilo de los colores
+pal <- c('#fc8d59','#377eb8','#99d594')
+
+# Coordenadas PCoA (2D) desde las distancias
+pc_total <- as.data.frame(cmdscale(beta.pod$D,    k = 2))
+pc_rich  <- as.data.frame(cmdscale(beta.pod$rich, k = 2))
+pc_repl  <- as.data.frame(cmdscale(beta.pod$repl, k = 2))
+colnames(pc_total) <- colnames(pc_rich) <- colnames(pc_repl) <- c("PCoA1","PCoA2")
+
+# PAM (k-medoids) sobre cada matriz de distancias
+pam_total <- cluster::pam(beta.pod$D,    k = 3, diss = TRUE)
+pam_rich  <- cluster::pam(beta.pod$rich, k = 3, diss = TRUE)
+pam_repl  <- cluster::pam(beta.pod$repl, k = 3, diss = TRUE)
+
+# Graficar usando la interfaz robusta: list(data=..., cluster=...)
+fig1 <- factoextra::fviz_cluster(
+        list(data = pc_total, cluster = pam_total$clustering),
+        palette = pal, ellipse.type = "confidence",
+        repel = TRUE, labelsize = 8, 
+        ggtheme = ggplot2::theme_bw()) + 
+  ggplot2::labs(title="(a) Beta total (Jaccard)") +
+  ggplot2::xlab("PCoA1") + 
+  ggplot2::ylab("PCoA2")
+
+fig2 <- factoextra::fviz_cluster(
+        list(data = pc_rich, cluster = pam_rich$clustering),
+        palette = pal, ellipse.type = "confidence",
+        repel = TRUE, labelsize = 8, 
+        ggtheme = ggplot2::theme_bw()) + 
+  ggplot2::labs(title="(b) Diferencia de riqueza") +
+  ggplot2::xlab("PCoA1") + 
+  ggplot2::ylab("PCoA2")
+
+fig3 <- factoextra::fviz_cluster(
+        list(data = pc_repl, cluster = pam_repl$clustering),
+        palette = pal, ellipse.type = "confidence",
+        repel = TRUE, labelsize = 8, 
+        ggtheme = ggplot2::theme_bw()) + 
+  ggplot2::labs(title="(c) Recambio") +
+  ggplot2::xlab("PCoA1") + 
+  ggplot2::ylab("PCoA2")
+
+# Dejar solo la leyenda de p1
+fig2 <- fig2 + guides(color = "none", shape = "none", fill = "none")
+fig3 <- fig3 + guides(color = "none", shape = "none", fill = "none")
+
+# Panel 1 fila × 3 figuras
+(fig1 | fig2 | fig3) + plot_layout(guides = "collect") &
+  theme(
+    legend.position = "bottom",
+    panel.grid=element_blank(),
+    text = element_text(size = 9),            # Tamaño general
+    axis.text = element_text(size = 8, 
+                             face = "bold"),  # Texto de los ejes
+    legend.text = element_text(size = 8),     # Texto de leyenda
+    strip.text = element_text(size = 9, 
+                              face = "bold")  # Texto de los títulos de panel
+  )
+
+
+  
+```
+
+#### f. Efecto de variables ambientales sobre componentes de beta (Legendre 2014)
+
+```{r}
+#| warning: false
+#| message: false
+#| echo: false
+
+# Explaining replacement and richness difference
+# by means of db-RDA
+
+# Extracción de la matriz de diferencias de riquezas 
+peces.riq <- beta.pod$rich
+
+# Extracción de la matriz de recambio o reemplazo 
+peces.repl <- beta.pod$repl
+
+
+# base de datos ambiental 
+amb <- read_xlsx("datos.c7.xlsx", sheet = "amb")
+
+# Variables ambientales de interés
+amb1 <- 
+  amb %>%
+   dplyr::select(`pH`, `Water temperature`, `Conductivity`, 
+         `Salinity`, `Transparency`, `Oxygen`, 
+         `Carbon Dioxide`, `Alkalinity`, `NO2`, 
+         `NO3`, `Ammonium`, `Hardness`, 
+         `Phosphates`, `TDS`)
+
+#---
+# Recambio
+dbrda.repl <- dbrda(peces.repl ~ ., data = amb1, add = "cailliez")
+anova(dbrda.repl)$"Pr(>F)"
+RsquareAdj(dbrda.repl)
+
+#---
+# Diferencia de riqueza
+dbrda.riq <- dbrda(peces.riq ~ ., data = amb1, add = "cailliez")
+anova(dbrda.riq)$"Pr(>F)"
+RsquareAdj(dbrda.riq)
+
+# plot(
+#  dbrda.riq,
+#  scaling = 1,
+#  display = c("lc", "cn"),
+#  main = "Efecto de las variables ambientales sobre la Diferencia de riqueza"
+# )
+
+#---
+# Diferencia de riqueza con selección de variables ambientales (envfit)
+amb2 <- envfit(dbrda.riq, amb1) # Se pueden seleccionar variables con, p.max = 0.05
+
+# Seleccionar solo variables con valor p < 0.05 (efecto significativo)
+amb2 <- 
+  amb2$vectors$pvals %>%
+  as.data.frame() %>%
+  tibble::rownames_to_column("Variable") %>%  
+  dplyr::rename(valor_p = 2) %>%
+  dplyr::arrange(valor_p)        # 🔹 ordena de menor a mayor
+
+# Filtrar las significativas
+amb2 %>%
+  dplyr::filter(valor_p < 0.05) %>% 
+  kbl(booktabs = T) %>% 
+  kable_classic(full_width = F)
+
+
+# Variables ambientales de interés
+amb3 <- 
+  amb %>%
+   dplyr::select(`Conductivity`, 
+         `Salinity`, `Transparency`, `NO2`, 
+         `Hardness`, `Phosphates`, `TDS`)
+
+# Diferencia de riqueza
+dbrda.riq <- dbrda(peces.riq ~ ., data = amb3, add = "cailliez")
+anova(dbrda.riq)$"Pr(>F)"
+RsquareAdj(dbrda.riq)
+```
+
+
+```{r}
+#| echo: false
+
+# 1) Coordenadas de los sitios y el factor zonas (coord.sit)
+coord.sit <- as.data.frame(scores(dbrda.riq,
+             choices = 1:2, display = "sites"))     # Coordenadas de los sitios
+coord.sit$sitio <- rownames(coord.sit)    # Crear una columna con nombres de los sitios
+coord.sit$grp <-  biol1$Sites1            # Adicionar columna de grupos por zonas
+# head(coord.sit)                         # vista resumida de las coordenadas de sitios
+```
+
+```{r}
+#| echo: false
+
+# 2) Coordenadas de las variables ambientales 
+coord.amb <- as.data.frame(scores(dbrda.riq,
+            choices = 1:2, display = "bp")) # Coordenadas de las ambientales
+coord.amb$amb <- rownames(coord.amb)    # Columna con nombres de las ambientales
+coord.amb = coord.amb                   # Coordenadas de las variables seleccionadas
+# head(coord.amb) 
+```
+
+```{r}
+#| label: fig-c7-22
+#| fig-cap: "Relación entre las variables ambientales y la diferencia de riqueza como componente de la diversidad beta de Podani"
+#| warning: false
+#| message: false
+#| echo: false
+
+library(ggforce)
+
+# Figura del bdRDA
+ggplot() +
+  # Factor Zona
+  geom_mark_ellipse(data=coord.sit,aes(x=dbRDA1,y=dbRDA2,
+                                       fill=grp,group=grp),alpha=0.20) +
+ 
+  # Sitios
+  geom_text_repel(data = coord.sit,aes(dbRDA1,dbRDA2,label=row.names(coord.sit)),
+                  size=4)+   # Muestra el cuadro de la figura
+  geom_point(data = coord.sit,aes(dbRDA1,dbRDA2,colour=grp),size=4)+
+  scale_shape_manual(values = c(21:25))+
+  
+  # Ambiental  
+  geom_segment(data = coord.amb,aes(x = 0, y = 0, xend = dbRDA1*4, yend = dbRDA2*4),
+               arrow = arrow(angle=22.5,length = unit(0.25,"cm"),
+                             type = "closed"),linetype=1, 
+                             size=0.6,colour = "blue")+
+  geom_text_repel(data = coord.amb,aes(dbRDA1*4,dbRDA2*4,
+                  label=row.names(coord.amb)), colour = "blue")+
+  
+  geom_hline(yintercept=0,linetype=3,size=1) + 
+  geom_vline(xintercept=0,linetype=3,size=1)+
+  guides(shape=guide_legend(title=NULL,color="black"),
+         fill=guide_legend(title=NULL))+
+  theme_bw()+
+  theme(panel.grid=element_blank())
+```
+
+
+

@@ -1,0 +1,305 @@
+
+
+## A. Modelo exponencial
+
+### A.1 Tiempo continuo
+
+#### Preparación (paquetes)
+
+```{r, message=FALSE, warning=FALSE}
+#| label: setup-c4
+library(tidyverse)
+library(kableExtra)
+```
+
+#### Ejemplo 1 — Curvas con r positivo
+
+$$
+T_d = \frac{\ln 2}{r} = \frac{0.6931}{0.4} \approx 1.73\;horas.
+$$ **Nota:** El tiempo de duplicación solo aplica para $r>0$.
+
+
+$$
+N(t) = 10\, e^{0.4\cdot 20} = 10\, e^{8} \approx 2.98\times10^{4}\;individuos.
+$$
+
+```{r}
+#| label: fig-c4-3
+#| fig-cap: Crecimiento exponencial en tiempo continuo para la muestra de la población de fitoplancton.
+#| fig-pos: 'H'
+
+# Parámetros del ejercicio
+N0 <- 10
+r  <- 0.4
+t  <- seq(0, 20, by = 0.5)
+tabla <- tibble(t, N = N0 * exp(r*t))
+
+# Figura de la proyección exponencial
+ggplot(tabla, aes(t, N)) +
+  geom_line(linewidth = 1.1) +
+  labs(title = "Crecimiento exponencial continuo",
+       subtitle = "N(t) = N0. e^(r.t)  con r = 0.4",
+       x = "Tiempo (t)", y = "Tamaño poblacional (N)") +
+  theme_bw()
+```
+
+------------------
+
+#### Ejemplo 2 — r negativo (decrecimiento)
+
+$$
+T_{1/2} = \frac{\ln(1/2)}{r} = \frac{-0.6931}{-0.2} \approx 3.47\;días.
+$$
+
+(2) En $t = 30\;días$:
+
+$$
+N(t) = 120\, e^{-0.2\cdot 30} = 120\, e^{-6} \approx 0.30\;individuos.
+$$
+
+```{r, echo=FALSE}
+#| label: fig-c4-4
+#| fig-cap: Patrón de reducción de la población de peces.
+#| fig-pos: 'H'
+
+# Parámetros del modelo
+N0 <- 120
+r  <- -0.2
+t  <- seq(0, 30, by = 1)
+tabla <- tibble(t, N = N0 * exp(r*t))
+
+# Figura de la proyección
+ggplot(tabla, aes(t, N)) +
+  geom_line(linewidth = 1.1) +
+  labs(title = "Decrecimiento (continuo)",
+       subtitle = "r = -0.2",
+       x = "Tiempo", y = "Tamaño poblacional") +
+  theme_bw()
+```
+
+---------------
+
+#### Ejemplo 3 — Comparación de múltiples r
+
+$$
+\begin{aligned}
+r=0.1:&\quad N(20)=50\, e^{2} \;\approx\; 3.70\times10^{2}\\
+r=0.3:&\quad N(20)=50\, e^{6} \;\approx\; 2.02\times10^{4}\\
+r=0.5:&\quad N(20)=50\, e^{10}\;\approx\; 1.10\times10^{6}
+\end{aligned}
+$$
+
+```{r, echo=FALSE}
+#| label: fig-c4-5
+#| fig-cap: Patrón de crecimiento en poblaciones de insectos.
+#| fig-pos: 'H'
+
+# Parámetros del modelo
+N0 <- 50
+t  <- seq(0, 20, by = 0.25)
+r  <- c(0.1, 0.3, 0.5)
+tabla <- purrr::map_dfr(r, function(r)
+         tibble(t, r = r, N = N0 * exp(r*t)))
+
+# Figura de las proyecciones
+ggplot(tabla, aes(t, N, group = factor(r), 
+                   linetype = factor(r))) +
+  geom_line(linewidth = 1.05) +
+  labs(title = "Patrón de aumento de la población",
+       linetype = "Valores de r", x = "Tiempo (t)", 
+       y = "Tamaño poblacional (N)") +
+  theme_bw()
+```
+
+---------------------------
+
+#### Ejemplo 4 — Tiempo de duplicación y de “mitad”
+
+
+```{r, echo=FALSE}
+#| label: tbl-c4-1a
+#| tbl-cap: "Visualización de Td con r>0 y T(1/2) con r<0 en función del crecimiento instantáneo -> r"
+#| message: false
+
+
+# Valores de r
+r_val <- c(-0.50, -0.25, -0.10, 0.10, 0.25, 0.50)
+
+# Tabla inicial
+tab <- 
+  tibble(
+  r  = r_val,
+  Td = if_else(r> 0, log(2)/r, NA_real_),  # tiempo de duplicación
+  Tsr = if_else(r< 0, log(0.5)/r, NA_real_) # medio tiempo (semirreducción)
+)
+
+# Tabla en formato largo
+tab_largo <- 
+  tab %>%
+  pivot_longer(cols = c(Td, Tsr), 
+               names_to = "Metrica", 
+               values_to = "Tiempo") %>%
+  filter(!is.na(Tiempo))
+
+tab_largo %>% 
+  head() %>% 
+  kbl(booktabs  = TRUE, digits = 2,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+
+```{r, echo=FALSE}
+#| label: fig-c4-6
+#| fig-cap: "Visualización de Td con r>0 y T(1/2) con r<0 en función del crecimiento instantáneo -> r."
+#| warning: false
+#| fig-pos: 'H'
+
+# Figura de la proyección
+ggplot(tab_largo, aes(x = r, y = Tiempo, 
+                     shape = Metrica, 
+                     linetype = Metrica)) +
+  geom_point(size = 2.6) +
+  geom_line() +
+  labs(x = "r (tasa crec. instantáneo)", 
+       y = "Tiempo",
+       title = "Escenarios de crecimiento exponencial continuo")+
+  theme_bw()
+
+```
+
+-------------------------
+
+#### Ejemplo 5 — dN/dt = rN (velocidad instantánea)
+
+$$
+\frac{dN}{dt} = rN = 0.2\times 30 = 6\;individuos/día.
+$$ En $t=25$:\
+$$
+N_{(t)} = 30\, e^{r\cdot t}\Rightarrow \ N_{(25)} = 30\, e^{0.2\cdot 25} = 30\, e^{5} \approx 4.45\times10^{3}\ invertebrados.
+$$
+
+$$
+\frac{dN}{dt} \approx 0.2\times 4.45\times10^{3} = 8.91\times10^{2}\;individuos/día.
+$$
+
+```{r, echo=FALSE}
+#| label: fig-c4-7
+#| fig-cap: Patrón de crecimiento exponencial para la población de invertebrados.
+#| fig-pos: 'H'
+
+# Parámetros del modelo
+N0 <- 30; 
+r <- 0.2; 
+t <- seq(0, 25, by = 0.5)
+N  <- N0 * exp(r*t)
+dNdt <- r * N
+tabla <- tibble(t, N, dNdt)
+
+# Figura de la proyección
+ggplot(tabla, aes(t, dNdt)) +
+  geom_line(linewidth = 1.1) +
+  labs(title = "Velocidad de cambio o de aumento (dN/dt = r.N)",x="Tiempo (t)", y="Velocidad de aumento (dN/dt)") +
+  theme_bw()
+```
+
+-----------------------
+
+#### Ejemplo 6 — Estimar r con dos observaciones
+
+```{r, echo=FALSE}
+#| label: tbl-c4-2
+#| tbl-cap: "Estimación de r a partir de valores (No, Nt, t)."
+#| message: false
+
+
+# Escenarios hipotéticos
+tabla <- 
+  tribble(
+  ~N0, ~Nt, ~t,
+   40, 120, 10,   # crecimiento
+   80,  20,  8,   # decrecimiento
+   50,  50, 12,   # estable
+   30, 200, 15    # crecimiento rápido
+)
+
+# Cálculo de r
+resultados <- 
+  tabla %>%
+  mutate(r = log(Nt/N0)/t)
+
+resultados %>% 
+  head() %>% 
+  kbl(booktabs  = TRUE, digits = 2,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+
+```
+
+```{r, echo=FALSE}
+#| label: fig-c4-8
+#| fig-cap: "Trayectorias poblacionales estimadas a partir de r calculado con cuatro escenarios."
+#| warning: false
+#| fig-pos: 'H'
+
+# Tabla con 10 valores de t por c/escenario
+tabla1 <- 
+  resultados %>%
+  rowwise() %>%
+  mutate(
+      curva = list(tibble(
+      tiempo = 0:t,
+      N = N0 * exp(r * (0:t))
+    ))
+  ) %>%
+  unnest(curva)
+
+# Figura con las proyecciones
+ggplot(tabla1, aes(x = tiempo, y = N, color = factor(Nt), group = interaction(N0, Nt, t))) +
+  geom_line(linewidth = 1.1) +
+  geom_point(data = resultados, aes(x = t, y = Nt), 
+             size = 3, shape = 21, fill = "white") +
+  labs(x = "Tiempo (t)", y = "Tamaño poblacional (N)",
+       title = "Estimación de r con las observaciones",
+       color = "Nt observado") +
+  theme_bw()
+
+```
+
+--------------------
+
+#### Ejemplo 7 — Estimar r en una población bacteriana
+
+$$
+r = \frac{\ln(N_t/N_0)}{t} = \frac{\ln(800/100)}{10} = \frac{\ln(8)}{10} \approx 0.2089\ bacterias/bacterias.hora
+$$
+
+```{r, echo=FALSE}
+#| label: fig-c4-9
+#| fig-cap: "Crecimiento continuo estimado en bacterias (visualización)."
+#| message: false
+#| warning: false
+#| fig-pos: 'H'
+
+# Parámetros del modelo
+N0 <- 100
+Nt <- 800
+t_max <- 10
+r <- log(Nt/N0) / t_max
+t <- seq(0, t_max, by = 0.1)
+tabla <- tibble(t = t, N = N0 * exp(r * t))
+
+# Figura de la proyección
+ggplot(tabla, aes(t, N)) +
+  geom_line(linewidth = 1.1) +
+  geom_point(data = tibble(t = t_max, N = Nt), 
+             size = 3, shape = 21, fill = "white") +
+  labs(title = "Crecimiento exponencial continuo",
+       subtitle = paste0("N0=", N0, ", Nt=", Nt, ", t=", t_max, ", r≈", round(r,3), 
+                         " ind/ind·hora"),
+       x = "Tiempo (horas)", y = "Número de individuos") +
+  theme_bw()
+```
+
+--------------------------------------------------------------------
+

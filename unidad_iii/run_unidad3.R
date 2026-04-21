@@ -1,7 +1,10 @@
 # =========================================================
 # ANVIDEA - Unidad III
-# Archivo: run_unidad3.R
-# Propósito: ejecutar la Unidad III completa
+# Ecología de comunidades
+# ---------------------------------------------------------
+# Archivo : run_unidad3.R
+# Propósito: ejecutar la Unidad III completa en secuencia
+# Uso: source("run_unidad3.R") desde la carpeta unidad_iii/
 # =========================================================
 
 cat("========================================\n")
@@ -10,20 +13,44 @@ cat("Ecología de comunidades\n")
 cat("========================================\n")
 
 # ---------------------------------------------------------
-# Capítulo 7 - Diversidad taxonómica
+# Verificar que se ejecuta desde la carpeta correcta
 # ---------------------------------------------------------
 
-cat("\nEjecutando Capítulo 7...\n")
-source("cap7-diversidad-taxonomica/R/01_casoA_TD_alfa_y_Hill.R")
-source("cap7-diversidad-taxonomica/R/02_casoB_TD_beta_y_recambio.R")
+if (!dir.exists("cap7-diversidad-taxonomica") ||
+    !dir.exists("cap8-diversidad-funcional-filogenetica")) {
+  stop(
+    "Ejecute run_unidad3.R desde la carpeta unidad_iii/.\n",
+    "Debe contener las subcarpetas cap7-diversidad-taxonomica/ ",
+    "y cap8-diversidad-funcional-filogenetica/."
+  )
+}
 
 # ---------------------------------------------------------
-# Capítulo 8 - Diversidad funcional y filogenética
+# Capítulo 7 — Diversidad taxonómica
 # ---------------------------------------------------------
 
-cat("\nEjecutando Capítulo 8...\n")
-source("cap8-diversidad-funcional-filogenetica/R/01_casoA_FD_PD_alfa.R")
-source("cap8-diversidad-funcional-filogenetica/R/02_casoB_PD_beta_y_alineacion.R")
-source("cap8-diversidad-funcional-filogenetica/R/03_casoC_FD_beta.R")
+cat("\n[Cap. 7] Diversidad taxonómica...\n")
 
-cat("\n✔ Unidad III ejecutada correctamente\n")
+unidad_dir <- getwd()
+setwd(file.path(unidad_dir, "cap7-diversidad-taxonomica"))
+source("run_cap7.R")
+setwd(unidad_dir)
+
+# ---------------------------------------------------------
+# Capítulo 8 — Diversidad funcional y filogenética
+# ---------------------------------------------------------
+
+cat("\n[Cap. 8] Diversidad funcional y filogenética...\n")
+
+setwd(file.path(unidad_dir, "cap8-diversidad-funcional-filogenetica"))
+source("run_cap8.R")
+setwd(unidad_dir)
+
+# ---------------------------------------------------------
+# Cierre
+# ---------------------------------------------------------
+
+cat("\n========================================\n")
+cat("Unidad III ejecutada correctamente.\n")
+cat("Resultados en outputs/ de cada capítulo.\n")
+cat("========================================\n")

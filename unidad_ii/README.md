@@ -6,11 +6,7 @@
 
 Esta unidad integra herramientas cuantitativas para el análisis de la dinámica poblacional, abordando procesos de crecimiento, estructura demográfica y organización espacial.
 
-Incluye tres capítulos articulados:
-
-- Modelos de crecimiento poblacional  
-- Estructura por edades y estados  
-- Patrones espaciales y estimación de densidad  
+Corresponde a la segunda parte del manual **ANVIDEA** y desarrolla las herramientas de modelación poblacional necesarias para los análisis de comunidades de la Unidad III.
 
 ---
 
@@ -18,30 +14,57 @@ Incluye tres capítulos articulados:
 
 Desarrollar competencias para:
 
-- modelar el crecimiento poblacional  
-- interpretar parámetros demográficos (r, λ, K)  
-- analizar la estructura poblacional por edades y estados  
-- evaluar patrones espaciales y estimar densidad  
+- modelar el crecimiento exponencial, discreto y logístico de poblaciones
+- construir e interpretar tablas de vida por edades y por estados
+- proyectar poblaciones estructuradas con modelos matriciales
+- evaluar patrones de distribución espacial mediante pruebas estadísticas
+- estimar la densidad poblacional con métodos basados en distancias
 
 ---
 
 ## 📁 Estructura de la unidad
 
-- **cap4-modelos-poblacionales/**  
-  Modelos de crecimiento poblacional  
-
-- **cap5-tablas-vida/**  
-  Estructura demográfica y modelos matriciales  
-
-- **cap6-distribucion-densidad/**  
-  Patrones espaciales y estimación de densidad  
+```
+unidad_ii/
+├── run_unidad2.R
+├── README.md
+├── index.qmd
+├── cap4-modelos-crecimiento/
+├── cap5-tablas-vida/
+└── cap6-distribucion-densidad/
+```
 
 Cada capítulo contiene:
 
-- `README.md` → explicación del capítulo  
-- `R/` → scripts del análisis  
-- `data/raw/` → datos de entrada  
-- `outputs/` → resultados generados  
+```
+capX-nombre/
+├── README.md
+├── run_capX.R
+├── limpiar_outputs.R
+├── reporte_capX.qmd
+├── R/
+│   ├── 00_setup.R
+│   ├── 01_caso*.R
+│   ├── ...
+│   ├── funciones_auxiliares.R
+│   ├── guardar_salidas_capX.R
+│   └── render_reporte.R
+├── data/raw/
+└── outputs/
+    ├── figuras/
+    ├── tablas/
+    └── reportes/
+```
+
+---
+
+## 🗂️ Bases de datos utilizadas
+
+| Capítulo | Archivos |
+|----------|----------|
+| Cap. 4 | datos del capítulo 4 |
+| Cap. 5 | `datos.c5.xlsx` |
+| Cap. 6 | `datos.c6.xlsx` |
 
 ---
 
@@ -53,9 +76,9 @@ Los scripts en R **no se ejecutan desde GitHub ni desde el portal web**.
 
 Para utilizarlo:
 
-1. Descarga la carpeta de la unidad o el repositorio completo  
-2. Ábrelo en RStudio o Quarto  
-3. Ejecuta los scripts en tu computador  
+1. Descarga la carpeta de la unidad o el repositorio completo
+2. Ábrela en RStudio
+3. Ejecuta los scripts en tu computador
 
 ---
 
@@ -63,75 +86,85 @@ Para utilizarlo:
 
 ### 🔹 Opción 1 — Ejecutar toda la unidad
 
+Desde la carpeta `unidad_ii/`:
+
 ```r
 source("run_unidad2.R")
 ```
+
+Esto ejecuta automáticamente los tres capítulos en secuencia.
 
 ---
 
 ### 🔹 Opción 2 — Ejecutar por capítulo
 
-#### Capítulo 4
-```r
-source("cap4-modelos-poblacionales/R/01_casoA_modelo_exponencial.R")
-source("cap4-modelos-poblacionales/R/02_casoB_modelo_logistico.R")
-```
+Ingresa a la carpeta del capítulo y ejecuta:
 
-#### Capítulo 5
 ```r
-source("cap5-tablas-vida/R/01_casoA1_tabla_vida_edad.R")
-source("cap5-tablas-vida/R/02_casoA2_tabla_vida_gotelli.R")
-source("cap5-tablas-vida/R/03_casoB_modelo_leslie.R")
-source("cap5-tablas-vida/R/04_casoC_modelo_lefkovitch.R")
-```
-
-#### Capítulo 6
-```r
-source("cap6-distribucion-densidad/R/01_casoA_patrones_distribucion.R")
-source("cap6-distribucion-densidad/R/02_casoB_estimacion_densidad.R")
+source("run_cap4.R")   # cap4-modelos-crecimiento/
+source("run_cap5.R")   # cap5-tablas-vida/
+source("run_cap6.R")   # cap6-distribucion-densidad/
 ```
 
 ---
 
-## 📊 Datos utilizados
+### 🔹 Opción 3 — Ejecutar por partes
 
-- Capítulo 4: simulaciones o datos generados en script  
-- Capítulo 5: `data/raw/datos.c5.xlsx`  
-- Capítulo 6: `data/raw/datos.c6.xlsx`  
+Dentro de cada capítulo:
+
+```r
+source("R/00_setup.R")
+source("R/01_caso*.R")
+source("R/guardar_salidas_capX.R")
+source("R/render_reporte.R")
+```
+
+---
+
+### 🔹 Opción 4 — Reiniciar salidas
+
+Desde la carpeta de cada capítulo:
+
+```r
+source("limpiar_outputs.R")
+```
 
 ---
 
 ## 💡 Recomendaciones
 
-- Ejecuta los capítulos en el orden propuesto  
-- No modifiques los nombres de archivos de datos  
-- Mantén la estructura de carpetas (`R/`, `data/raw/`, `outputs/`)  
-- Verifica que los paquetes necesarios estén instalados  
-
----
-
-## 🧠 Enfoque pedagógico
-
-La unidad sigue una progresión conceptual:
-
-1. **Tiempo** → crecimiento poblacional  
-2. **Estructura** → organización por edades y estados  
-3. **Espacio** → distribución y densidad  
-
-Esto permite integrar modelos matemáticos con interpretación ecológica en diferentes escalas.
+- Ejecuta los scripts desde la carpeta raíz de cada capítulo
+- No modifiques los nombres de los archivos de datos
+- Mantén la estructura de carpetas (`R/`, `data/raw/`, `outputs/`)
+- Verifica que los paquetes necesarios estén instalados (`tidyverse`, `readxl`, `writexl`, `kableExtra`, `patchwork`, `corrplot`, `broom`, `MASS`)
 
 ---
 
 ## 🔗 Relación con el libro
 
-Esta unidad corresponde al componente de **ecología de poblaciones** del libro ANVIDEA, conectando los fundamentos analíticos con aplicaciones ecológicas reales.
+Esta unidad corresponde al núcleo de modelación de la **Unidad II — Ecología de poblaciones** del libro ANVIDEA, donde se desarrollan las herramientas para:
+
+- modelos de crecimiento (Capítulo 4)
+- demografía estructurada (Capítulo 5)
+- análisis espacial y densidad (Capítulo 6)
+
+---
+
+## 📄 Licencia
+
+Este proyecto distingue entre el código y los contenidos académicos:
+
+- 💻 Código en R: Licenciado bajo MIT License
+- 📘 Contenidos del libro y material pedagógico: Licenciados bajo Creative Commons CC BY-NC 4.0
+
+Esto permite la reutilización académica y docente del material, evitando su uso comercial sin autorización del autor.
 
 ---
 
 ## ⬅️ Navegación
 
-👉 Volver al repositorio principal:  
-https://github.com/Javier-2712/libro_anvidea  
+👉 Volver al repositorio principal:
+https://github.com/Javier-2712/libro_anvidea
 
-👉 Volver al portal web:  
+👉 Volver al portal web:
 https://javier-2712.github.io/libro_anvidea/

@@ -1,0 +1,333 @@
+
+## B. Caso guiado: Diversidad beta y gamma con peces en ríos de México
+
+### 1. Diversidad beta y gamma con la propuesta de Whittaker
+
+```{r}
+#| warning: false
+#| message: false
+
+library(knitr) 
+library(purrr)
+library(tibble)
+library(tidyverse)    # Para diferentes operaciones
+library(readxl)       # Para la lectura de archivos de Excel
+library(corrplot)     # Para las figuras de elipses
+library(vegan)        # Estimadores de diversidad
+library(ggrepel)      # Rótulos a los puntos de figuras en ggplot2
+library(kableExtra)   # Edición de las tablas
+
+# Diversidad beta
+library(betapart)   # Para diversidad beta de Baselga
+library(adespatial) # Para diversidad beta de Podani
+library(ggplot2)    # Para la edición de figuras
+library(caret)      # Para convertir datos a binarios
+library(factoextra) # Para los dendogramas
+library(gridExtra)  # Proyecta varias imágenes en un solo panel 
+
+library(iNEXT.beta3D)
+library(iNEXT)
+```
+
+#### b. Organización de los datos
+
+```{r}
+#| label: tbl-c7-22
+#| tbl-cap: "Resumen de la base de datos con el total de especies por cada zona (montañas- M, planicies- P y desembocadura- RM"
+#| warning: false
+#| message: false
+#| echo: false
+
+# Cargar datos desde Excel
+biol <- read_xlsx("datos.c7.xlsx", sheet = "tax")
+
+# Nombres abreviados de los taxones
+biol1 <- 
+  biol %>%
+  dplyr::select(-1) %>%      # Elimina la primera columna (Sites)
+  rename_with(~ abbreviate(.x, minlength = 4), -1)
+
+
+# Agrupar por Sitio y sumar la abundancia de cada taxón por sitio
+biol2 <- 
+  biol1 %>%
+  group_by(Sites1) %>%
+  summarise(across(everything(), sum, na.rm = TRUE)) 
+
+# Subconjunto ilustrativo: 3 filas x 11 columnas
+biol1_head <- 
+  biol2 %>% 
+  dplyr::select(1:11) %>% 
+  head(4)
+
+# Tabla sencilla para PDF (sin longtabu)
+knitr::kable(
+  biol1_head,
+  booktabs = T, longtable = T) %>%
+  kable_classic(full_width = F)
+```
+
+#### c. Diversidad gamma ($\gamma$)
+
+```{r}
+#| warning: false
+#| message: false
+#| echo: false
+
+# gamma observada
+(gamma.obs <- ncol(biol2[,-1]))
+
+```
+
+
+```{r}
+#| label: tbl-c7-23
+#| tbl-cap: "Estimadores de diversidad gamma, n= localidades, chao, jack1 y boot (bootstrap)= diversidad esperada y ee= error estándar de los estimadores"
+#| warning: false
+#| message: false
+#| echo: false
+
+# gamma estimada
+gamma.est <- specpool(biol2[,-1])
+attach(gamma.est)
+
+# Base de datos con los valores estimados de gamma.est
+gamma.est <- data.frame(n, 
+                        Riqueza= round(Species,2), 
+                        Chao=round(chao,1), 
+                        ee.Chao=round(chao.se,2),
+                        jack1=round(jack1,1), 
+                        ee.Jack1=round(jack1.se,2), 
+                        Boot=round(boot,1), 
+                        de.Boot=round(boot.se,2))
+
+# Edición de la tabla (gamma.est) para su impresión
+gamma.est %>%
+  kbl(digits = 0, 
+      booktabs = F,longtable = T) %>%
+  kable_classic(full_width = F)
+```
+
+#### d. Diversidad alfa promedio ($\alpha$) por cada zona
+
+```{r}
+#| label: tbl-c7-24
+#| tbl-cap: "Estimadores de diversidad (S.obs, Chao1, ACE) y diversidad alfa promedio (Whittaker, 1960)"
+#| warning: false
+#| message: false
+#| echo: false
+
+alfa.est <- 
+  estimateR(biol2[,-1]) %>% 
+  as.data.frame() %>%
+  setNames(c("M", "P", "RM")) %>%
+  mutate(Alfa_est = rowMeans(across(c(M, P, RM))))
+
+
+# Tabla final con alfa promedio
+alfa.est %>%
+  kbl(booktabs = FALSE, digits = 0) %>%
+  kable_classic(full_width = FALSE)
+```
+
+#### e. Diversidad beta ($\beta$)
+
+```{r}
+# Beta observada
+beta_ob <- gamma.est$Riqueza / alfa.est$alfa_est[1]
+beta_ob
+
+# Beta estimada con Chao y Chao1
+beta_est <- gamma.est$chao / alfa.est$alfa_est[2]
+beta_est
+```
+
+#### f. Diversidad beta entre parejas de zonas ($\beta_{W}$)
+
+```{r}
+#| label: tbl-c7-25
+#| tbl-cap: "Índices de diversidad beta entre pares de zonas (Jaccard, Sørensen y Whittaker)"
+#| warning: false
+#| message: false
+#| echo: false
+
+library(vegan)
+
+# 24 opciones de índices beta
+# betadiver(help=TRUE)
+
+# Calcular matrices de disimilitud entre las 3 zonas
+beta.j <- betadiver(biol2[,-1], "j")     # Jaccard
+beta.s <- betadiver(biol2[,-1], "sor")   # Sørensen
+beta.w <- betadiver(biol2[,-1], "w")     # Whittaker
+
+# Convertir cada resultado a matriz con nombres de filas/columnas
+mat.j <- as.matrix(beta.j)
+mat.s <- as.matrix(beta.s)
+mat.w <- as.matrix(beta.w)
+
+# Extraer las comparaciones únicas (parte superior)
+comparaciones <- c("M_vs_P", "M_vs_RM", "P_vs_RM")
+
+beta.est <- data.frame(
+  Comparación = comparaciones,
+  Jaccard   = c(mat.j[1,2], mat.j[1,3], mat.j[2,3]),
+  Sorensen  = c(mat.s[1,2], mat.s[1,3], mat.s[2,3]),
+  Whittaker = c(mat.w[1,2], mat.w[1,3], mat.w[2,3])
+)
+
+# Mostrar tabla
+beta.est %>%
+  kbl(booktabs = TRUE, digits = 2,
+      longtable = T) %>%
+  kable_classic(full_width = FALSE)
+```
+
+
+### 2. Diversidad beta con la varianza en la composición de especies
+
+#### a. Diversidad beta general
+
+```{r}
+# Calculo de la diversidad beta total con el paquete "adespatial"y la transformación de Hellinger para las abundancias de las especies (datos1)
+library(vegan)
+library(adespatial)
+
+# Diversidad beta por taxones (SCBD) y por Estaciones(LCBD) 
+d.beta <- beta.div(biol2[,-1], 
+                   method = "hellinger", 
+                   nperm = 9999)
+round(d.beta$beta,2)  # SSTotal and BDTotal
+```
+
+
+#### b. Contribución de las especies a la diversdad beta- SCBD
+
+```{r}
+#| label: tbl-c7-26
+#| tbl-cap: "Especies que más varían en las tres zonas en comparación (valor p<0.05)"
+#| warning: false
+#| message: false
+#| echo: false
+
+# Taxones con contribución a la diversidad beta (SCBD) mayor o igual al promedio
+p <- round(
+  d.beta$SCBD[d.beta$SCBD >= mean(d.beta$SCBD)], 
+  2
+)
+
+# Convertir el vector en data frame y organizar resultados
+p <- 
+  p %>%
+  as.data.frame() %>%                         # transforma el vector en data frame
+  tibble::rownames_to_column(var = "Especie") %>% # conserva el nombre del taxón
+  dplyr::rename(p = 2) %>%                    # renombra la columna del SCBD
+  dplyr::arrange(p)                           # ordena de menor a mayor contribución
+
+# Filtrar solo taxones con contribución significativa (p < 0.05)
+p <- 
+  p %>%
+  dplyr::filter(p < 0.05)                     # elimina contribuciones no significativas
+
+# Tabla final de taxones con SCBD significativo
+p %>% 
+  kbl(booktabs = TRUE,
+      digits   = 2,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+
+
+```
+
+#### c. Contribución de las localidades a la diversdad beta- LCBD
+
+```{r}
+# Prueba de permutación 
+p.adjust(d.beta$p.LCBD, "holm")
+```
+
+
+#### d. Visualización de las localidades y su contribución a beta
+
+```{r}
+#| warning: false
+#| message: false
+#| echo: false
+
+# Lectura de la base de datos de coordenadas de los taxones "tax"
+tax <- read_xlsx("datos.c7.xlsx", "tax")
+
+# Elimina filas o columnas sin abundancias
+tax2 <- 
+  tax %>%
+  dplyr::select(-1, -2) %>%          # elimina columnas no numéricas (ej. Sites, Especies)
+  mutate_all(~replace_na(., 0)) %>%  # reemplaza NA por 0
+  select_if(~sum(.) > 0) %>%         # elimina columnas de especies con 0 total
+  filter(rowSums(.) > 0)             # elimina filas vacías (sitios sin individuos)
+
+# Diversidad beta por taxones (SCBD) y por Estaciones(LCBD) 
+d.beta1 <- beta.div(tax2, method = "hellinger", nperm = 999)
+
+# Valores LCBD para elaborar la siguiente grafica
+# (LCBD <- d.beta1$LCBD %>% 
+#     round(2))
+
+# Prueba de permutación para las 42 localidades
+# p.adjust(d.beta1$p.LCBD, "holm")
+```
+
+```{r}
+#| label: fig-c7-15
+#| fig-cap: Aportes de diversidad beta general con datos de abundancia (LCBD) por cada Estación evaluado. 
+#| warning: false
+#| message: false
+#| echo: false
+#| fig-pos: 'H'
+#| fig-width: 7
+#| fig-height: 5
+
+# Lectura de la base de datos de coordenadas de las zonas "coord"
+coord <- read_xlsx("datos.c7.xlsx", "coord")
+
+# Seleccionar las columnas de los sitios y las coordenadas
+coord <- coord[,c(1,6,7)]
+
+# Combinar coordenadas y LCBD en un dataframe
+coord <- cbind(coord , LCBD = d.beta1$LCBD)
+
+# Crear el gráfico con ggplot2
+ggplot(coord, 
+       aes(x = Longitude, y = Latitude, label = Code)) +
+  geom_point(shape = 21, fill = "brown", 
+             color = "#7E2D2D", aes(size = LCBD)) +
+  geom_text(color = "#377eb8", size = 4, vjust = -1) +
+  annotate("text", x = -99.7, y = 24.7, label = "Montañas", 
+           color = "darkgreen", size = 4, fontface = "italic") +
+  annotate("text", x = -98.4, y = 24.24, label = "planicies", 
+           color = "darkgreen", size = 4, fontface = "italic") +
+  annotate("text", x = -97.8, y = 23.95, label = "Desembocadura", 
+           color = "darkgreen", size = 4, fontface = "italic") +
+  annotate("text", x = -97.909, y = 23.735, label = "***", 
+           color = "darkred", size = 4, fontface = "italic") +
+  annotate("text", x = -97.737, y = 23.717
+           , label = "***", 
+           color = "darkred", size = 4, fontface = "italic") +
+  labs(title = "Valores LCBD",
+       x = "Coordenadas x",
+       y = "Coordenadas y") +
+  xlim(-99.8, -97.5) +
+  ylim(23.7, 24.7) +
+  scale_size_continuous(range = c(3, 8)) +  # Rango de tamaños
+  geom_path(data = coord, aes(x = Longitude, y = Latitude), 
+            color = "light blue") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5) ,
+        panel.grid=element_blank(),
+        axis.title = element_text(size = 14))
+
+```
+
+
+
+
+

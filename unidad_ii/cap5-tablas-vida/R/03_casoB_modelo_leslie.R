@@ -1,244 +1,336 @@
 # =========================================================
-# ANDIVEA - Unidad II
-# Capítulo 5 - Tablas de vida y modelos matriciales
-# Archivo: 03_casoB_modelo_leslie.R
-# Propósito: construir y analizar matrices de Leslie
-#             pre y post-reproductivas como continuación
-#             del caso A2 basado en datos de Gotelli
+# ANVIDEA - Capítulo 5
+# Tablas de vida y modelos matriciales
+# ---------------------------------------------------------
+# Archivo : 03_casoB_modelo_leslie.R
+# Caso    : B. Modelo de Leslie
 # =========================================================
 
-source("R/00_setup.R")
-source("R/03_funciones_auxiliares.R")
-
-archivo_datos <- file.path(data_dir, "datos.c5.xlsx")
-
-message("→ Leyendo tabla de vida derivada del caso A2...")
+cat("\n========================================\n")
+cat("Caso B - Modelo de Leslie\n")
+cat("========================================\n")
 
 # ---------------------------------------------------------
-# Paso 1. Lectura y validación de la tabla base
+# Paso 1. Estimadores de estructura de edad
+# Fpre, Fpost, Sx, cx, vx  (tabla2 del casoA2)
 # ---------------------------------------------------------
-tabla2 <- readxl::read_excel(archivo_datos, sheet = "t.vida") %>%
-  dplyr::mutate(
-    dplyr::across(
-      .cols = c(x, Nx, Sx, Fpre, Fpost),
-      .fns  = as.numeric
-    )
-  ) %>%
-  dplyr::filter(!is.na(x), !is.na(Nx)) %>%
-  dplyr::arrange(x)
 
-columnas_necesarias <- c("x", "Nx", "Sx", "Fpre", "Fpost")
-faltantes <- setdiff(columnas_necesarias, names(tabla2))
+library(tidyverse)
+library(readxl)
+library(kableExtra)
+library(purrr)
 
-if (length(faltantes) > 0) {
-  stop(
-    paste0(
-      "La hoja 't.vida' no contiene las columnas requeridas: ",
-      paste(faltantes, collapse = ", ")
-    )
+# Impresión de la tabla (tabla2 proviene del casoA2)
+tabla2 %>%
+  kbl(digits = 2,
+      col.names = c(
+        "x", "Nx", "lx", "mx", "Sx",
+        "F(pre)", "F(post)",
+        "lx\u00b7e^{-rx}", "c(x)",
+        "v(x)", "v(x) norm"
+      ),
+      booktabs = TRUE) %>%
+  kable_classic(full_width = FALSE) %>%
+  kable_styling(
+    full_width    = FALSE,
+    font_size     = 10,
+    latex_options = c("repeat_header")
   )
+
+
+# ---------------------------------------------------------
+# Paso 2. Matrices de Leslie: L (pre y post reproductivas)
+# ---------------------------------------------------------
+
+# Cargar la base de datos "tabla2"
+tabla2 <- read_xlsx(archivo_datos, sheet = "t.vida")
+
+# Vectores necesarios
+edades <- tabla2$x        # edades: 0,1,2,3,4
+Fpre   <- tabla2$Fpre     # fecundidades pre-reproductivas
+Fpost  <- tabla2$Fpost    # fecundidades post-reproductivas
+Sx     <- tabla2$Sx       # supervivencia de x -> x+1
+k      <- length(edades)  # aquí: 5
+
+# Chequeos mínimos
+stopifnot(k >= 2, length(Fpre) >= k, length(Fpost) >= k, length(Sx) >= k - 1)
+
+# =============================
+# Matriz de Leslie PRE (4x4)
+#  - Trunca la última edad (no aporta fecundidad/continuación)
+#  - Subdiagonal inicia en S1 (transición 1->2, 2->3, 3->4)
+# =============================
+k_pre      <- k - 1                  # 4
+edades_pre <- edades[1:k_pre]        # 0..3
+Fpre_pre   <- Fpre[1:k_pre]          # Fpre para 0..3
+
+# Subdiagonal PRE: S1, S2, S3 (longitud = k_pre-1)
+stopifnot(length(Sx) >= k_pre)
+Sx_pre <- Sx[2:k_pre]
+
+L_pre <- matrix(0, nrow = k_pre, ncol = k_pre)
+L_pre[1, ] <- Fpre_pre
+if (k_pre > 1) {
+  L_pre[cbind(2:k_pre, 1:(k_pre - 1))] <- Sx_pre
 }
 
-if (nrow(tabla2) < 2) {
-  stop("La hoja 't.vida' debe contener al menos dos clases de edad.")
+dimnames(L_pre) <- list(paste0("Edad_", edades_pre),
+                        paste0("Edad_", edades_pre))
+
+# =============================
+# Matriz de Leslie POST (5x5)
+#  - Completa (todas las edades)
+#  - Subdiagonal inicia en S0 (transición 0->1)
+# =============================
+L_post <- matrix(0, nrow = k, ncol = k)
+L_post[1, ] <- Fpost
+if (k > 1) {
+  L_post[cbind(2:k, 1:(k - 1))] <- Sx[1:(k - 1)]
 }
 
-edades <- tabla2$x
-Nx     <- tabla2$Nx
-Sx     <- tabla2$Sx
-Fpre   <- tabla2$Fpre
-Fpost  <- tabla2$Fpost
+dimnames(L_post) <- list(paste0("Edad_", edades),
+                         paste0("Edad_", edades))
+
+# Impresión
+kable(L_pre,
+      booktabs = TRUE, digits = 2, align = "c") %>%
+  kable_styling(full_width = FALSE, position = "center",
+                font_size = 9,
+                latex_options = c("hold_position", "scale_down"))
+
+kable(L_post,
+      booktabs = TRUE, digits = 2, align = "c") %>%
+  kable_styling(full_width = FALSE, position = "center",
+                font_size = 9,
+                latex_options = c("hold_position", "scale_down"))
+
 
 # ---------------------------------------------------------
-# Paso 2. Construcción de matrices de Leslie
+# Paso 3. Modelación matricial multi-edad (pre y post reproductiva)
 # ---------------------------------------------------------
-message("→ Construyendo matrices de Leslie pre y post-reproductivas...")
 
-# En la matriz pre-reproductiva, la fecundidad del último intervalo
-# suele omitirse si no hay una clase siguiente bien definida.
-L_pre <- construir_matriz_leslie(
-  F = Fpre[1:(length(edades) - 1)],
-  S = Sx[1:(length(edades) - 2)]
-)
-
-# En la matriz post-reproductiva se conserva la estructura completa
-# de fecundidades y supervivencias entre clases consecutivas.
-L_post <- construir_matriz_leslie(
-  F = Fpost[1:length(edades)],
-  S = Sx[1:(length(edades) - 1)]
-)
-
-# Vectores iniciales compatibles con cada matriz
-N0_pre  <- Nx[1:ncol(L_pre)]
-N0_post <- Nx[1:ncol(L_post)]
-
-# ---------------------------------------------------------
-# Paso 3. Proyecciones poblacionales
-# ---------------------------------------------------------
-message("→ Proyectando la población con ambos modelos matriciales...")
-
-proj_pre <- proyectar_matriz(L_pre, N0_pre, t_max = 20) %>%
-  tidyr::pivot_longer(-t, names_to = "clase", values_to = "N") %>%
-  dplyr::mutate(modelo = "Pre-reproductiva")
-
-proj_post <- proyectar_matriz(L_post, N0_post, t_max = 20) %>%
-  tidyr::pivot_longer(-t, names_to = "clase", values_to = "N") %>%
-  dplyr::mutate(modelo = "Post-reproductiva")
-
-proyecciones <- dplyr::bind_rows(proj_pre, proj_post)
-
-# Totales poblacionales por tiempo
-totales <- proyecciones %>%
-  dplyr::group_by(modelo, t) %>%
-  dplyr::summarise(N_total = sum(N, na.rm = TRUE), .groups = "drop")
-
-# ---------------------------------------------------------
-# Paso 4. Gráficos
-# ---------------------------------------------------------
-message("→ Generando figuras del caso B...")
-
-p_pre <- ggplot2::ggplot(proj_pre, ggplot2::aes(t, N, color = clase)) +
-  ggplot2::geom_line(linewidth = 1) +
-  ggplot2::labs(
-    title = "Proyección Leslie pre-reproductiva",
-    x = "Tiempo",
-    y = "Abundancia",
-    color = "Clase"
-  ) +
-  ggplot2::theme_bw()
-
-p_post <- ggplot2::ggplot(proj_post, ggplot2::aes(t, N, color = clase)) +
-  ggplot2::geom_line(linewidth = 1) +
-  ggplot2::labs(
-    title = "Proyección Leslie post-reproductiva",
-    x = "Tiempo",
-    y = "Abundancia",
-    color = "Clase"
-  ) +
-  ggplot2::theme_bw()
-
-p_total <- ggplot2::ggplot(totales, ggplot2::aes(t, N_total, color = modelo)) +
-  ggplot2::geom_line(linewidth = 1.1) +
-  ggplot2::geom_point(size = 2) +
-  ggplot2::labs(
-    title = "Tamaño poblacional total proyectado",
-    x = "Tiempo",
-    y = "N total",
-    color = "Modelo"
-  ) +
-  ggplot2::theme_bw()
-
-if (requireNamespace("cowplot", quietly = TRUE)) {
-  fig_comb <- cowplot::plot_grid(p_pre, p_post, ncol = 2)
-  guardar_figura(fig_comb, "cap5_leslie_proyecciones_clases.png", width = 11, height = 5)
-} else {
-  guardar_figura(p_pre, "cap5_leslie_pre_reproductiva.png", width = 7, height = 5)
-  guardar_figura(p_post, "cap5_leslie_post_reproductiva.png", width = 7, height = 5)
+# Función modelo_pob para automatizar N(t+1) = L · N(t)
+modelo_pob <- function(L, Nt, t) {
+  k   <- length(Nt)
+  out <- matrix(NA_real_, nrow = t + 1, ncol = k)
+  out[1, ] <- Nt
+  for (i in 1:t) out[i + 1, ] <- L %*% out[i, ]
+  as.data.frame(out) %>%
+    purrr::set_names(paste0("Edad_", seq_len(k)))
 }
 
-guardar_figura(p_total, "cap5_leslie_proyecciones_totales.png", width = 8, height = 5)
+
+# ---- a.) Proyección post-reproductiva ----
+
+# Paso 1. Vector de edades (Nt) y periodos a proyectar (t)
+Nt <- tabla_v$Nx
+Nt
+
+t <- 12
+t
+
+# Paso 3. Simulación de la proyección N(t+1) = L · N(t)
+simulacion <- modelo_pob(as.matrix(L_post), Nt, t)
+
+simulacion <- simulacion %>%
+  mutate(Tiempo = 0:(nrow(simulacion) - 1))
+
+simulacion <- simulacion %>%
+  dplyr::select(Tiempo, everything())
+
+colnames(simulacion) <- c("Tiempo", "Edad_0", "Edad_1",
+                          "Edad_2", "Edad_3", "Edad_4")
+
+head(round(simulacion)) %>%
+  kbl(booktabs  = TRUE,
+      longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+# Formato largo
+simulacion_l <- simulacion %>%
+  pivot_longer(cols      = -Tiempo,
+               names_to  = "Edad",
+               values_to = "Abundancia") %>%
+  mutate(Abundancia = round(Abundancia, 0))
+
+head(simulacion_l) %>%
+  kbl(booktabs  = TRUE,
+      longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+# Paso 4. Figura de la proyección multi-Edad (post-reproductiva)
+ggplot(simulacion_l, aes(x = Tiempo, y = Abundancia, color = Edad)) +
+  geom_point(size = 3) +
+  geom_line() +
+  labs(x     = "Per\u00edodos de tiempo (a\u00f1os)",
+       y     = "Densidad (Nx)",
+       color = "Edades",
+       title = "Proyecci\u00f3n Post-Reproductiva") +
+  scale_x_continuous(breaks = seq(min(simulacion_l$Tiempo),
+                                  max(simulacion_l$Tiempo), by = 2)) +
+  theme_bw() +
+  theme(axis.text    = element_text(size = 13),
+        axis.title.x = element_text(size = 13),
+        axis.title.y = element_text(size = 13),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+# Paso 5. Lambda, cx y vx del censo post-reproductivo
+A    <- as.matrix(L_post)
+eigR <- eigen(A)
+posR   <- which.max(Mod(eigR$values))
+lambda <- Re(eigR$values[posR])
+w      <- Re(eigR$vectors[, posR])
+cx     <- w / sum(w)
+
+eigL <- eigen(t(A))
+posL   <- which.max(Mod(eigL$values))
+v      <- Re(eigL$vectors[, posL])
+v_norm <- v / v[1]
+
+if (sum(cx) < 0)     cx     <- -cx
+if (v_norm[1] < 0)   v_norm <- -v_norm
+
+r <- log(lambda)
+
+cat("a) Tasa instant\u00e1nea de aumento (r)\n\n")
+print(round(r, 6))
+
+cat("\n\nb) Tasa finita post-reproductiva (lambda)\n\n")
+print(round(lambda, 6))
+
+cat("\n\nc) Distribuci\u00f3n estable de edades (c_x)\n\n")
+print(round(setNames(cx, rownames(A)), 5))
+
+cat("\n\nd) Valor reproductivo normalizado (v_x^norm)\n\n")
+print(round(setNames(v_norm, rownames(A)), 5))
+
+
+# ---- b.) Proyección pre-reproductiva ----
+
+# Paso 3. Simulación pre-reproductiva
+Nt_pre <- Nt[1:4]
+t_pre  <- 12
+
+simulacion <- modelo_pob(as.matrix(L_pre), Nt_pre, t_pre)
+
+simulacion <- simulacion %>%
+  mutate(Tiempo = 0:(nrow(simulacion) - 1))
+
+simulacion <- simulacion %>%
+  dplyr::select(Tiempo, everything())
+
+colnames(simulacion) <- c("Tiempo", "Edad_0", "Edad_1",
+                          "Edad_2", "Edad_3")
+
+head(round(simulacion)) %>%
+  kbl(booktabs  = TRUE,
+      longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+# Formato largo
+simulacion_l <- simulacion %>%
+  pivot_longer(cols      = -Tiempo,
+               names_to  = "Edad",
+               values_to = "Abundancia") %>%
+  mutate(Abundancia = round(Abundancia, 0))
+
+head(simulacion_l) %>%
+  kbl(booktabs  = TRUE,
+      longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+# Paso 4. Figura de la proyección multi-Edad (pre-reproductiva)
+ggplot(simulacion_l, aes(x = Tiempo, y = Abundancia, color = Edad)) +
+  geom_point(size = 3) +
+  geom_line() +
+  labs(x     = "Per\u00edodos de tiempo (a\u00f1os)",
+       y     = "Densidad (Nx)",
+       color = "Edades",
+       title = "Proyecci\u00f3n Pre-Reproductiva") +
+  scale_x_continuous(breaks = seq(min(simulacion_l$Tiempo),
+                                  max(simulacion_l$Tiempo), by = 2)) +
+  theme_bw() +
+  theme(axis.text    = element_text(size = 13),
+        axis.title.x = element_text(size = 13),
+        axis.title.y = element_text(size = 13),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+# Paso 6. Lambda, cx y vx del censo pre-reproductivo
+A    <- as.matrix(L_pre)
+eigR <- eigen(A)
+posR   <- which.max(Mod(eigR$values))
+lambda <- Re(eigR$values[posR])
+w      <- Re(eigR$vectors[, posR])
+cx     <- w / sum(w)
+
+eigL <- eigen(t(A))
+posL   <- which.max(Mod(eigL$values))
+v      <- Re(eigL$vectors[, posL])
+v_norm <- v / v[1]
+
+if (sum(cx) < 0)   cx     <- -cx
+if (v_norm[1] < 0) v_norm <- -v_norm
+
+r <- log(lambda)
+
+cat("a) Tasa instant\u00e1nea de aumento (r)\n\n")
+print(round(r, 6))
+
+cat("\n\nb) Tasa finita pre-reproductiva (lambda)\n\n")
+print(round(lambda, 6))
+
+cat("\n\nc) Distribuci\u00f3n estable de edades (c_x)\n\n")
+print(round(setNames(cx, rownames(A)), 4))
+
+cat("\n\nd) Valor reproductivo normalizado (v_x^norm)\n\n")
+print(round(setNames(v_norm, rownames(A)), 4))
+
 
 # ---------------------------------------------------------
-# Paso 5. Análisis matricial
+# Paso 4. Cálculos especiales: Sensibilidad y Elasticidad
 # ---------------------------------------------------------
-message("→ Calculando propiedades matriciales...")
 
-analisis_pre <- analisis_matricial(L_pre)
-analisis_post <- analisis_matricial(L_post)
+# ---- a.) Análisis de Sensibilidad ----
 
-resumen <- tibble::tibble(
-  modelo = c("Pre-reproductiva", "Post-reproductiva"),
-  lambda = c(analisis_pre$lambda, analisis_post$lambda)
-)
+L <- as.matrix(L_post)
+round(L, 2)
 
-# Distribución estable y valor reproductivo
-dist_estable_pre <- tibble::as_tibble(as.data.frame(analisis_pre$w)) %>%
-  dplyr::mutate(clase = paste0("clase_", seq_len(nrow(.)))) %>%
-  dplyr::relocate(clase)
+# Matriz de proyección (Leslie post-reproductiva)
+L <- as.matrix(L_post)
 
-dist_estable_post <- tibble::as_tibble(as.data.frame(analisis_post$w)) %>%
-  dplyr::mutate(clase = paste0("clase_", seq_len(nrow(.)))) %>%
-  dplyr::relocate(clase)
+# 1) Autovalor dominante (λ) y autovector derecho (w)
+eigR  <- eigen(L)
+posR  <- which.max(Mod(eigR$values))
+lambda <- Re(eigR$values[posR])
+w     <- Re(eigR$vectors[, posR])
 
-valor_reprod_pre <- tibble::as_tibble(as.data.frame(analisis_pre$v)) %>%
-  dplyr::mutate(clase = paste0("clase_", seq_len(nrow(.)))) %>%
-  dplyr::relocate(clase)
+# 2) Autovector izquierdo (v)
+eigL <- eigen(t(L))
+posL <- which.max(Mod(eigL$values))
+v    <- Re(eigL$vectors[, posL])
 
-valor_reprod_post <- tibble::as_tibble(as.data.frame(analisis_post$v)) %>%
-  dplyr::mutate(clase = paste0("clase_", seq_len(nrow(.)))) %>%
-  dplyr::relocate(clase)
+# 3) Ajuste de signo
+if (sum(w) < 0) w <- -w
+if (sum(v) < 0) v <- -v
 
-# ---------------------------------------------------------
-# Paso 6. Exportación de tablas
-# ---------------------------------------------------------
-message("→ Exportando resultados del caso B...")
+# 4) Normalización biortogonal: v^T w = 1
+v <- v / as.numeric(t(v) %*% w)
 
-Leslie_pre_df <- as.data.frame(L_pre)
-colnames(Leslie_pre_df) <- paste0("c", seq_len(ncol(Leslie_pre_df)))
-Leslie_pre_df <- tibble::add_column(
-  Leslie_pre_df,
-  fila = paste0("c", seq_len(nrow(Leslie_pre_df))),
-  .before = 1
-)
+# 5) Matriz de sensibilidad S_ij
+S <- outer(v, w)
+round(S, 3)
 
-Leslie_post_df <- as.data.frame(L_post)
-colnames(Leslie_post_df) <- paste0("c", seq_len(ncol(Leslie_post_df)))
-Leslie_post_df <- tibble::add_column(
-  Leslie_post_df,
-  fila = paste0("c", seq_len(nrow(Leslie_post_df))),
-  .before = 1
-)
 
-sens_pre_df <- as.data.frame(analisis_pre$sensibilidad)
-colnames(sens_pre_df) <- paste0("c", seq_len(ncol(sens_pre_df)))
-sens_pre_df <- tibble::add_column(
-  sens_pre_df,
-  fila = paste0("c", seq_len(nrow(sens_pre_df))),
-  .before = 1
-)
+# ---- b.) Análisis de Elasticidad ----
 
-elas_pre_df <- as.data.frame(analisis_pre$elasticidad)
-colnames(elas_pre_df) <- paste0("c", seq_len(ncol(elas_pre_df)))
-elas_pre_df <- tibble::add_column(
-  elas_pre_df,
-  fila = paste0("c", seq_len(nrow(elas_pre_df))),
-  .before = 1
-)
+L <- as.matrix(L_post)
+round(L, 2)
 
-sens_post_df <- as.data.frame(analisis_post$sensibilidad)
-colnames(sens_post_df) <- paste0("c", seq_len(ncol(sens_post_df)))
-sens_post_df <- tibble::add_column(
-  sens_post_df,
-  fila = paste0("c", seq_len(nrow(sens_post_df))),
-  .before = 1
-)
+E <- (L / lambda) * S
+round(E, 3)
 
-elas_post_df <- as.data.frame(analisis_post$elasticidad)
-colnames(elas_post_df) <- paste0("c", seq_len(ncol(elas_post_df)))
-elas_post_df <- tibble::add_column(
-  elas_post_df,
-  fila = paste0("c", seq_len(nrow(elas_post_df))),
-  .before = 1
-)
+sum(E)
 
-guardar_tabla_excel(
-  list(
-    tabla_vida_base = tabla2,
-    Leslie_pre = Leslie_pre_df,
-    Leslie_post = Leslie_post_df,
-    resumen_lambda = resumen,
-    distribucion_estable_pre = dist_estable_pre,
-    distribucion_estable_post = dist_estable_post,
-    valor_reproductivo_pre = valor_reprod_pre,
-    valor_reproductivo_post = valor_reprod_post,
-    sensibilidad_pre = sens_pre_df,
-    elasticidad_pre = elas_pre_df,
-    sensibilidad_post = sens_post_df,
-    elasticidad_post = elas_post_df,
-    proyecciones = proyecciones,
-    totales = totales
-  ),
-  archivo = "cap5_modelo_leslie.xlsx"
-)
-
-message("✔ Capítulo 5 - Caso B ejecutado correctamente")
+cat("\nCaso B finalizado correctamente.\n")

@@ -1,0 +1,5 @@
+No,Nt,t,Lambda,Interpretacion
+60,240,6,1.2599210498948732,Crecimiento (λ>1)
+100,100,10,1,Estable (λ=1)
+80,20,8,0.8408964152537145,Decrecimiento (λ<1)
+30,300,10,1.2589254117941673,Crecimiento (λ>1)

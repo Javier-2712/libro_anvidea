@@ -1,11 +1,14 @@
 # =========================================================
 # ANVIDEA - Unidad III
 # Capítulo 8 - Diversidad funcional y filogenética
-# Archivo: 06_Rao_ajustado.R
+# Archivo: 06_Rao.R
 # Propósito: calcular componentes alfa, gamma y beta de diversidad
 #            taxonómica (TD), funcional (FD) y filogenética (PD)
 #            mediante la entropía cuadrática de Rao.
+# Basado en: Villeger & Mouillot (J Ecol, 2008) y S. Pavoine (ade4)
 # =========================================================
+
+library(ade4)
 
 if (!requireNamespace("ade4", quietly = TRUE)) {
   stop("Falta el paquete 'ade4'. Instálalo antes de usar esta función.")
@@ -290,7 +293,7 @@ Rao <- function(sample,
   # 3.1 Diversidad taxonómica
   # -------------------------------------------------------
 
-  dS <- matrix(1, ncol(sample), ncol(sample)) - diag(rep(1, ncol(sample)))
+  dS <- matrix(1, nrow(sample), nrow(sample)) - diag(rep(1, nrow(sample)))
   temp_qdec <- Qdecomp(dS, t(sample), w = weight)
 
   TD$Richness_per_plot <- temp_qdec$Richness_per_plot

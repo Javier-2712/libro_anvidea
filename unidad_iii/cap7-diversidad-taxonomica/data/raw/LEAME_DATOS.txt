@@ -1,0 +1,14 @@
+Capítulo 7 — Archivos requeridos en data/raw/
+
+Ubique aquí los archivos de entrada antes de ejecutar los scripts:
+
+1. datos.c7.xlsx
+   Hojas esperadas:
+   - tax
+   - tax1
+   - amb
+   - rasgos
+   - coord
+
+No cambie el nombre del archivo ni de las hojas, a menos que también ajuste
+las rutas dentro de los scripts.

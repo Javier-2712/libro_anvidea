@@ -1,9 +1,15 @@
 # =========================================================
-# ANVIDEA - Unidad I
-# Capítulo 3 - Visualización gráfica de patrones climáticos
+# ANVIDEA - Capítulo 3
 # Archivo: 00_setup.R
-# Propósito: cargar paquetes y preparar el entorno de trabajo
+# Propósito: configuración general del capítulo 3
+#            Análisis climático y ecológico en ambientes contrastantes
 # =========================================================
+
+cat("========================================\n")
+cat("ANVIDEA - Capítulo 3\n")
+cat("Análisis climático y ecológico en ambientes contrastantes\n")
+cat("Cargando configuración general...\n")
+cat("========================================\n")
 
 # ---------------------------------------------------------
 # 1. Paquetes requeridos
@@ -12,66 +18,101 @@
 required_packages <- c(
   "tidyverse",
   "readxl",
+  "writexl",
   "janitor",
-  "cowplot",
+  "scales",
   "viridis",
-  "writexl"
+  "knitr",
+  "kableExtra",
+  "cowplot"
 )
 
-# Detectar paquetes faltantes
 missing_packages <- required_packages[
-  !vapply(required_packages, requireNamespace, logical(1), quietly = TRUE)
+  !required_packages %in% installed.packages()[, "Package"]
 ]
 
-# Verificación
 if (length(missing_packages) > 0) {
-  stop(
-    "Instale primero estos paquetes: ",
-    paste(missing_packages, collapse = ", ")
-  )
+  message("Instalando paquetes faltantes: ", paste(missing_packages, collapse = ", "))
+  install.packages(missing_packages, dependencies = TRUE)
 }
 
+invisible(lapply(required_packages, library, character.only = TRUE))
+
 # ---------------------------------------------------------
-# 2. Cargar paquetes
+# 2. Rutas del proyecto
+# ---------------------------------------------------------
+
+root_dir      <- getwd()
+ruta_scripts  <- file.path(root_dir, "R")
+ruta_datos    <- file.path(root_dir, "data", "raw")
+ruta_outputs  <- file.path(root_dir, "outputs")
+ruta_figuras  <- file.path(ruta_outputs, "figuras")
+ruta_tablas   <- file.path(ruta_outputs, "tablas")
+ruta_reportes <- file.path(ruta_outputs, "reportes")
+
+# ---------------------------------------------------------
+# 3. Crear carpetas si no existen
 # ---------------------------------------------------------
 
 invisible(lapply(
-  required_packages,
-  function(pkg) suppressPackageStartupMessages(
-    library(pkg, character.only = TRUE)
-  )
+  c(ruta_outputs, ruta_figuras, ruta_tablas, ruta_reportes),
+  dir.create, recursive = TRUE, showWarnings = FALSE
 ))
 
 # ---------------------------------------------------------
-# 3. Crear carpetas de salida
+# 4. Cargar funciones auxiliares
 # ---------------------------------------------------------
 
-if (!dir.exists("outputs/figuras")) {
-  dir.create("outputs/figuras", recursive = TRUE, showWarnings = FALSE)
+archivo_funciones <- file.path(ruta_scripts, "02_funciones_auxiliares.R")
+
+if (file.exists(archivo_funciones)) {
+  source(archivo_funciones)
+} else {
+  warning("No se encontró 02_funciones_auxiliares.R")
 }
 
-if (!dir.exists("outputs/tablas")) {
-  dir.create("outputs/tablas", recursive = TRUE, showWarnings = FALSE)
+# ---------------------------------------------------------
+# 5. Ruta del archivo de datos y validación de hojas
+# ---------------------------------------------------------
+
+archivo_datos <- file.path(ruta_datos, "datos.c3.xlsx")
+
+if (!file.exists(archivo_datos)) {
+  stop("No se encontró 'datos.c3.xlsx' en data/raw/", call. = FALSE)
 }
 
-# ---------------------------------------------------------
-# 4. Directorios de trabajo
-# ---------------------------------------------------------
+hojas_datos           <- readxl::excel_sheets(archivo_datos)
+hojas_datos_requeridas <- c("serie_temp", "serie_precipit", "clima")
+faltan_hojas           <- setdiff(hojas_datos_requeridas, hojas_datos)
 
-root_dir <- getwd()
-data_dir <- file.path(root_dir, "data", "raw")
-
-if (!dir.exists(data_dir)) {
+if (length(faltan_hojas) > 0) {
   stop(
-    "No se encontró el directorio de datos esperado: ", data_dir,
-    "\nVerifique que la estructura del proyecto incluya la carpeta data/raw."
+    "En 'datos.c3.xlsx' faltan las siguientes hojas:\n- ",
+    paste(faltan_hojas, collapse = "\n- "),
+    call. = FALSE
   )
 }
 
 # ---------------------------------------------------------
-# 5. Mensajes de verificación
+# 6. Cargar función de balance hídrico (bal_hid.R)
 # ---------------------------------------------------------
 
-message("Proyecto cargado desde: ", root_dir)
-message("Directorio de datos: ", data_dir)
-message("Carpetas de salida listas en: outputs/figuras y outputs/tablas")
+archivo_balhid <- file.path(ruta_datos, "bal_hid.R")
+
+if (file.exists(archivo_balhid)) {
+  source(archivo_balhid)
+} else {
+  stop("No se encontró bal_hid.R en data/raw/", call. = FALSE)
+}
+
+# ---------------------------------------------------------
+# 7. Opciones globales
+# ---------------------------------------------------------
+
+options(
+  scipen = 999,
+  dplyr.summarise.inform = FALSE,
+  width = 120
+)
+
+cat("Configuración general cargada correctamente.\n")

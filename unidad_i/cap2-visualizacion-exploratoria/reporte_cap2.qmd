@@ -1,0 +1,266 @@
+---
+title: "ANVIDEA - Reporte reproducible"
+subtitle: "Capítulo 2. Visualización exploratoria de datos ecológicos"
+author: "Javier Rodríguez-Barrios"
+date: last-modified
+lang: es
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    number-sections: false
+    code-fold: false
+    code-tools: false
+    embed-resources: true
+
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+::: {.callout-note}
+## Nota para el lector
+
+Este reporte complementa el Capítulo 2 de ANVIDEA y organiza las salidas reproducibles
+siguiendo la secuencia presentada en el libro.
+Todos los objetos se leen desde archivos `.rds` generados por `04_guardar_salidas_cap2.R`.
+:::
+
+```{r}
+#| include: false
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(htmltools)
+
+ruta_figuras  <- file.path("outputs", "figuras")
+ruta_reportes <- file.path("outputs", "reportes")
+
+resA <- readRDS(file.path(ruta_reportes, "resultado_casoA.rds"))
+resB <- readRDS(file.path(ruta_reportes, "resultado_casoB.rds"))
+
+# Función de tabla HTML segura
+tabla_html <- function(df, caption = NULL, digits = 2, max_filas = NULL) {
+  if (is.null(df) || !is.data.frame(df) || nrow(df) == 0) {
+    return(htmltools::HTML("<p><em>Tabla no disponible.</em></p>"))
+  }
+  if (!is.null(max_filas)) df <- head(df, max_filas)
+  kableExtra::kbl(df, caption = caption, digits = digits,
+                  booktabs = TRUE, format = "html") %>%
+    kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria")
+}
+
+# Función para mostrar figura desde disco
+mostrar_figura <- function(fig, titulo = NULL, width = "85%") {
+  ruta <- file.path(ruta_figuras, fig)
+  if (!is.null(titulo)) cat("**", titulo, "**\n\n", sep = "")
+  if (file.exists(ruta)) {
+    cat("![](", ruta, "){fig-align='center' out-width='", width, "'}\n", sep = "")
+  } else {
+    cat("_Figura no disponible._\n")
+  }
+}
+```
+
+# Introducción
+
+Este reporte resume las principales salidas del **Capítulo 2** de ANVIDEA, centrado
+en la visualización exploratoria de datos ecológicos a partir de dos casos guiados:
+mesozooplancton estuarino y macroinvertebrados bentónicos fluviales.
+
+---
+
+# A. Caso guiado: Mesozooplancton estuarino
+
+## Preparación de los datos
+
+```{r}
+resA$datos_select %>%
+  tabla_html("Tabla 35. Base de datos en formato largo (estación 2).", max_filas = 6)
+```
+
+```{r}
+resA$biol_ancho %>%
+  dplyr::select(1:min(10, ncol(.))) %>%
+  tabla_html("Tabla 36. Base de datos en formato ancho.", max_filas = 4)
+```
+
+## 2. Exploración de relaciones
+
+### 2.1 Correlogramas
+
+```{r results='asis'}
+mostrar_figura("casoA_fig_corr_ellipse.png",
+  "Figura 10. Relación de variables ambientales y taxones de mesozooplancton (elipses).")
+mostrar_figura("casoA_fig_corr_mixed.png",
+  "Figura 11. Correlograma mixto (elipses + coeficientes).")
+mostrar_figura("casoA_fig_corr_circle.png",
+  "Figura 12. Correlograma con círculos y coeficientes, ordenado por AOE.")
+mostrar_figura("casoA_fig_corr_amb_taxa.png",
+  "Figura 13. Variables ambientales (filas) vs. taxones (columnas).")
+```
+
+### 2.2 Dispersión por pares de variables
+
+```{r results='asis'}
+mostrar_figura("casoA_fig_pairs.png",
+  "Figura 14. Relaciones entre variables ambientales: regresiones suavizadas, correlaciones de Pearson e histogramas.")
+```
+
+### 2.3 Histogramas de densidad
+
+```{r results='asis'}
+mostrar_figura("casoA_fig_densidad_capas.png",
+  "Figura 15. Distribución continua de abundancia por capa de profundidad.")
+mostrar_figura("casoA_fig_densidad_capas_malla.png",
+  "Figura 16. Distribución por capa y tamaño de malla.")
+```
+
+### 2.4 Dispersión X-Y
+
+```{r results='asis'}
+mostrar_figura("casoA_fig_lineal_ab_dens.png",
+  "Figura 17. Relación lineal: abundancia vs. densidad de individuos.")
+mostrar_figura("casoA_fig_loess_ab_dens1.png",
+  "Figura 18. Relación suavizada (Loess) con banda de confianza.")
+mostrar_figura("casoA_fig_loess_ab_dens2.png",
+  "Figura 19. Relación suavizada (Loess) sin banda, span = 0.5.")
+```
+
+## 3. Exploración de diferencias
+
+### 3.1 Cajas y bigotes
+
+```{r results='asis'}
+mostrar_figura("casoA_fig_estacion.png",
+  "Figura 20. Variación de abundancia entre las seis estaciones evaluadas.")
+mostrar_figura("casoA_fig_capas.png",
+  "Figura 21. Abundancia por estación y capa de profundidad.")
+mostrar_figura("casoA_fig_capas_facetas.png",
+  "Figura 22. Variables ambientales por estación (facetas).")
+mostrar_figura("casoA_fig_salinidad_terciles.png",
+  "Figura 23. Abundancia por estación, temperatura y salinidad (terciles).")
+```
+
+### 3.2 Figuras con estimadores estadísticos
+
+```{r}
+resA$datos_resum %>%
+  tabla_html("Tabla 37. Estadísticos descriptivos por tamaño de malla y capa.", max_filas = 12)
+```
+
+```{r results='asis'}
+mostrar_figura("casoA_fig_barras_error_ncol.png",
+  "Figura 24. Abundancia por capa y malla (paneles en columnas).")
+mostrar_figura("casoA_fig_barras_error_nrow.png",
+  "Figura 25. Abundancia por capa y malla (paneles en filas).")
+```
+
+## 4. Figuras de burbujas
+
+```{r results='asis'}
+mostrar_figura("casoA_fig_burb_ext.png",
+  "Figura 26. Burbuja con datos hipotéticos — leyenda exterior.")
+mostrar_figura("casoA_fig_burb_int.png",
+  "Figura 27. Burbuja con datos hipotéticos — leyenda interior.")
+mostrar_figura("casoA_fig_burb_salinidad1.png",
+  "Figura 28. Abundancia de mesozooplancton por salinidad y estación.")
+mostrar_figura("casoA_fig_burb_salinidad2.png",
+  "Figura 29. Igual con paleta viridis.")
+```
+
+---
+
+# B. Caso guiado: Macroinvertebrados bentónicos fluviales
+
+## Carga y exploración de datos
+
+```{r}
+resB$biol1a %>%
+  dplyr::select(1:min(7, ncol(.))) %>%
+  tabla_html("Tabla 39. Base de datos biológicos (primeras columnas).", max_filas = 6)
+```
+
+```{r}
+resB$tabla_abrev %>%
+  tabla_html("Tabla 40. Catálogo de abreviaturas de taxones.", max_filas = 12)
+```
+
+```{r}
+resB$tabla_totales %>%
+  tabla_html("Tabla 41. Taxones ordenados por abundancia total.", max_filas = 12)
+```
+
+```{r}
+resB$biol2 %>%
+  dplyr::select(1:min(12, ncol(.))) %>%
+  tabla_html("Tabla 42. Los 15 taxones más abundantes por sitio.", max_filas = 12)
+```
+
+```{r}
+resB$biol3 %>%
+  dplyr::select(1:min(8, ncol(.))) %>%
+  tabla_html("Tabla 43. Promedios de los 15 taxones más abundantes.", max_filas = 12)
+```
+
+```{r}
+resB$amb %>%
+  dplyr::select(1:min(9, ncol(.))) %>%
+  tabla_html("Tabla 44. Variables ambientales por sitio y réplica.", max_filas = 9)
+```
+
+```{r}
+resB$amb1 %>%
+  dplyr::select(1:min(9, ncol(.))) %>%
+  tabla_html("Tabla 45. Promedios de variables ambientales por sitio.", max_filas = 9)
+```
+
+## 1. Exploración de relaciones
+
+```{r results='asis'}
+mostrar_figura("casoB_fig_corr_taxa.png",
+  "Figura 30. Correlaciones entre taxones de macroinvertebrados.")
+mostrar_figura("casoB_fig_dom_familias.png",
+  "Figura 31. Familias más abundantes de macroinvertebrados.")
+mostrar_figura("casoB_fig_corr_amb_taxa.png",
+  "Figura 32. Variables ambientales (filas) vs. taxones dominantes (columnas).")
+```
+
+## 2. Exploración de diferencias
+
+```{r}
+resB$datos_resum %>%
+  tabla_html("Tabla 47. Estadísticos descriptivos por sitio y microhábitat.", max_filas = 12)
+```
+
+```{r results='asis'}
+mostrar_figura("casoB_fig_box_sitio.png",
+  "Figura 33. Abundancia de insectos entre los tres sitios evaluados.")
+mostrar_figura("casoB_fig_box_microh.png",
+  "Figura 34. Abundancia entre los tres microhábitats evaluados.")
+mostrar_figura("casoB_fig_box_sitio_microh.png",
+  "Figura 35. Patrón combinado: sitio × microhábitat.")
+mostrar_figura("casoB_fig_bar_obs.png",
+  "Figura 36. Barras agrupadas por microhábitat.")
+mostrar_figura("casoB_fig_bar_error.png",
+  "Figura 37. Promedios con error estándar por sitio y microhábitat.")
+```
+
+## 3. Figuras de burbujas
+
+```{r results='asis'}
+mostrar_figura("casoB_fig_burb_oxigeno.png",
+  "Figura 38. Abundancia de macroinvertebrados por oxígeno disuelto y sitio.")
+```
+
+---
+
+# Cierre del capítulo
+
+La visualización exploratoria constituye una etapa estructurante del análisis ecológico.
+Antes de aplicar pruebas estadísticas o modelos multivariados, las figuras y tablas
+permiten reconocer gradientes, contrastes entre grupos, valores extremos y asociaciones
+preliminares entre componentes bióticos y ambientales.

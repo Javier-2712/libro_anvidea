@@ -1,0 +1,542 @@
+---
+title: "ANVIDEA - Reporte reproducible"
+subtitle: "Capítulo 6 — Patrones de distribución y estimación de la densidad"
+author: "Javier Rodríguez-Barrios"
+date: last-modified
+lang: es
+
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: false
+    theme: cosmo
+    code-fold: false
+    embed-resources: true
+
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+# Presentación
+
+Este reporte corresponde al **Capítulo 6 — Patrones de distribución y estimación de la densidad** del proyecto **ANVIDEA**. Su propósito es articular los casos guiados con los scripts del repositorio, ofreciendo tablas, figuras e interpretaciones ecológicas para estudiantes que ejecutan el capítulo completo con `source("run_cap6.R")`.
+
+::: {.callout-tip}
+## Lo que desarrolla este capítulo
+
+1. **Evaluar el patrón espacial** de una población vegetal mediante ajuste a distribuciones probabilísticas e índices de dispersión.
+2. **Comparar Poisson y Binomial Negativa** como modelos alternativos para describir la distribución de conteos por unidad muestral.
+3. **Estimar la densidad poblacional** mediante métodos basados en distancias: Holgate, King y Hayne.
+:::
+
+```{r}
+#| label: setup-c6
+#| include: false
+
+suppressPackageStartupMessages({
+  library(readxl)
+  library(dplyr)
+  library(tidyr)
+  library(ggplot2)
+  library(kableExtra)
+  library(stringr)
+  library(MASS)
+})
+
+archivo_datos <- file.path("data", "raw", "datos.c6.xlsx")
+```
+
+------------------------------------------------------------------------
+
+# Caso A. Patrones de distribución espacial
+
+## Contexto ecológico
+
+Cuando se estudia una población en campo, una de las primeras preguntas ecológicas es: **¿cómo están distribuidos los individuos en el espacio?** Los individuos pueden estar dispersos de forma aleatoria, agregada o uniforme, y cada patrón tiene implicaciones distintas sobre la competencia, la facilitación, el acceso a recursos y la historia natural de la especie.
+
+Para responder esta pregunta se registran los **conteos por unidad muestral** (cuadrículas, parcelas, puntos) y se compara la distribución observada con la esperada bajo distintos modelos probabilísticos.
+
+## Paso 1. Descripción de la muestra
+
+```{r}
+#| label: casoA-datos
+
+datos <- read_xlsx(archivo_datos, sheet = "poisson")
+
+conteos <-
+  datos %>%
+  dplyr::rename(x = Individuos) %>%
+  dplyr::mutate(x = as.integer(x)) %>%
+  dplyr::pull(x)
+
+n  <- length(conteos)
+N  <- sum(conteos)
+mu <- mean(conteos)
+s2 <- stats::var(conteos)
+
+resumen <- tibble::tibble(
+  `n (cuadriculas)` = n,
+  `N (individuos)`  = N,
+  `media`           = mu,
+  `varianza`        = s2
+)
+```
+
+La muestra cuenta con **`r n` unidades de muestreo** y **`r N` individuos** en total. La media es `r round(mu, 2)` y la varianza es `r round(s2, 2)`. Cuando la varianza supera notablemente a la media, ello anticipa un posible patrón **agregado**.
+
+```{r}
+#| label: tbl-c6-2
+#| tbl-cap: "Estimadores descriptivos de la muestra evaluada"
+
+resumen %>%
+  kbl(booktabs = TRUE, digits = c(0, 0, 2, 2), longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+## Paso 2. Ajuste a la distribución de Poisson
+
+La distribución de **Poisson** describe el número de eventos aleatorios en una unidad de espacio o tiempo. Si la población se distribuye al azar, los conteos por cuadrícula deberían seguir esta distribución con parámetro $\lambda = \mu$.
+
+### Frecuencias observadas vs. esperadas
+
+```{r}
+#| label: tbl-c6-3
+#| tbl-cap: "Frecuencias, Poisson esperada y chi^2"
+
+x_max <- max(conteos)
+
+fx <- tibble::tibble(x = conteos) %>%
+  count(x, name = "Fx") %>%
+  complete(x = 0:x_max, fill = list(Fx = 0)) %>%
+  arrange(x) %>%
+  mutate(
+    Px = dpois(x, mu),
+    Ex = n * Px,
+    `chi^2 comp` = (Fx - Ex)^2 / Ex
+  )
+
+fx %>%
+  kbl(booktabs = TRUE, digits = c(0, 0, 2, 1, 2), longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+### Agrupación y prueba de bondad de ajuste
+
+Para garantizar la validez de la prueba $\chi^2$, las clases con frecuencias esperadas bajas se agrupan. Los grados de libertad se calculan como $k - 1 - 1$, descontando el parámetro estimado ($\mu$).
+
+```{r}
+#| label: tbl-c6-4
+#| tbl-cap: "Frecuencias agrupadas (3 clases: 0, 1, ≥2)"
+
+fx_agrup <-
+  fx %>%
+  mutate(clase = dplyr::case_when(
+    x == 0 ~ "0",
+    x == 1 ~ "1",
+    x >= 2 ~ "\u22652"
+  )) %>%
+  group_by(clase) %>%
+  summarise(Fx = sum(Fx), Ex = sum(Ex), .groups = "drop") %>%
+  mutate(`chi^2 comp` = (Fx - Ex)^2 / Ex)
+
+fx_agrup %>%
+  kbl(digits = 2,
+      col.names = c("clase", "Fx", "Ex", "chi^2 comp"),
+      booktabs = TRUE, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+```{r}
+#| label: tbl-c6-5
+#| tbl-cap: "Prueba de bondad de ajuste chi^2 — Poisson"
+
+chi2  <- sum(fx_agrup$`chi^2 comp`)
+gl    <- nrow(fx_agrup) - 1 - 1
+p_val <- if (gl > 0) pchisq(chi2, df = gl, lower.tail = FALSE) else NA_real_
+
+tibble::tibble(
+  `chi^2 (baj)` = chi2,
+  gl            = gl,
+  `p-valor`     = p_val
+) %>%
+  kbl(booktabs = TRUE, digits = c(2, 0, 3), longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+Un p-valor **pequeño** (< 0.05) indica que los datos se alejan significativamente de una distribución aleatoria.
+
+### Figura: observado vs. Poisson esperado
+
+```{r}
+#| label: fig-c6-3
+#| fig-cap: "Distribución de frecuencias observadas vs. esperadas (Poisson)"
+
+obs_exp <-
+  fx %>%
+  dplyr::select(x, Fx, Ex) %>%
+  tidyr::pivot_longer(cols = c(Fx, Ex), names_to = "tipo", values_to = "frecuencia")
+
+ggplot(obs_exp, aes(x = factor(x), y = frecuencia, fill = tipo)) +
+  geom_col(position = "dodge") +
+  labs(x = "Individuos por cuadr\u00edcula (x)", y = "Frecuencia", fill = "", title = "") +
+  theme_bw(base_size = 13)
+```
+
+### Índice de Morisita
+
+```{r}
+#| label: tbl-c6-6
+#| tbl-cap: "Índice de Morisita para el patrón espacial"
+
+IM <- (n * sum(conteos * (conteos - 1))) / (N * (N - 1))
+
+tibble::tibble(
+  `I_M (Morisita)` = IM,
+  `Interpretacion` = dplyr::case_when(
+    is.na(IM) ~ "No calculable (verificar N).",
+    IM > 1    ~ "Agrupado",
+    IM < 1    ~ "Uniforme",
+    TRUE      ~ "Aleatorio"
+  )
+) %>%
+  kbl(booktabs = TRUE, digits = 3, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+------------------------------------------------------------------------
+
+## Paso 3. Ajuste a la Binomial Negativa
+
+La **Binomial Negativa** incorpora un parámetro de agregación $k$ que permite modelar poblaciones con tendencia a concentrarse en ciertas unidades. Valores pequeños de $k$ indican mayor agregación.
+
+### Estimación del parámetro k
+
+```{r}
+#| label: tbl-c6-estimacion-k
+#| tbl-cap: "Estimador inicial de k (método de momentos)"
+
+k_hat <- if (s2 > mu) (mu^2) / (s2 - mu) else NA_real_
+
+tibble::tibble(`k (momentos)` = k_hat) %>%
+  kbl(booktabs = TRUE, digits = 3, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+### Frecuencias observadas vs. BN esperadas
+
+```{r}
+#| label: tbl-c6-frecuencias-BN
+#| tbl-cap: "Frecuencias observadas, BN esperada y chi^2"
+
+fx_BN <- tibble::tibble(x = conteos) %>%
+  count(x, name = "Fx") %>%
+  complete(x = 0:x_max, fill = list(Fx = 0)) %>%
+  arrange(x) %>%
+  mutate(
+    Px = if (!is.na(k_hat) && k_hat > 0) dnbinom(x, size = k_hat, mu = mu) else NA_real_,
+    Ex = n * Px,
+    `chi^2 comp` = (Fx - Ex)^2 / Ex
+  )
+
+fx_BN %>%
+  kbl(booktabs = TRUE, digits = c(0, 0, 3, 3, 3), longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+### Agrupación y bondad de ajuste
+
+```{r}
+#| label: tbl-c6-agrupacion-BN
+#| tbl-cap: "Frecuencias agrupadas (4 clases: 0, 1, 2, ≥3) — BN"
+
+fx_BN_agrup <-
+  fx_BN %>%
+  mutate(clase = dplyr::case_when(
+    x == 0 ~ "0",
+    x == 1 ~ "1",
+    x == 2 ~ "2",
+    x >= 3 ~ "\u22653"
+  )) %>%
+  group_by(clase) %>%
+  summarise(Fx = sum(Fx), Ex = sum(Ex, na.rm = TRUE), .groups = "drop") %>%
+  mutate(`chi^2 comp` = (Fx - Ex)^2 / Ex)
+
+fx_BN_agrup %>%
+  kbl(digits = 3,
+      col.names = c("clase", "Fx", "Ex", "chi^2 comp"),
+      booktabs = TRUE, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+```{r}
+#| label: tbl-c6-baj-BN
+#| tbl-cap: "Prueba de bondad de ajuste chi^2 — Binomial Negativa"
+
+k_clases <- sum(!is.na(fx_BN_agrup$Ex))
+gl_BN    <- k_clases - 1
+chi2_BN  <- sum(fx_BN_agrup$`chi^2 comp`, na.rm = TRUE)
+p_BN     <- if (gl_BN > 0) pchisq(chi2_BN, df = gl_BN, lower.tail = FALSE) else NA_real_
+
+tibble::tibble(
+  `chi^2 (baj BN)` = chi2_BN,
+  `gl (BN)`        = gl_BN,
+  `p-valor (BN)`   = p_BN
+) %>%
+  kbl(digits = 3,
+      col.names = c("chi^2 (baj BN)", "gl (BN)", "p-valor (BN)"),
+      booktabs = TRUE, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+### Figura: observado vs. BN esperado
+
+```{r}
+#| label: fig-c6-4
+#| fig-cap: "Distribución de frecuencias observadas vs. esperadas (Binomial Negativa)"
+
+obs_exp_BN <-
+  fx_BN %>%
+  dplyr::select(x, Fx, Ex) %>%
+  tidyr::pivot_longer(cols = c(Fx, Ex), names_to = "tipo", values_to = "frecuencia")
+
+ggplot(obs_exp_BN, aes(x = factor(x), y = frecuencia, fill = tipo)) +
+  geom_col(position = "dodge") +
+  labs(x = "Individuos por cuadr\u00edcula (x)", y = "Frecuencia", fill = "", title = "") +
+  theme_bw(base_size = 13)
+```
+
+------------------------------------------------------------------------
+
+## Paso 4. Comparación de modelos: Poisson vs. Binomial Negativa
+
+El criterio de información de Akaike (AIC) permite comparar los dos modelos de forma objetiva. El modelo con menor AIC y mayor peso $w_{AIC}$ representa mejor los datos observados.
+
+```{r}
+#| label: tbl-c6-aic
+#| tbl-cap: "Comparación de modelos por AIC (MLE)"
+
+df_counts <- data.frame(y = conteos)
+mod_pois  <- glm(y ~ 1, data = df_counts, family = poisson(link = "log"))
+mod_nb    <- tryCatch(glm.nb(y ~ 1, data = df_counts), error = function(e) NULL)
+
+get_row <- function(name, fit) {
+  if (is.null(fit)) return(data.frame(Modelo = name, logLik = NA, k = NA, AIC = NA))
+  ll <- as.numeric(logLik(fit))
+  k  <- attr(logLik(fit), "df")
+  data.frame(Modelo = name, logLik = ll, k = k, AIC = AIC(fit))
+}
+
+tab <- bind_rows(
+  get_row("Poisson (glm)", mod_pois),
+  get_row("Binomial Negativa (glm.nb)", mod_nb)
+)
+
+minAIC        <- min(tab$AIC, na.rm = TRUE)
+tab$Delta_AIC <- tab$AIC - minAIC
+tab$wAIC      <- exp(-0.5 * tab$Delta_AIC)
+tab$wAIC      <- tab$wAIC / sum(tab$wAIC, na.rm = TRUE)
+
+tab %>%
+  mutate(across(where(is.numeric), ~ round(., 3))) %>%
+  kbl(align = c("l", "c", "c", "c", "c", "c"),
+      booktabs = TRUE, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+------------------------------------------------------------------------
+
+## Paso 5. Índices de dispersión
+
+Los índices de dispersión permiten sintetizar el patrón espacial sin depender de un ajuste de distribución. Se calculan a partir de la relación entre varianza y media.
+
+```{r}
+#| label: tbl-c6-diagnosticos
+#| tbl-cap: "Diagnósticos de patron espacial"
+
+n_quad    <- length(conteos)
+ID        <- s2 / mu
+chi2_disp <- (n_quad - 1) * ID
+p_disp    <- pchisq(chi2_disp, df = n_quad - 1, lower.tail = FALSE)
+IC        <- (s2 / mu) - 1
+IH        <- NA_real_
+m_crowd   <- mu + (s2 / mu) - 1
+I_c       <- m_crowd / mu
+IM2       <- if (N > 1) n * sum(conteos * (conteos - 1)) / (N * (N - 1)) else NA_real_
+
+diag_tbl <- tibble::tibble(
+  `ID = s2/mu` = ID,
+  `IC (D. & M.)` = IC,
+  `IH (Holgate)` = IH,
+  `Lloyd m*`     = m_crowd,
+  `Ic (Lloyd)`   = I_c,
+  `Morisita IM`  = IM2,
+  `chi2_disp`    = chi2_disp,
+  gl             = n - 1,
+  p              = p_disp
+)
+
+diag_tbl %>%
+  kbl(digits = c(2, 2, 2, 2, 2, 2, 2, 0, 5),
+      col.names = c("ID = s2/mu", "IC (D. & M.)", "IH (Holgate)", "Lloyd m*",
+                    "Ic (Lloyd)", "Morisita IM", "chi2_disp", "gl", "p"),
+      booktabs = TRUE) %>%
+  kable_classic(full_width = FALSE) %>%
+  kable_styling(full_width = FALSE, font_size = 10,
+                latex_options = c("repeat_header"))
+```
+
+Un **ID > 1** indica agregación; **ID ≈ 1** aleatoriedad; **ID < 1** uniformidad. El Índice de Morisita y el de Lloyd confirman o matizan esta conclusión.
+
+------------------------------------------------------------------------
+
+# Caso B. Estimación de la densidad
+
+## Contexto ecológico
+
+Cuando no es posible censar directamente toda la población, la densidad se estima a partir de **distancias** entre puntos de muestreo e individuos. Los métodos de Holgate, King y Hayne son tres estimadores clásicos que difieren en cómo resumen esas distancias y en sus supuestos sobre la distribución espacial.
+
+------------------------------------------------------------------------
+
+## 1. Método de Holgate
+
+Holgate estima la densidad usando la **distancia cuadrática** $x^2$ desde puntos aleatorios al individuo más cercano. La fórmula es:
+
+$$D_{Ht} = \frac{n}{\pi \sum x^2_i}$$
+
+```{r}
+#| label: tbl-c6-holgate-datos
+#| tbl-cap: "Vista previa — Densidad por puntos de interseccion al azar"
+
+datos1 <- read_xlsx(archivo_datos, sheet = "densidad1")
+
+head(datos1, 4) %>%
+  kbl(booktabs = TRUE, digits = 3, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+```{r}
+#| label: tbl-c6-holgate-res
+#| tbl-cap: "Holgate — Densidad estimada"
+
+res_ih <-
+  datos1 %>%
+  rename_with(tolower) %>%
+  transmute(x2_m = as.numeric(x2_m)) %>%
+  filter(!is.na(x2_m), x2_m > 0) %>%
+  summarise(
+    n_puntos  = n(),
+    sum_x2_m2 = sum(x2_m),
+    D_Ht_m2   = n_puntos / (pi * sum_x2_m2),
+    D_Ht_ha   = D_Ht_m2 * 10000
+  )
+
+res_ih %>%
+  kbl(booktabs = TRUE, digits = c(0, 3, 6, 0), longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+```{r}
+#| label: fig-c6-5
+#| fig-cap: "Distribucion de distancias usadas en el metodo de Holgate"
+
+ggplot(datos1, aes(x = sqrt(x2_m))) +
+  geom_histogram(bins = 20, fill = "skyblue", color = "white") +
+  geom_vline(aes(xintercept = mean(sqrt(x2_m), na.rm = TRUE)),
+             linetype = 2, color = "red") +
+  labs(x = "Distancia al 1er individuo (m)", y = "Frecuencia", title = "") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+## 2. Métodos de King y Hayne
+
+King y Hayne se aplican sobre puntos distribuidos en un **transecto diagonal**. Comparten los datos de distancias pero difieren en la fórmula de estimación:
+
+- **King**: $D_K = \frac{n^2}{2 \cdot L \cdot \sum d_i}$
+- **Hayne**: $D_H = \frac{\sum (1/d_i)}{2 \cdot L}$
+
+```{r}
+#| label: tbl-c6-king-datos
+#| tbl-cap: "Vista previa — Densidad por transecto diagonal"
+
+datos2 <- read_xlsx(archivo_datos, sheet = "densidad2")
+
+head(datos2, 4) %>%
+  kbl(booktabs = TRUE, digits = 3, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+```{r}
+#| label: tbl-c6-king-hayne
+#| tbl-cap: "Indices de King y Hayne — Densidad estimada"
+
+d2 <- datos2 %>% dplyr::rename_with(tolower)
+
+L <- 28.284271  # Hipotenusa (L) tomada de la hoja de resultados
+
+d <- d2 %>%
+  transmute(
+    di    = as.numeric(di_m),
+    invdi = as.numeric(`1/di`)
+  ) %>%
+  filter(is.finite(di), di > 0, is.finite(invdi))
+
+n_d     <- nrow(d)
+sum_di  <- sum(d$di)
+sum_inv <- sum(d$invdi)
+
+res <- tibble::tibble(
+  `L (m)`          = L,
+  `n (puntos)`     = n_d,
+  `sum di (m)`     = sum_di,
+  `sum 1/di`       = sum_inv,
+  `King (ind/m2)`  = (n_d^2) / (2 * L * sum_di),
+  `King (ind/ha)`  = ((n_d^2) / (2 * L * sum_di)) * 10000,
+  `Hayne (ind/m2)` = sum_inv / (2 * L),
+  `Hayne (ind/ha)` = (sum_inv / (2 * L)) * 10000
+)
+
+res %>%
+  kbl(booktabs = TRUE, digits = c(2, 0, 3, 3, 3, 0, 2, 0)) %>%
+  kable_classic(full_width = FALSE) %>%
+  kable_styling(full_width = FALSE, font_size = 10,
+                latex_options = c("repeat_header"))
+```
+
+```{r}
+#| label: fig-c6-6
+#| fig-cap: "Distribucion de distancias di — metodo King"
+
+ggplot(d, aes(x = di)) +
+  geom_histogram(bins = 20, fill = "skyblue", color = "white") +
+  geom_vline(aes(xintercept = mean(di, na.rm = TRUE)),
+             linetype = 2, color = "red") +
+  labs(x = "Distancia perpendicular di (m)", y = "Frecuencia", title = "") +
+  theme_bw()
+```
+
+```{r}
+#| label: fig-c6-7
+#| fig-cap: "Distribucion de 1/di — metodo Hayne"
+
+ggplot(d, aes(x = invdi)) +
+  geom_histogram(bins = 20, fill = "skyblue", color = "white") +
+  geom_vline(xintercept = mean(d$invdi, na.rm = TRUE),
+             linetype = 2, color = "red") +
+  labs(x = "1/di (m^-1)", y = "Frecuencia", title = "") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+# Integración final del capítulo
+
+Los dos casos guiados abordan dimensiones complementarias de la ecología de poblaciones. El **patrón espacial** revela cómo los individuos ocupan el espacio — con implicaciones sobre competencia, facilitación y estructura del hábitat. La **densidad** cuantifica cuántos individuos hay por unidad de área, dato fundamental para el manejo y la conservación.
+
+La comparación entre Holgate, King y Hayne ilustra que la densidad no es un valor absoluto sino una **estimación condicionada por el método**: cada fórmula resume la información de distancias de forma distinta y tiene sus propios supuestos. Evaluar la coherencia entre los tres métodos es parte del análisis.
+
+En conjunto, este capítulo muestra que el análisis ecológico riguroso requiere integrar datos, modelos probabilísticos, índices descriptivos y representación gráfica — no una sola fórmula aislada.

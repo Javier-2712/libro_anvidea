@@ -1,0 +1,482 @@
+---
+title: "ANVIDEA - Reporte reproducible"
+subtitle: "Capítulo 8 — Diversidad funcional y filogenética"
+author: "Javier Rodríguez-Barrios"
+date: last-modified
+lang: es
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 4
+    number-sections: false
+    embed-resources: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+
+rep_dir <- file.path("outputs", "reportes")
+tab_dir <- file.path("outputs", "tablas")
+fig_dir <- file.path("outputs", "figuras")
+
+casoA  <- tryCatch(readRDS(file.path(rep_dir, "resultado_casoA.rds")),  error = function(e) NULL)
+casoB1 <- tryCatch(readRDS(file.path(rep_dir, "resultado_casoB1.rds")), error = function(e) NULL)
+casoB2 <- tryCatch(readRDS(file.path(rep_dir, "resultado_casoB2.rds")), error = function(e) NULL)
+
+mostrar_tabla <- function(x, caption = NULL, digits = 2, n = 6) {
+  if (is.null(x)) { cat("*No disponible.*\n"); return(invisible(NULL)) }
+  x <- head(x, n)
+  x %>%
+    kbl(booktabs = TRUE, longtable = FALSE, digits = digits, caption = caption) %>%
+    kable_classic(full_width = FALSE, html_font = "Cambria")
+}
+
+mostrar_figura <- function(nombre, caption = NULL) {
+  ruta <- file.path(fig_dir, nombre)
+  if (file.exists(ruta)) knitr::include_graphics(ruta)
+  else cat(paste0("*Figura no encontrada: ", nombre, "*\n"))
+}
+```
+
+::: {.callout-note}
+## Nota para el lector
+Este reporte muestra todas las tablas (resumidas con las primeras filas) y figuras generadas por los tres casos del Capítulo 8 de ANVIDEA. Úsalo para comparar tus resultados con los del libro y verificar que los scripts corrieron correctamente.
+:::
+
+---
+
+## A. Diversidad funcional y filogenética alfa (clásica)
+
+### A.1 Datos de entrada
+
+#### Matriz de abundancias (`biol1`) — primeras filas y columnas
+
+```{r}
+mostrar_tabla(as.data.frame(casoA$biol1)[, 1:10],
+              caption = "Abundancias de peces por sitio (10 primeras especies)",
+              digits = 0)
+```
+
+#### Rasgos funcionales (`rasgos1`) — primeras filas
+
+```{r}
+mostrar_tabla(as.data.frame(casoA$rasgos_fd)[, 1:7],
+              caption = "Rasgos funcionales de las especies (primeras 7 columnas)")
+```
+
+#### Coordenadas de los sitios (`coord`)
+
+```{r}
+mostrar_tabla(as.data.frame(casoA$coord_sitios),
+              caption = "Coordenadas geográficas de los sitios de muestreo",
+              digits = 3)
+```
+
+---
+
+### A.2 Diversidad funcional alfa — índices dbFD
+
+#### Valores medios de rasgos por sitio (CWM)
+
+```{r}
+mostrar_tabla(as.data.frame(casoA$cwm)[, 1:6],
+              caption = "Community Weighted Mean (CWM) — primeras 6 columnas de rasgos")
+```
+
+#### Índices de diversidad funcional por sitio (FRic, FEve, FDiv, FDis, RaoQ)
+
+```{r}
+mostrar_tabla(casoA$tabla_fd_indices,
+              caption = "Índices de diversidad funcional alfa por sitio",
+              digits = 3)
+```
+
+---
+
+### A.3 Clasificación de especies por estrategias funcionales
+
+#### Dendrograma funcional (Ward.D2)
+
+```{r}
+#| fig-cap: "Dendrograma jerárquico para la clasificación de especies por sus estrategias funcionales"
+#| fig-width: 10
+#| fig-height: 5
+mostrar_figura("casoA_fig_dendrograma_funcional.png")
+```
+
+#### Clúster k-medias en el espacio funcional (PCoA)
+
+```{r}
+#| fig-cap: "Clasificación no jerárquica de k-medias para las estrategias funcionales de las especies"
+#| fig-width: 9
+#| fig-height: 7
+mostrar_figura("casoA_fig_kmeans_pcoa.png")
+```
+
+#### Grupos funcionales (k = 3)
+
+```{r}
+mostrar_tabla(casoA$grupos_funcionales,
+              caption = "Clasificación de especies en grupos funcionales (k-medias, k = 3)",
+              n = 10)
+```
+
+---
+
+### A.4 Distribución espacial de la diversidad funcional
+
+#### Panel de índices funcionales por sitio (FRic, FEve, FDiv, FDis, RaoQ, FGR)
+
+```{r}
+#| fig-cap: "Distribución espacial de índices de diversidad funcional por sitio"
+#| fig-width: 10
+#| fig-height: 13
+mostrar_figura("casoA_fig_panel_FD_sitios.png")
+```
+
+#### FRic por sitio
+
+```{r}
+#| fig-cap: "Riqueza funcional (FRic) por sitio"
+mostrar_figura("fig_01_FRic_por_sitio.png")
+```
+
+#### FDis por sitio
+
+```{r}
+#| fig-cap: "Dispersión funcional (FDis) por sitio"
+mostrar_figura("fig_02_FDis_por_sitio.png")
+```
+
+---
+
+### A.5 Diversidad taxonómica y funcional por sitio
+
+#### Tabla resumen: índices TD y FD por sitio
+
+```{r}
+mostrar_tabla(casoA$div_completo[, 1:10],
+              caption = "Índices de diversidad taxonómica y funcional por sitio (primeras 10 columnas)",
+              digits = 2)
+```
+
+---
+
+### A.6 Partición aditiva de Rao (TD, FD, PD)
+
+#### Diversidad alfa taxonómica, funcional y filogenética por sitio
+
+```{r}
+mostrar_tabla(casoA$div_rao_resumen,
+              caption = "Diversidad alfa (TD, PD, FD) por sitio — partición de Rao",
+              digits = 3)
+```
+
+#### Descomposición de Rao — Diversidad funcional (FD)
+
+```{r}
+mostrar_tabla(casoA$tabla_rao_fd,
+              caption = "Componentes alfa, gamma y beta de la diversidad funcional (Rao)",
+              digits = 3)
+```
+
+#### Descomposición de Rao — Diversidad filogenética (PD)
+
+```{r}
+mostrar_tabla(casoA$tabla_rao_pd,
+              caption = "Componentes alfa, gamma y beta de la diversidad filogenética (Rao)",
+              digits = 3)
+```
+
+#### Panel TD, PD y FD por sitio
+
+```{r}
+#| fig-cap: "Distribución espacial de la diversidad taxonómica, filogenética y funcional (Rao)"
+#| fig-width: 10
+#| fig-height: 9
+mostrar_figura("casoA_fig_panel_TD_PD_FD.png")
+```
+
+---
+
+## B. Diversidad con números efectivos de Hill
+
+### B.1 iNEXT.3D — Diversidad alfa (TD, PD, FD)
+
+#### B.1.1 Diversidad filogenética (PD)
+
+##### Resumen general (PDInfo)
+
+```{r}
+mostrar_tabla(as.data.frame(head(casoB1$salida_abun2$PDInfo[, 1:9], 6)),
+              caption = "Resumen de la diversidad filogenética (PD) por ensamblaje",
+              digits = 2)
+```
+
+##### Estimaciones tamaño-dependientes (size-based)
+
+```{r}
+mostrar_tabla(as.data.frame(head(casoB1$salida_abun2$PDiNextEst$size_based)),
+              caption = "Estimaciones size-based de la diversidad filogenética (qPD)",
+              digits = 2)
+```
+
+##### Estimaciones basadas en cobertura (coverage-based)
+
+```{r}
+mostrar_tabla(as.data.frame(head(casoB1$salida_abun2$PDiNextEst$coverage_based)),
+              caption = "Estimaciones coverage-based de la diversidad filogenética (qPD)",
+              digits = 2)
+```
+
+##### Estimaciones asintóticas (PDAsyEst)
+
+```{r}
+mostrar_tabla(as.data.frame(head(casoB1$salida_abun2$PDAsyEst)),
+              caption = "Estimadores asintóticos de diversidad filogenética (q = 0, 1, 2)",
+              digits = 2)
+```
+
+##### Curvas R/E — PD por ensamblaje
+
+```{r}
+#| fig-cap: "Curvas de rarefacción/extrapolación de la diversidad filogenética por ensamblaje"
+mostrar_figura("casoB1_fig_PD_RE_assemblage.png")
+```
+
+##### Curvas R/E — PD por orden q
+
+```{r}
+#| fig-cap: "Curvas de rarefacción/extrapolación de la diversidad filogenética por orden q"
+mostrar_figura("casoB1_fig_PD_RE_orderq.png")
+```
+
+##### Curvas de completitud muestral — PD
+
+```{r}
+#| fig-cap: "Curvas de completitud muestral para la diversidad filogenética"
+mostrar_figura("casoB1_fig_PD_completitud.png")
+```
+
+##### Curvas R/E basadas en cobertura — PD por ensamblaje
+
+```{r}
+#| fig-cap: "Curvas R/E basadas en cobertura — PD por ensamblaje"
+mostrar_figura("casoB1_fig_PD_cov_assemblage.png")
+```
+
+##### Curvas R/E basadas en cobertura — PD por orden q
+
+```{r}
+#| fig-cap: "Curvas R/E basadas en cobertura — PD por orden q"
+mostrar_figura("casoB1_fig_PD_cov_orderq.png")
+```
+
+##### Perfiles tau de diversidad filogenética
+
+```{r}
+#| fig-cap: "Perfiles de diversidad filogenética en función del tiempo de referencia (tau)"
+mostrar_figura("casoB1_fig_PD_tau_profiles.png")
+```
+
+---
+
+#### B.1.2 Diversidad funcional (FD)
+
+##### Resumen general (FDInfo)
+
+```{r}
+mostrar_tabla(as.data.frame(casoB1$salida_abun3$FDInfo),
+              caption = "Resumen de la diversidad funcional (FD) por ensamblaje",
+              digits = 2)
+```
+
+##### Estimaciones tamaño-dependientes (size-based)
+
+```{r}
+mostrar_tabla(as.data.frame(head(casoB1$salida_abun3$FDiNextEst$size_based)),
+              caption = "Estimaciones size-based de la diversidad funcional (qFD)",
+              digits = 2)
+```
+
+##### Estimaciones basadas en cobertura (coverage-based)
+
+```{r}
+mostrar_tabla(as.data.frame(head(casoB1$salida_abun3$FDiNextEst$coverage_based)),
+              caption = "Estimaciones coverage-based de la diversidad funcional (qFD)",
+              digits = 2)
+```
+
+##### Estimaciones asintóticas (FDAsyEst)
+
+```{r}
+mostrar_tabla(as.data.frame(head(casoB1$salida_abun3$FDAsyEst)),
+              caption = "Estimadores asintóticos de diversidad funcional (q = 0, 1, 2)",
+              digits = 2)
+```
+
+##### Perfiles tau de distintividad funcional
+
+```{r}
+mostrar_tabla(as.data.frame(head(casoB1$salida_abun3a)),
+              caption = "Perfiles tau de diversidad funcional (ObsAsy3D)",
+              digits = 2)
+```
+
+##### Perfil-q de diversidad funcional (AUC)
+
+```{r}
+mostrar_tabla(as.data.frame(head(casoB1$salida_abun3b)),
+              caption = "Perfil-q de diversidad funcional AUC (ObsAsy3D)",
+              digits = 2)
+```
+
+##### Curvas R/E — FD por ensamblaje
+
+```{r}
+#| fig-cap: "Curvas de rarefacción/extrapolación de la diversidad funcional por ensamblaje"
+mostrar_figura("casoB1_fig_FD_RE_assemblage.png")
+```
+
+##### Curvas R/E — FD por orden q
+
+```{r}
+#| fig-cap: "Curvas de rarefacción/extrapolación de la diversidad funcional por orden q"
+mostrar_figura("casoB1_fig_FD_RE_orderq.png")
+```
+
+##### Curvas de completitud muestral — FD
+
+```{r}
+#| fig-cap: "Curvas de completitud muestral para la diversidad funcional"
+mostrar_figura("casoB1_fig_FD_completitud.png")
+```
+
+##### Curvas R/E basadas en cobertura — FD por ensamblaje
+
+```{r}
+#| fig-cap: "Curvas R/E basadas en cobertura — FD por ensamblaje"
+mostrar_figura("casoB1_fig_FD_cov_assemblage.png")
+```
+
+##### Curvas R/E basadas en cobertura — FD por orden q
+
+```{r}
+#| fig-cap: "Curvas R/E basadas en cobertura — FD por orden q"
+mostrar_figura("casoB1_fig_FD_cov_orderq.png")
+```
+
+##### Perfiles tau de diversidad funcional
+
+```{r}
+#| fig-cap: "Perfiles tau de diversidad funcional"
+mostrar_figura("casoB1_fig_FD_tau_profiles.png")
+```
+
+##### Perfil-q de diversidad funcional
+
+```{r}
+#| fig-cap: "Perfil-q de diversidad funcional (AUC)"
+mostrar_figura("casoB1_fig_FD_q_profiles.png")
+```
+
+---
+
+### B.2 iNEXTbeta3D — Diversidad beta (PD y FD)
+
+#### B.2.1 Diversidad beta filogenética (PD)
+
+##### Información general — PD beta
+
+```{r}
+mostrar_tabla(as.data.frame(casoB2$informacion_gral_PD),
+              caption = "Información general de la diversidad beta filogenética",
+              digits = 2)
+```
+
+##### Gamma M vs P — cobertura
+
+```{r}
+mostrar_tabla(as.data.frame(head(casoB2$salida.abun21$M_vs_P$gamma)),
+              caption = "Diversidad gamma PD beta (cobertura) — comparación M vs P",
+              digits = 2)
+```
+
+##### Gamma M vs P — tamaño
+
+```{r}
+mostrar_tabla(as.data.frame(head(casoB2$salida.abun22$M_vs_P$gamma)),
+              caption = "Diversidad gamma PD beta (tamaño) — comparación M vs P",
+              digits = 2)
+```
+
+##### Curvas R/E PD beta — cobertura
+
+```{r}
+#| fig-cap: "Curvas de rarefacción/extrapolación de la diversidad beta filogenética (cobertura)"
+mostrar_figura("casoB2_fig_PD_beta_cobertura.png")
+```
+
+##### Curvas R/E PD beta — tamaño
+
+```{r}
+#| fig-cap: "Curvas de rarefacción/extrapolación de la diversidad beta filogenética (tamaño)"
+mostrar_figura("casoB2_fig_PD_beta_tamano.png")
+```
+
+---
+
+#### B.2.2 Diversidad beta funcional (FD)
+
+##### Información general — FD beta (tau)
+
+```{r}
+mostrar_tabla(as.data.frame(casoB2$informacion_gral_FD),
+              caption = "Información general de la diversidad beta funcional (tau_value)",
+              digits = 2)
+```
+
+##### Información general — FD beta (AUC)
+
+```{r}
+mostrar_tabla(as.data.frame(casoB2$informacion_gral_FD1),
+              caption = "Información general de la diversidad beta funcional (AUC)",
+              digits = 2)
+```
+
+##### Gamma M vs P — cobertura
+
+```{r}
+mostrar_tabla(as.data.frame(head(casoB2$salida_abun31$M_vs_P$gamma)),
+              caption = "Diversidad gamma FD beta (cobertura) — comparación M vs P",
+              digits = 2)
+```
+
+##### Gamma M vs P — tamaño
+
+```{r}
+mostrar_tabla(as.data.frame(head(casoB2$salida_abun32$M_vs_P$gamma)),
+              caption = "Diversidad gamma FD beta (tamaño) — comparación M vs P",
+              digits = 2)
+```
+
+##### Curvas R/E FD beta — cobertura
+
+```{r}
+#| fig-cap: "Curvas de rarefacción/extrapolación de la diversidad beta funcional (cobertura)"
+mostrar_figura("casoB2_fig_FD_beta_cobertura.png")
+```
+
+##### Curvas R/E FD beta — tamaño
+
+```{r}
+#| fig-cap: "Curvas de rarefacción/extrapolación de la diversidad beta funcional (tamaño)"
+mostrar_figura("casoB2_fig_FD_beta_tamano.png")
+```

@@ -1,0 +1,203 @@
+
+
+## B. Modelo logístico
+
+#### Ejemplo 1 — Tasa inicial $dN/dt$
+
+$$
+\left.\frac{dN}{dt}\right|_{t=0} = rN_0 \left(1 - \frac{N_0}{K}\right)
+= 0.05 \times 500 \times \left(1 - \frac{500}{10000}\right) = 23.75
+$$
+
+```{r}
+#| label: ej1
+r <- 0.05; 
+N0 <- 500; 
+K <- 10000
+dNdt_0 <- r*N0*(1 - N0/K); 
+dNdt_0
+```
+
+```{r}
+#| label: ej5
+r <- 0.04; N0 <- 200; K <- 5000; r*N0*(1 - N0/K)
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 2 — Tamaño tras 6 meses
+
+$$
+N(t) = \frac{K}{1 + \left(\frac{K-N_0}{N_0}\right).e^{-rt}}
+$$
+
+```{r}
+#| label: ej2
+N0 <- 100; K <- 400; r <- 0.02; t <- 180
+N_t <- K/(1 + ((K-N0)/N0)*exp(-r*t)); N_t
+```
+
+
+$$
+t = \frac{1}{r}\ln\left(\frac{K-N_0}{N_0} \cdot \frac{N}{K-N}\right)
+$$
+
+```{r, echo=FALSE}
+#| label: ej3
+N0 <- 50; K <- 500; r <- 0.1; Nstar <- 0.8*K
+t_req <- (1/r)*log(((K-N0)/N0)*(Nstar/(K-Nstar))); t_req
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 4 — $b'(N)$ cuadrática y $d'(N)$ lineal
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#| label: ej4-tabla
+#| tbl-cap: "Valores de b' y d' en función de N (cada 5 unidades)"
+
+b_p <- function(N) 0.12 + 0.01*N - 0.0001*N^2
+d_p <- function(N) 0.18 + 0.008*N
+N_vals <- seq(0, 50, by=5)
+
+tab <- tibble(N=N_vals, 
+              `b'`=round(b_p(N_vals),4), 
+              `d'`=round(d_p(N_vals),4))
+  kbl(tab, booktabs  = TRUE, digits = 2,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+```{r, echo=FALSE}
+#| label: fig-c4-14
+#| fig-cap: "b'(N) (cuadrática) y d'(N) (lineal). El máximo de b' ocurre en N=50."
+#| fig-pos: 'H'
+
+# Parámetros del modelo
+tabla <- tibble(N=seq(0,60,by=1)) %>% 
+  mutate(b = b_p(N), d = d_p(N)) %>% 
+  pivot_longer(cols=c(b,d), names_to="tasa", values_to="valor")
+  
+# Figura de la proyección  
+ggplot(tabla, aes(N, valor, linetype=tasa)) +
+  geom_line(linewidth=1.1) +
+  geom_vline(xintercept = 50, linetype=2) +
+  labs(y="tasa específica", 
+       title="Tasas densodependientes") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 5 — Población tras 12 meses
+
+```{r, echo=FALSE}
+#| label: ej6
+N0 <- 150; K <- 3000; r <- 0.03; t <- 12
+K/(1 + ((K-N0)/N0)*exp(-r*t))
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 6 — Tiempo hasta 75% de K
+
+```{r, echo=FALSE}
+#| label: ej7
+N0 <- 50; 
+K <- 800; 
+r <- 0.08; 
+Nstar <- 0.75*K
+(1/r)*log(((K-N0)/N0)*(Nstar/(K-Nstar)))
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 7 — K reducida por degradación
+
+```{r, echo=FALSE}
+#| label: ej8
+N0 <- 200; 
+Kp <- 840; 
+r <- 0.06;
+f <- 0.99; 
+Nstar <- f*Kp
+t_99 <- (1/r)*log(((Kp-N0)/N0)*(Nstar/(Kp-Nstar))); t_99
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 8 — Tamaño tras 24 h
+
+```{r, echo=FALSE}
+#| label: ej9
+r <- 0.07; K <- 50000; N0 <- 1000; t <- 24
+K/(1 + ((K-N0)/N0)*exp(-r*t))
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 9 — Equilibrio con $b'(N)$ y $d'(N)$
+
+```{r, echo=FALSE}
+#| label: ej10
+b2 <- function(N) 0.10 + 0.015*N - 0.00015*N^2
+d2 <- function(N) 0.12 + 0.006*N
+f_eq <- function(N) b2(N) - d2(N)
+
+uniroot_all <- function(f, interval, n=2000){
+  xs <- seq(interval[1], interval[2], length.out = n)
+  ys <- f(xs)
+  sign_change <- which(diff(sign(ys)) != 0)
+  roots <- purrr::map_dbl(sign_change, ~uniroot(f, c(xs[.x], xs[.x+1]))$root)
+  unique(round(roots, 6))
+}
+roots <- uniroot_all(f_eq, c(0, 1000))
+roots
+```
+
+```{r, echo=FALSE}
+#| label: fig-c4-15
+#| fig-cap: "Intersección b'(N)=d'(N) define estados de equilibrio."
+#| fig-pos: 'H'
+
+# Tabla
+df <- tibble(N=seq(0, 300, by=1),
+             b=b2(N), d=d2(N))
+
+# Figura
+ggplot(df, aes(N)) + 
+  geom_line(aes(y=b, linetype="b'(N)"), linewidth=1.1) +
+  geom_line(aes(y=d, linetype="d'(N)"), linewidth=1.1) +
+  geom_vline(xintercept = roots, linetype=2) +
+  labs(y="Tasa específica (b' y d')", 
+       x="Tamaño de la población (N)",
+       linetype="", 
+       title="Equilibrios por intersección de tasas") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 10 — Tiempo para duplicar $N_0$
+
+```{r, echo=FALSE}
+#| label: ej11
+r <- 0.05; K <- 1000; N0 <- 200; Nstar <- 2*N0
+(1/r)*log(((K-N0)/N0)*(Nstar/(K-Nstar)))
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 11 — Tasa $dN/dt$ en $t=10$ d
+
+```{r, echo=FALSE}
+#| label: ej12
+r <- 0.09; 
+K <- 10000; 
+N0 <- 500; 
+t <- 10
+N10 <- K/(1 + ((K-N0)/N0)*exp(-r*t))
+dNdt_10 <- r*N10*(1 - N10/K)
+N10; dNdt_10
+```
+

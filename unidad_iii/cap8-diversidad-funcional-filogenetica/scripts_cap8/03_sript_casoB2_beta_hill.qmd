@@ -1,0 +1,598 @@
+
+## Caso guiado: Diversidad funcional y filogenética de peces en ríos de México
+
+## B. Diversidad taxonómica, funcional y filogenética con números efectivos q = 0, 1 y 2
+
+
+### B.2 iNEXTbeta.3D (2023): Diversidad beta taxonómica (TD), filogenética (PD) y funcional (FD).
+#### B.2.1 Diversidad beta taxonómica (TD)
+
+#### B.2.2 Diversidad beta filogenética (PD)
+
+##### 1) Cálculo de la diversidad beta filogenética con iNEXT.beta3D
+
+```{r, echo=FALSE}
+#| message: false
+#| warning: false
+
+library(readxl); 
+library(dplyr); 
+library(tidyr); 
+library(ape)
+library(kableExtra)
+library(iNEXT.3D)      # Números de Hill en 3 dimensiones (TD/FD/PD)
+library(iNEXT.beta3D) # Extensión para beta-diversidad (TD/FD/PD)
+
+
+# --- Árbol (ya construido previamente) ---
+arbol_filo_beta <- readRDS("arbol_filo_beta.rds")
+stopifnot(inherits(arbol_filo_beta, "phylo"))
+arbol_beta <- arbol_filo_beta  # alias para claridad
+
+# --- Matriz de abundancias 'biol' (Especies × Sitios: M,P,RM) ---
+# (Si ya la tienes en el entorno, omite este bloque de lectura)
+biol <- read_xlsx("datos.c8.xlsx", sheet = "tax") %>%
+  dplyr::select(-1) %>%
+  pivot_longer(-Sites1, 
+               names_to = "Especies", 
+               values_to = "Abundancia") %>%
+  group_by(Sites1, Especies) %>%
+  summarise(Abundance = sum(Abundancia, na.rm = TRUE), 
+            .groups = "drop") %>%
+  pivot_wider(names_from = Sites1, 
+              values_from = Abundance, 
+              values_fill = 0) %>%
+  tibble::column_to_rownames("Especies") %>%
+  as.data.frame()
+
+# Opcional: excluir especies problemáticas si aplica
+biol <- biol[rownames(biol) != "Notropis aguirrepequenoi", 
+             , drop = FALSE]
+```
+
+```{r}
+#| message: false
+#| warning: false
+
+# --- Tres pares (M_vs_P, M_vs_RM, P_vs_RM) ---
+stopifnot(all(c("M","P","RM") %in% colnames(biol)))
+biol_PD_beta <- list(
+  M_vs_P  = biol[, c("M","P"),  drop = FALSE],
+  M_vs_RM = biol[, c("M","RM"), drop = FALSE],
+  P_vs_RM = biol[, c("P","RM"), drop = FALSE]
+)
+```
+
+```{r}
+#| message: false
+#| warning: false
+
+arbol_beta <- readRDS("arbol_filo_beta.rds")   # phylo ya construido
+tax1 <- read_xlsx("datos.c8.xlsx", sheet = "tax1") %>% 
+        dplyr::select(Abbrev = 1, LatinName = 2)
+```
+
+**1.2 Alineación automática con `alineador.R`**
+
+```{r}
+# Código para alinear el arbol a los datos de abundancias.
+source("alineador.R")
+
+# Alineación del árbol filogenético
+ali <- alinear_beta(biol_PD_beta, arbol_beta, tax1 = tax1)
+
+biol_PD <- ali$pairs_aligned      # lista final alineada con el árbol
+arbol_PD  <- ali$tree_aligned     # árbol podado y reordenado
+ali$report                        # diagnóstico resumido del proceso
+
+```
+
+**1.3 Diversidad beta filogenética (PD) basada en coberturas**
+
+```{r}
+#| message: FALSE
+#| warning: FALSE
+#| echo: TRUE     # Silenciar o encapsular los resultados de este chunk
+
+salida.abun21 <- iNEXTbeta3D(
+  biol_PD,
+  diversity = "PD",
+  PDtree    = arbol_PD,
+  datatype  = "abundance",
+  base      = "coverage",
+  nboot     = 10,
+  PDreftime = NULL,
+  PDtype    = "meanPD"
+)
+```
+
+```{r}
+#| label: tbl-c8-32
+#| tbl-cap: "Resumen de las estimaciones de diversidad filogenética gamma para la comparación pareada entre las zonas M y P, mostrando los valores estimados bajo rarefacción, sus errores estándar e intervalos de confianza a distintos niveles de cobertura muestral."
+#| message: false
+#| warning: false
+#| echo: false
+
+library(kableExtra)
+
+# Resumen (ejemplo: primera combinación de zonas $M_vs_P)
+salida.abun21$M_vs_P$gamma %>%
+  head() %>%
+  kbl(booktabs = TRUE, digits = 2,
+      longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)  
+
+# También se puede tabular la diversidad alfa y beta para esas dos localidades
+# salida.abun21$M_vs_P$alpha %>% ...
+# salida.abun21$M_vs_P$beta %>% ... 
+```
+
+**1.4 Curvas de rarefacción y extrapolación de PD por coberturas**
+
+```{r, echo=FALSE}
+#| label: fig-c8-24
+#| fig-cap: "Curvas de rarefacción y extrapolación basadas en cobertura para las diversidades filogenéticas gamma, alfa y beta, separadas por órdenes de diversidad q (0, 1 y 2) y comparadas entre los pares de ensamblajes M–P, M–RM y P–RM."
+#| message: false
+#| warning: false
+#| fig-pos: 'H'
+#| fig-height: 5
+
+ggiNEXTbeta3D(salida.abun21, type = "B") +
+  labs(
+    title = "",
+    x = "Cobertura de la muestra",
+    y = "Diversidad filogenética media",
+    color = "Comparación",
+    shape = "Comparación",
+    fill  = "Comparación",
+    linetype = "Tipo de curva"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  ) +
+  scale_linetype_discrete(labels = c("Rarefacción", "Extrapolación"))
+```
+
+**1.5 Diversidad beta filogenética (PD) por tamaño de las muestras**
+
+```{r}
+#| message: FALSE
+#| warning: FALSE
+#| echo: false
+
+salida.abun22 <- iNEXTbeta3D(
+  biol_PD,
+  diversity = "PD",
+  PDtree    = arbol_PD,
+  datatype  = "abundance",
+  base      = "size",
+  nboot     = 10,
+  PDreftime = NULL,
+  PDtype    = "meanPD"
+)
+```
+
+```{r}
+#| label: tbl-c8-33
+#| tbl-cap: "Estimaciones de la diversidad filogenética gamma para la comparación M–P, basadas en tamaños de muestra crecientes. La tabla muestra los valores gamma estimados bajo rarefacción, junto con errores estándar e intervalos de confianza para q = 0."
+#| message: false
+#| warning: false
+#| echo: false
+
+# Resumen (ejemplo: primera combinación de zonas $M_vs_P)
+salida.abun22$M_vs_P$gamma %>%
+  head() %>%
+  kbl(booktabs = TRUE, digits = 2,
+      longtable = TRUE) %>%
+  kable_classic(full_width = FALSE) 
+
+# También se puede tabular la diversidad alfa para esas dos localidades
+# salida.abun22$M_vs_P$alpha %>% ...
+```
+
+**1.6 Curvas de rarefacción y extrapolación basadas en el tamaño de muestra**
+
+```{r}
+#| label: fig-c8-25
+#| fig-cap: "Curvas de rarefacción y extrapolación basadas en el tamaño de muestra para las diversidades filogenéticas gamma y alfa, separadas por órdenes de diversidad q (0, 1 y 2) y comparadas entre los pares de ensamblajes M vs P, M vs RM y P vs RM."
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-pos: 'H'
+#| fig-height: 5
+
+ggiNEXTbeta3D(salida.abun22) +
+  labs(
+    x = "Número de individuos",
+    y = "Diversidad filogenética media",
+    color   = "Comparación",
+    shape   = "Comparación",
+    linetype = "Tipo de curva"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  ) +
+  scale_linetype_discrete(labels = c("Rarefacción", "Extrapolación")) +
+  scale_color_discrete(labels = c("M vs. P", "M vs. RM", "P vs. RM")) +
+  scale_shape_discrete(labels = c("M vs. P", "M vs. RM", "P vs. RM"))
+
+```
+
+##### 2) Información general de la diversidad beta filogenética (PD)
+
+```{r}
+#| label: tbl-c8-34
+#| tbl-cap: "Información general para los análisis de diversidad beta filogenética (beta.PD) en las comparaciones pareadas M vs P, M vs RM y P vs RM."
+#| message: false
+#| warning: false
+#| echo: false
+
+## Data information for phylogenetic diversity
+informacion_gral <-
+DataInfobeta3D(
+  data      = biol_PD,         # matrices de abundancia por pares
+  diversity = "PD",            # dimensión filogenética
+  datatype  = "abundance",     # datos cuantitativos
+  PDtree    = arbol_PD,
+  PDreftime = NULL)
+
+# Tabla general
+informacion_gral %>%
+  kbl(booktabs = TRUE, digits = 2, 
+      longtable = TRUE) %>%
+  kable_classic(full_width = FALSE) 
+```
+
+#### B.2.2 Diversidad beta funcional (FD)
+
+##### 1) Construir la matriz de abundancias (Especies × Sitios)
+
+```{r}
+#| message: false
+#| warning: false
+#| echo: false
+
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(tibble)
+library(stringr)
+library(FD)
+library(kableExtra)
+library(ggplot2)
+library(iNEXT.beta3D)
+
+# ---------------------------
+# Paso 1: Abundancias (Especies × Sitios)
+# ---------------------------
+biol_raw <- read_xlsx("datos.c8.xlsx", sheet = "tax")
+
+# limpiar espacios finales en encabezados (importante en tu hoja)
+names(biol_raw) <- str_replace(names(biol_raw), "\\s+$", "")
+
+# detectar columna de sitio y estandarizar a "Site"
+site_col <- intersect(c("Sites1","Sites","Sitio","Station","Site"), 
+                      names(biol_raw)) %>% dplyr::first()
+stopifnot(!is.null(site_col))
+
+biol <- biol_raw %>%
+  dplyr::rename(Site = !!site_col) %>%
+  # pivotear SOLO columnas numéricas (evita mezclar "Site" carácter con especies numéricas)
+  pivot_longer(cols = where(is.numeric), 
+               names_to = "Especies", 
+               values_to = "Abundancia") %>%
+  mutate(Abundancia = as.numeric(Abundancia)) %>%
+  group_by(Especies, Site) %>%
+  summarise(Abundancia = sum(Abundancia, na.rm = TRUE), 
+            .groups = "drop") %>%
+  pivot_wider(names_from = Site, values_from = Abundancia, 
+              values_fill = 0) %>%
+  column_to_rownames("Especies") %>%
+  as.data.frame()
+
+# Tabla general
+biol %>%
+  head() %>% 
+  kbl(booktabs = TRUE, digits = 2,
+      longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+##### 2) Armar los pares de sitios para $\beta$-FD
+
+```{r}
+#| echo: false
+
+# ---------------------------
+# Paso 2: Pares de sitios ($\beta$-FD)
+# ---------------------------
+sitios <- c("M","P","RM"); 
+stopifnot(all(sitios %in% colnames(biol)))
+
+nombres_pares <- combn(sitios, 2, FUN = \(p) paste(p, collapse = "_vs_"))
+biol_FD_beta <- combn(sitios, 2, simplify = FALSE) %>%
+  set_names(nombres_pares) %>%
+  map(\(p) biol[, p, drop = FALSE])
+```
+
+##### 3) Preparar rasgos funcionales
+
+```{r}
+#| echo: false
+
+# ---------------------------
+# Paso 3: Rasgos funcionales
+# ---------------------------
+rasgos <- read_xlsx("datos.c8.xlsx", sheet = "rasgos") %>%
+  mutate(
+    across(c(TrophicLevel, BodyLength, BodyLengthMax, ShapeFactor), as.numeric),
+    across(c(omnivory, detritivory, herbivory, invertivory, piscivory, carnivory),
+           ~ case_when(
+             .x %in% c("Sí","Si","yes","TRUE","True","true","1") ~ 1,
+             .x %in% c("No","no","FALSE","False","false","0","")  ~ 0,
+             TRUE ~ as.numeric(.x)
+           ))
+  ) %>%
+  drop_na(TrophicLevel:carnivory) %>%
+  column_to_rownames("LatinName")
+
+```
+
+##### 4) Distancias funcionales (Gower)
+
+```{r}
+# ---------------------------
+# Paso 4: Distancias funcionales (Gower)
+# ---------------------------
+biol.dist.beta <- 
+  gowdis(rasgos) %>% 
+  as.matrix()
+```
+
+##### 5) Alinear “abundancias ↔ rasgos”
+
+```{r}
+#| echo: false
+
+# ---------------------------
+# Paso 5: Alineación abundancias ↔ rasgos
+# ---------------------------
+# especies presentes en ≥1 par de sitios
+pares_sp <- unique(unlist(lapply(biol_FD_beta, rownames)))
+
+# intersección con especies que tienen rasgos/distancias
+alinear_sp  <- intersect(pares_sp, rownames(biol.dist.beta))
+stopifnot(length(alinear_sp) > 0)
+
+# podar/ordenar matriz de distancias al conjunto de trabajo
+biol.dist.beta <- biol.dist.beta[alinear_sp, alinear_sp, drop = FALSE]
+
+# función para rellenar y reordenar cada matriz 2-columnas al orden 'alinear_sp'
+relleno_sp <- function(X, ref_sp){
+  X <- as.data.frame(X)
+  missing <- setdiff(ref_sp, rownames(X))
+  if (length(missing)) {
+    X <- rbind(
+      X,
+      matrix(0, nrow = length(missing), ncol = ncol(X),
+             dimnames = list(missing, colnames(X)))
+    )
+  }
+  X <- X[ref_sp, , drop = FALSE]
+  X[] <- lapply(X, \(v) suppressWarnings(as.numeric(v)))
+  as.matrix(X)
+}
+
+biol_FD_beta <- map(biol_FD_beta, relleno_sp, ref_sp = alinear_sp)
+
+```
+
+##### 6) Chequeos de consistencia
+
+```{r}
+stopifnot(is.matrix(biol.dist.beta), isSymmetric(biol.dist.beta))
+stopifnot(identical(rownames(biol.dist.beta), colnames(biol.dist.beta)))
+stopifnot(all(map_lgl(biol_FD_beta, \(m) identical(rownames(m), alinear_sp))))
+```
+
+##### 7) Diversidad beta funcional FD mediante rarefacción y extrapolación (R/E)
+
+```{r}
+# Datos de abundancia: biol_FD_beta
+# Matriz de distancias: biol.dist.beta
+
+# Diversidad beta multi-componente
+salida_abun31 <- iNEXTbeta3D(
+  data      = biol_FD_beta,  # matrices de abundancia por pares
+  diversity = "FD",           # dimensión funcional
+  datatype  = "abundance",    # datos cuantitativos
+  base      = "coverage",     # estandarización por cobertura
+  nboot     = 5,              # número de remuestreos bootstrap
+  FDdistM   = biol.dist.beta, # matriz de distancias funcionales (Gower)
+  FDtype    = "AUC",          # método AUC (área bajo la curva)
+  FDcut_number = 30           # número de umbrales considerados
+)
+```
+
+```{r}
+#| label: tbl-c8-35
+#| tbl-cap: "Resumen de las estimaciones de la diversidad funcional gamma para la comparación M vs P, calculadas mediante rarefacción bajo el método FD.AUC. La tabla muestra los valores estimados de gamma, sus errores estándar e intervalos de confianza para distintos niveles de cobertura muestral."
+#| message: false
+#| warning: false
+#| echo: false
+
+# Resumen (ejemplo: primera combinación de zonas $M_vs_P)
+salida_abun31$M_vs_P$gamma %>%
+  head() %>%
+  kbl(booktabs = TRUE, digits = 2,
+      longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+# De manera análoga, pueden explorarse los componentes $\alpha$ y $\beta$:
+# salida_abun31$M_vs_P$alpha %>% ...
+# salida_abun31$M_vs_P$beta %>% ... 
+```
+
+**1. curvas de rarefacción y extrapolación (R/E) basadas en cobertura**
+
+```{r}
+#| label: fig-c8-27
+#| fig-cap: "Curvas de rarefacción y extrapolación basadas en cobertura para las diversidades funcionales gamma, alfa y beta, separadas por órdenes de diversidad q (0, 1 y 2) y comparadas entre los pares de ensamblajes M–P, M–RM y P–RM."
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-pos: 'H'
+#| fig-height: 5
+
+ggiNEXTbeta3D(salida_abun31, type = "B") +
+  labs(
+    title = "",
+    x = "Cobertura de la muestra",
+    y = "Diversidad funcional (AUC)",
+    color = "Comparación",
+    fill  = "Comparación",
+    shape = "Comparación",
+    linetype = "Tipo de curva"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  ) +
+  scale_linetype_discrete(labels = c("Rarefacción", "Extrapolación"))
+
+```
+
+##### 8) Curvas de rarefacción y extrapolación por tamaño de muestra (FD $\gamma$ y $\alpha$)
+
+```{r}
+#| message: false
+#| warning: false
+
+## Curvas R/E basadas en el tamaño para la diversidad funcional gamma y alfa
+# Datos de abundancia: biol_FD_beta
+# Matriz de distancias: biol.dist.beta
+salida_abun32 <- iNEXTbeta3D(
+  data      = biol_FD_beta,  # matrices de abundancia por pares
+  diversity = "FD",           # dimensión funcional
+  datatype  = "abundance",    # datos cuantitativos
+  base      = "size",         # estandarización por abundancia
+  nboot     = 2,              # número de remuestreos bootstrap
+  FDdistM   = biol.dist.beta, # matriz de distancias funcionales (Gower)
+  FDtype    = "AUC",          # método AUC (área bajo la curva)
+  FDcut_number = 10           # número de umbrales considerados
+)
+```
+
+
+```{r}
+#| label: tbl-c8-36
+#| tbl-cap: "Diversidad funcional gamma basada en el tamaño de muestra para la comparación entre las zonas de montaña (M) y Planicie (P), obtenida mediante curvas de rarefacción y extrapolación estandarizadas por abundancia."
+#| message: false
+#| warning: false
+#| echo: false
+
+# Resumen (ejemplo: primera combinación de zonas $M_vs_P)
+salida_abun32$M_vs_P$gamma %>%
+  head() %>%
+  kbl(booktabs = TRUE, digits = 2,
+      longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+# De manera análoga, pueden explorarse al componente $\alpha$:
+# salida_abun31$M_vs_P$alpha %>% ...
+```
+
+
+**Figura 2. curvas de rarefacción y extrapolación (R/E) basadas en abundancias**
+
+```{r}
+#| label: fig-c8-28
+#| fig-cap: "Curvas de rarefacción y extrapolación basadas en el tamaño de muestra para la diversidad funcional (FD) gamma y alfa en comparaciones pareadas. Se muestran los valores para q = 0 (riqueza funcional), q = 1 (entropía de Shannon) y q = 2 (índice de Simpson). Los ejes están estandarizados por número de individuos y la diversidad funcional se expresa como área bajo la curva (AUC)."
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-pos: 'H'
+#| fig-height: 5
+
+# Curvas R/E basadas en tamaño de muestra (size-based sampling curves)
+# para diversidad funcional gamma y alfa, con traducción incorporada
+ggiNEXTbeta3D(salida_abun32) +
+  labs(
+    x = "Número de individuos",
+    y = "Diversidad funcional (AUC)"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  ) +
+  scale_linetype_discrete(
+    name = "",
+    labels = c("Rarefacción", "Extrapolación")
+  ) +
+  scale_shape_discrete(
+    name = "",
+    labels = c("M_vs_P", "M_vs_RM", "P_vs_RM")
+  ) +
+  scale_color_discrete(
+    name = "",
+    labels = c("M_vs_P", "M_vs_RM", "P_vs_RM")
+  )
+
+```
+
+##### 9) Información general de la diversidad beta funcional - FD
+
+```{r}
+#| message: false
+#| warning: false
+
+# Información general
+informacion_gral <-
+DataInfobeta3D(
+  data      = biol_FD_beta,    # matrices de abundancia por pares
+  diversity = "FD",            # dimensión funcional
+  datatype  = "abundance",     # datos cuantitativos
+  FDdistM   = biol.dist.beta,  # matriz de distancias funcionales (Gower)
+  FDtype    = 'tau_value', 
+  FDtau     = NULL)
+```
+
+```{r}
+#| label: tbl-c8-37
+#| tbl-cap: "Diversidad funcional beta (FD) para las comparaciones pareadas entre zonas. Tamaños de muestra (n), la riqueza observada (S.obs), la completitud de la muestra (SC), y los parámetros derivados del perfil tau, así como el valor de tau empleado en la estandarización."
+#| message: false
+#| warning: false
+
+# Tabla general
+informacion_gral %>%
+  kbl(booktabs = TRUE, digits = 2,
+      longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+
+```{r}
+#| label: tbl-c8-38
+#| tbl-cap: "Diversidad funcional beta (FD) basada en el método AUC. Tamaño de muestra (n), la riqueza observada (S.obs), la completitud de la muestra (SC), los valores mínimo, medio y máximo de las distancias funcionales entre especies para cada ensamblaje y combinación pareada de zonas."
+#| message: false
+#| warning: false
+#| echo: false
+
+## Data information for functional diversity (FDtype = 'AUC')
+informacion_gral1 <-
+DataInfobeta3D(
+  data      = biol_FD_beta,    # matrices de abundancia por pares
+  diversity = "FD",            # dimensión funcional
+  datatype  = "abundance",     # datos cuantitativos
+  FDdistM   = biol.dist.beta,  # matriz de distancias funcionales (Gower)
+  FDtype    = 'AUC', 
+  FDtau     = NULL)
+
+# Tabla general
+informacion_gral1 %>%
+  kbl(booktabs = TRUE, digits = 2,
+      longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+
+

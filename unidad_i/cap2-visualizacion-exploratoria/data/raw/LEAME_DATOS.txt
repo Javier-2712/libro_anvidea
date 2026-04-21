@@ -1,6 +1,9 @@
-Coloque aquí los archivos originales usados en el capítulo:
+Capítulo 2 — Archivos requeridos en data/raw/
 
-- plancton.xlsx
-- invert.xlsx
+Ubique aquí los archivos de entrada antes de ejecutar los scripts:
 
-No se incluyen en este paquete para respetar su organización editorial.
+1. plancton.xlsx
+2. invert.xlsx
+
+No cambie los nombres de los archivos, a menos que también ajuste las rutas
+dentro de los scripts.

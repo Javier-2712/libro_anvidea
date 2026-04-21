@@ -1,0 +1,6 @@
+- Origen: `4_expo_log.qmd`.
+- Se reorganizó el contenido en dos scripts ejecutables:
+  - Caso A: modelo exponencial
+  - Caso B: modelo logístico
+- Se conservaron fórmulas, ejemplos y visualizaciones representativas.
+- Se omitieron bloques puramente editoriales del documento Quarto.

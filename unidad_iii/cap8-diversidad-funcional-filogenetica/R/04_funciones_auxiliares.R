@@ -1,261 +1,114 @@
 # =========================================================
 # ANVIDEA - Unidad III
-# Capítulo 8 - Diversidad funcional y filogenética
-# Archivo: 04_funciones_auxiliares.R
-# Propósito: definir funciones auxiliares reutilizables
+# Cap\u00edtulo 8 - Diversidad funcional y filogen\u00e9tica
+# ---------------------------------------------------------
+# Archivo : 04_funciones_auxiliares.R
+# Prop\u00f3sito: funciones de apoyo reutilizables para los
+#            scripts del cap\u00edtulo 8
 # =========================================================
 
 # ---------------------------------------------------------
-# 0. Utilidades internas
+# 1. Resumen tabular de componentes Rao
 # ---------------------------------------------------------
 
-asegurar_directorio <- function(ruta) {
-  if (!dir.exists(ruta)) dir.create(ruta, recursive = TRUE, showWarnings = FALSE)
-  invisible(ruta)
+# Extrae alfa, gamma y beta (TD, FD, PD) desde la salida de Rao()
+# y los devuelve como un data.frame limpio para tablas y exportación.
+
+resumen_rao <- function(rao_out, dimensiones = c("TD", "FD", "PD")) {
+  purrr::map_dfr(dimensiones, function(dim) {
+    comp <- rao_out[[dim]]
+    if (is.null(comp)) return(NULL)
+    tibble::tibble(
+      Dimension  = dim,
+      Mean_Alpha = comp$Mean_Alpha,
+      Gamma      = comp$Gamma,
+      Beta_add   = comp$Beta_add,
+      Beta_prop  = comp$Beta_prop
+    )
+  })
 }
 
-validar_columnas <- function(df, columnas, nombre_objeto = "data.frame") {
-  faltantes <- setdiff(columnas, names(df))
-  if (length(faltantes) > 0) {
+
+# ---------------------------------------------------------
+# 2. Resumen tabular de iNEXT3D (DataInfo)
+# ---------------------------------------------------------
+
+# Extrae la tabla DataInfo de un objeto iNEXT3D y añade
+# la columna Dimension para facilitar comparaciones.
+
+extraer_datainfo <- function(obj, dim_name) {
+  campo <- paste0(dim_name, "Info")
+  if (!campo %in% names(obj) || is.null(obj[[campo]])) return(NULL)
+  as.data.frame(obj[[campo]]) %>%
+    dplyr::mutate(Dimension = dim_name)
+}
+
+
+# ---------------------------------------------------------
+# 3. Resumen tabular de AsyEst (iNEXT3D)
+# ---------------------------------------------------------
+
+# Extrae la tabla de estimaciones asintóticas de un objeto
+# iNEXT3D añadiendo la columna Dimension.
+
+extraer_asyest <- function(obj, dim_name) {
+  campo <- paste0(dim_name, "AsyEst")
+  if (!campo %in% names(obj) || is.null(obj[[campo]])) return(NULL)
+  as.data.frame(obj[[campo]]) %>%
+    dplyr::mutate(Dimension = dim_name)
+}
+
+
+# ---------------------------------------------------------
+# 4. Validar coincidencia de especies entre matrices
+# ---------------------------------------------------------
+
+# Comprueba que las especies (rownames/colnames) de dos
+# objetos coincidan. Devuelve TRUE o lanza error.
+
+validar_especies <- function(mat_abund, mat_dist,
+                              nombre_abund = "abundancias",
+                              nombre_dist  = "distancias") {
+  sp_abund <- colnames(mat_abund)
+  sp_dist  <- rownames(mat_dist)
+
+  if (!setequal(sp_abund, sp_dist)) {
+    solo_abund <- setdiff(sp_abund, sp_dist)
+    solo_dist  <- setdiff(sp_dist, sp_abund)
     stop(
-      "Faltan columnas en ", nombre_objeto, ": ",
-      paste(faltantes, collapse = ", ")
+      "Las especies no coinciden entre '", nombre_abund,
+      "' y '", nombre_dist, "'.\n",
+      if (length(solo_abund) > 0)
+        paste0("  Solo en abundancias: ",
+               paste(utils::head(solo_abund, 5), collapse = ", "), "\n"),
+      if (length(solo_dist) > 0)
+        paste0("  Solo en distancias: ",
+               paste(utils::head(solo_dist, 5), collapse = ", "), "\n")
     )
   }
+
   invisible(TRUE)
 }
 
-normalizar_binaria <- function(x) {
-  x_chr <- trimws(as.character(x))
 
-  dplyr::case_when(
-    is.na(x) ~ NA_real_,
-    x_chr %in% c("Sí", "Si", "sí", "si", "yes", "YES", "TRUE", "True", "true", "1") ~ 1,
-    x_chr %in% c("No", "no", "NO", "FALSE", "False", "false", "0", "") ~ 0,
-    TRUE ~ suppressWarnings(as.numeric(x_chr))
+# ---------------------------------------------------------
+# 5. Alinear matriz de abundancia con matriz de distancias
+# ---------------------------------------------------------
+
+# Reduce ambas matrices a las especies comunes y las reordena
+# para que coincidan. Devuelve lista con $abund y $dist.
+
+alinear_abund_dist <- function(mat_abund, mat_dist) {
+  sp_comunes <- intersect(colnames(mat_abund), rownames(mat_dist))
+
+  if (length(sp_comunes) == 0) {
+    stop("No hay especies comunes entre la matriz de abundancias y la de distancias.")
+  }
+
+  list(
+    abund = mat_abund[, sp_comunes, drop = FALSE],
+    dist  = mat_dist[sp_comunes, sp_comunes, drop = FALSE]
   )
 }
 
-leer_hoja_c8 <- function(data_dir, sheet_name) {
-  archivo <- file.path(data_dir, "datos.c8.xlsx")
-
-  if (!file.exists(archivo)) {
-    stop("No se encontró el archivo de datos: ", archivo)
-  }
-
-  hojas <- readxl::excel_sheets(archivo)
-  if (!sheet_name %in% hojas) {
-    stop(
-      "La hoja '", sheet_name, "' no existe en ", archivo,
-      ". Hojas disponibles: ", paste(hojas, collapse = ", ")
-    )
-  }
-
-  readxl::read_xlsx(archivo, sheet = sheet_name)
-}
-
-# ---------------------------------------------------------
-# 1. Guardado de figuras y tablas
-# ---------------------------------------------------------
-
-guardar_figura <- function(plot_obj, nombre, width = 8, height = 5, dpi = 300) {
-  if (missing(plot_obj) || is.null(plot_obj)) {
-    stop("Debe suministrar un objeto gráfico válido en 'plot_obj'.")
-  }
-
-  if (!is.character(nombre) || length(nombre) != 1 || !nzchar(nombre)) {
-    stop("El argumento 'nombre' debe ser una cadena de texto no vacía.")
-  }
-
-  ruta_salida <- file.path("outputs", "figuras")
-  asegurar_directorio(ruta_salida)
-
-  ggplot2::ggsave(
-    filename = file.path(ruta_salida, nombre),
-    plot = plot_obj,
-    width = width,
-    height = height,
-    dpi = dpi
-  )
-}
-
-guardar_tabla_excel <- function(df, nombre) {
-  if (missing(df) || is.null(df)) {
-    stop("Debe suministrar un objeto válido en 'df'.")
-  }
-
-  if (!inherits(df, c("data.frame", "list"))) {
-    stop("El objeto 'df' debe ser un data.frame o una lista de data.frames.")
-  }
-
-  if (!is.character(nombre) || length(nombre) != 1 || !nzchar(nombre)) {
-    stop("El argumento 'nombre' debe ser una cadena de texto no vacía.")
-  }
-
-  ruta_salida <- file.path("outputs", "tablas")
-  asegurar_directorio(ruta_salida)
-
-  writexl::write_xlsx(df, file.path(ruta_salida, nombre))
-}
-
-# ---------------------------------------------------------
-# 2. Lectura de datos del capítulo 8
-# ---------------------------------------------------------
-
-leer_tax_c8 <- function(data_dir) {
-  leer_hoja_c8(data_dir, "tax")
-}
-
-leer_tax1_c8 <- function(data_dir) {
-  leer_hoja_c8(data_dir, "tax1")
-}
-
-leer_rasgos_c8 <- function(data_dir) {
-  leer_hoja_c8(data_dir, "rasgos")
-}
-
-leer_coord_c8 <- function(data_dir) {
-  leer_hoja_c8(data_dir, "coord")
-}
-
-# ---------------------------------------------------------
-# 3. Preparación de matrices biológicas
-# ---------------------------------------------------------
-
-preparar_biol_abrev <- function(taxas) {
-  validar_columnas(taxas, c("Sites", "Sites1"), "taxas")
-
-  biol <- taxas %>%
-    dplyr::select(-dplyr::any_of(c("Sites", "Sites1")))
-
-  if (ncol(biol) == 0) {
-    stop("Después de excluir 'Sites' y 'Sites1', no quedaron columnas de especies.")
-  }
-
-  nombres_abrev <- abbreviate(names(biol), minlength = 4)
-  names(biol) <- make.unique(nombres_abrev, sep = "_")
-
-  biol
-}
-
-preparar_biol_zona <- function(taxas) {
-  validar_columnas(taxas, c("Sites1"), "taxas")
-
-  if (!any(vapply(taxas, is.numeric, logical(1)))) {
-    stop("El objeto 'taxas' no contiene columnas numéricas de abundancia.")
-  }
-
-  taxas %>%
-    dplyr::select(-dplyr::any_of("Sites")) %>%
-    dplyr::group_by(Sites1) %>%
-    dplyr::summarise(
-      dplyr::across(where(is.numeric), ~ sum(.x, na.rm = TRUE)),
-      .groups = "drop"
-    ) %>%
-    tibble::column_to_rownames("Sites1") %>%
-    as.data.frame()
-}
-
-# ---------------------------------------------------------
-# 4. Preparación de rasgos funcionales
-# ---------------------------------------------------------
-
-preparar_rasgos_fd <- function(rasgos) {
-  columnas_requeridas <- c(
-    "Abrev", "LatinName", "CommonName", "Family", "Guild",
-    "TrophicLevel", "BodyLength", "BodyLengthMax", "ShapeFactor",
-    "omnivory", "detritivory", "herbivory", "invertivory",
-    "piscivory", "carnivory"
-  )
-  validar_columnas(rasgos, columnas_requeridas, "rasgos")
-
-  rasgos_limpios <- rasgos %>%
-    dplyr::mutate(
-      dplyr::across(
-        c(TrophicLevel, BodyLength, BodyLengthMax, ShapeFactor),
-        ~ suppressWarnings(as.numeric(.x))
-      ),
-      dplyr::across(
-        c(omnivory, detritivory, herbivory, invertivory, piscivory, carnivory),
-        normalizar_binaria
-      )
-    ) %>%
-    dplyr::filter(
-      dplyr::if_all(
-        c(TrophicLevel, BodyLength, BodyLengthMax, ShapeFactor,
-          omnivory, detritivory, herbivory, invertivory, piscivory, carnivory),
-        ~ !is.na(.x)
-      )
-    ) %>%
-    as.data.frame()
-
-  if (nrow(rasgos_limpios) == 0) {
-    stop("No quedaron filas válidas en la tabla de rasgos después de la depuración.")
-  }
-
-  rasgos_limpios
-}
-
-# ---------------------------------------------------------
-# 5. Construcción de matrices de rasgos
-# ---------------------------------------------------------
-
-matriz_fd <- function(rasgos_df) {
-  validar_columnas(
-    rasgos_df,
-    c("LatinName", "Abrev", "CommonName", "Family", "Guild"),
-    "rasgos_df"
-  )
-
-  r <- as.data.frame(rasgos_df)
-  rownames(r) <- r$LatinName
-  r <- r[, setdiff(names(r), c("Abrev", "LatinName", "CommonName", "Family", "Guild")), drop = FALSE]
-
-  if (ncol(r) == 0) {
-    stop("La matriz funcional quedó sin columnas de rasgos.")
-  }
-
-  r
-}
-
-alinear_matriz_rasgos_abrev <- function(rasgos_df) {
-  validar_columnas(
-    rasgos_df,
-    c("Abrev", "LatinName", "CommonName", "Family", "Guild"),
-    "rasgos_df"
-  )
-
-  r <- as.data.frame(rasgos_df)
-  rownames(r) <- r$Abrev
-  r <- r[, setdiff(names(r), c("Abrev", "LatinName", "CommonName", "Family", "Guild")), drop = FALSE]
-
-  if (ncol(r) == 0) {
-    stop("La matriz de rasgos abreviada quedó sin columnas.")
-  }
-
-  r
-}
-
-# ---------------------------------------------------------
-# 6. Resúmenes de Rao
-# ---------------------------------------------------------
-
-resumen_rao <- function(obj, dim_name = "FD") {
-  campos_requeridos <- c("Mean_Alpha", "Gamma", "Beta_add", "Beta_prop")
-  faltantes <- setdiff(campos_requeridos, names(obj))
-
-  if (length(faltantes) > 0) {
-    stop(
-      "El objeto de Rao no contiene los campos requeridos: ",
-      paste(faltantes, collapse = ", ")
-    )
-  }
-
-  tibble::tibble(
-    Dimension = dim_name,
-    Mean_Alpha = obj$Mean_Alpha,
-    Gamma = obj$Gamma,
-    Beta_add = obj$Beta_add,
-    Beta_prop = obj$Beta_prop
-  )
-}
+cat("Funciones auxiliares del cap\u00edtulo 8 cargadas correctamente.\n")

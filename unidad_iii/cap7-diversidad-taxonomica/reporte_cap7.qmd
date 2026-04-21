@@ -1,0 +1,622 @@
+---
+title: "ANVIDEA - Reporte reproducible"
+subtitle: "Capítulo 7 — Diversidad taxonómica"
+author: "Javier Rodríguez-Barrios"
+date: last-modified
+lang: es
+format:
+  html:
+    toc: true
+    toc-depth: 4
+    number-sections: false
+    theme: cosmo
+    embed-resources: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+
+ruta_rds <- file.path("outputs", "reportes", "resultado_cap7.rds")
+if (!file.exists(ruta_rds)) {
+  stop("No se encontró resultado_cap7.rds en: ",
+       normalizePath(ruta_rds, mustWork = FALSE))
+}
+
+res     <- readRDS(ruta_rds)
+tab_dir <- file.path("outputs", "tablas")
+fig_dir <- file.path("outputs", "figuras")
+
+casoA1 <- res$casoA1
+casoA2 <- res$casoA2
+casoA3 <- res$casoA3
+casoB1 <- res$casoB1
+casoB2 <- res$casoB2
+casoB3 <- res$casoB3
+
+mostrar_tabla <- function(x, caption = NULL, digits = 2, n = NULL) {
+  if (is.null(x)) {
+    cat("*No disponible.*\n")
+    return(invisible(NULL))
+  }
+  if (!is.null(n)) x <- head(x, n)
+  x %>%
+    kbl(booktabs = TRUE, longtable = FALSE, digits = digits,
+        caption = caption) %>%
+    kable_classic(full_width = FALSE, html_font = "Cambria")
+}
+
+mostrar_figura <- function(nombre, caption = NULL) {
+  ruta <- file.path(fig_dir, nombre)
+  if (file.exists(ruta)) {
+    knitr::include_graphics(ruta)
+  } else {
+    cat(paste0("*Figura no encontrada: ", nombre, "*\n"))
+  }
+}
+```
+
+::: {.callout-note}
+## Nota para el lector
+Este reporte complementa el **Capítulo 7** de ANVIDEA. Muestra e interpreta todas las salidas producidas por los seis casos guiados del capítulo, siguiendo la misma jerarquía de secciones de los scripts del libro.
+:::
+
+---
+
+## A. Caso guiado: Diversidad alfa de peces en ríos de México
+
+### Cargar paquetes y lectura de bases de datos
+
+Los seis scripts del capítulo cargan los paquetes requeridos y leen los datos desde `datos.c7.xlsx`. Las hojas utilizadas son `tax` (abundancias por sitio), `tax1` (abreviaturas), `amb` (variables ambientales) y `coord` (coordenadas geográficas).
+
+#### a. Base de datos de las especies
+
+```{r}
+mostrar_tabla(casoA1$biol_head,
+              caption = "Resumen de la base de datos biológicos para los seis primeros sitios",
+              digits = 0)
+```
+
+#### b. Tabla con nombres completos y abreviados en formato largo
+
+```{r}
+mostrar_tabla(casoA1$tabla_resumen,
+              caption = "Resumen de la base con nombres abreviados de las especies (10 más abundantes)",
+              digits = 0, n = 10)
+```
+
+---
+
+### 1. Estimadores clásicos de diversidad alfa por cada zona altitudinal
+
+```{r}
+mostrar_tabla(casoA1$biol2_zonas,
+              caption = "Resumen de la base de datos con totales de abundancia para cada sitio evaluado (primeras 12 columnas)",
+              digits = 0)
+```
+
+```{r}
+mostrar_tabla(casoA1$d.alfa,
+              caption = "Base de datos con diferentes estimadores de diversidad para cada zona evaluada",
+              digits = 2)
+```
+
+---
+
+### 2. Diversidad alfa con curvas de distribución rango-abundancia RAD
+
+```{r}
+mostrar_tabla(casoA1$biol_rad,
+              caption = "Resumen de la base de datos con diferentes estadísticos requeridos para las curvas RAD (primeras 12 filas)",
+              digits = 3, n = 12)
+```
+
+```{r}
+#| fig-cap: "Patrón de distribución rango-abundancia (RAD) para los taxones más abundantes"
+mostrar_figura("casoA1_fig_rad_simple.png")
+```
+
+```{r}
+#| fig-cap: "Patrón de distribución rango-abundancia (RAD) — versión estilizada por zona altitudinal"
+mostrar_figura("casoA1_fig_rad_mejorado.png")
+```
+
+#### a. Ajuste de las curvas RAD
+
+```{r}
+mostrar_tabla(casoA1$tab_aic,
+              caption = "Modelo con mejor ajuste por sitio (menor AIC)",
+              digits = 0)
+```
+
+#### b. Figuras de los modelos RAD por sitio
+
+```{r}
+#| fig-cap: "Ajuste del patrón de diversidad de cada sitio evaluado, para los cinco modelos empíricos evaluados"
+mostrar_figura("casoA1_fig_radfit_todos.png")
+```
+
+```{r}
+#| fig-cap: "Ajuste del patrón de diversidad de acuerdo al modelo con menor AIC por sitio"
+mostrar_figura("casoA1_fig_radfit_mejor.png")
+```
+
+#### c. Diagnóstico de supuestos
+
+##### *c.2 Homogeneidad de covarianzas*
+
+```{r}
+mostrar_tabla(casoA1$anova_disper,
+              caption = "ANOVA de betadisper: homogeneidad de varianzas multivariada entre zonas",
+              digits = 4)
+```
+
+```{r}
+mostrar_tabla(casoA1$permutest_disper,
+              caption = "Permutest de betadisper: prueba de permutación de homogeneidad de varianzas",
+              digits = 4)
+```
+
+##### *c.3 Independencia de los datos*
+
+```{r}
+mostrar_tabla(casoA1$dw_test,
+              caption = "Test de Durbin-Watson: independencia de residuos",
+              digits = 4)
+```
+
+---
+
+### 3. Comparación de zonas con GLMs y PERMANOVAs
+
+#### a. Prueba con distribución Poisson y Binomial Negativa para una especie (GLM)
+
+```{r}
+if (!is.null(casoA2$sum_poisson)) {
+  cat("**GLM Poisson — summary:**\n\n")
+  cat("```\n")
+  cat(paste(casoA2$sum_poisson, collapse = "\n"))
+  cat("\n```\n")
+}
+```
+
+```{r}
+if (!is.null(casoA2$sum_mod_nb)) {
+  cat("**GLM Binomial Negativa — summary:**\n\n")
+  cat("```\n")
+  cat(paste(casoA2$sum_mod_nb, collapse = "\n"))
+  cat("\n```\n")
+}
+```
+
+```{r}
+if (!is.null(casoA2$sum_bin_neg)) {
+  cat("**glmmTMB Binomial Negativa — summary:**\n\n")
+  cat("```\n")
+  cat(paste(casoA2$sum_bin_neg, collapse = "\n"))
+  cat("\n```\n")
+}
+```
+
+#### b. Evaluación conjunta del efecto de la zona sobre todas las especies (manyGLM)
+
+El `manyglm` multivariado Poisson evalúa si la zona explica la composición conjunta de todas las especies. El `summary` y el `anova` del modelo se imprimen en consola durante la ejecución de `02_casoA_alfa_glm_permanovas.R`.
+
+#### c. Comparación de muestras con PERMANOVAs
+
+```{r}
+mostrar_tabla(casoA2$permanova,
+              caption = "Resultados de la PERMANOVA para la composición taxonómica entre zonas (Bray-Curtis, 999 permutaciones)",
+              digits = 4)
+```
+
+#### d. Prueba de comparaciones múltiples del PERMANOVA
+
+Las comparaciones post hoc entre pares de zonas (`pairwise.perm.manova`) se imprimen en consola durante la ejecución del script.
+
+#### e. Análisis SIMPER
+
+```{r}
+mostrar_tabla(casoA2$simper.M_P,
+              caption = "a. Diez primeras especies ordenadas por valor-p (menor a mayor) en el SIMPER de zonas M vs P",
+              digits = 3)
+```
+
+```{r}
+mostrar_tabla(casoA2$simper.M_RM,
+              caption = "b. Diez primeras especies ordenadas por valor-p en el SIMPER de zonas M vs RM",
+              digits = 3)
+```
+
+```{r}
+mostrar_tabla(casoA2$simper.P_RM,
+              caption = "c. Diez primeras especies ordenadas por valor-p en el SIMPER de zonas P vs RM",
+              digits = 3)
+```
+
+---
+
+### 4. Diversidad alfa con números efectivos de Hill
+
+##### Estructura mínima de los datos (abundancia)
+
+```{r}
+mostrar_tabla(as.data.frame(head(casoA3$biol_sit, 8)),
+              caption = "Matriz de abundancias con la organización requerida para los tres paquetes de iNEXT (filas = especies, columnas = zonas)",
+              digits = 0)
+```
+
+#### 4.2 iNEXT (2016): rarefacción/extrapolación como base comparativa
+
+```{r}
+mostrar_tabla(casoA3$result,
+              caption = "Estimadores generales de diversidad alfa (iNEXT, q = 0): N = individuos, Riqueza = S obs., f1 = singletons, f2 = doubletons",
+              digits = 1)
+```
+
+#### 4.3 iNEXT.4steps (2020): diversidad alfa en cuatro pasos
+
+##### a. Paso 1: perfil de completitud
+
+```{r}
+mostrar_tabla(casoA3$tab_paso1,
+              caption = "Paso 1. Perfil de completitud en las tres estaciones evaluadas",
+              digits = 3)
+```
+
+```{r}
+#| fig-cap: "Paso 1. Perfil de completitud de las muestras por orden q"
+mostrar_figura("casoA3_fig_paso1_completitud.png")
+```
+
+##### b. Paso 2: perfil asintótico (observada vs estimada)
+
+```{r}
+mostrar_tabla(casoA3$asinto_tab,
+              caption = "Paso 2. Perfil asintótico (observada vs estimada) y especies sin detectar",
+              digits = 2)
+```
+
+```{r}
+#| fig-cap: "Paso 2.1. Rarefacción basada en el tamaño de la muestra y extrapolación"
+mostrar_figura("casoA3_fig_paso2_rarefa_tamano.png")
+```
+
+##### c. Paso 3: perfil no asintótico (rarefacción/extrapolación por cobertura)
+
+```{r}
+mostrar_tabla(casoA3$tab_paso3,
+              caption = "Paso 3. Perfil no asintótico para los tres ensamblajes evaluados",
+              digits = 3)
+```
+
+```{r}
+#| fig-cap: "Paso 3. Perfil no asintótico basado en rarefacción/extrapolación por cobertura"
+mostrar_figura("casoA3_fig_paso3_rarefa_cobertura.png")
+```
+
+##### d. Paso 4: uniformidad
+
+```{r}
+mostrar_tabla(casoA3$tab_paso4,
+              caption = "Paso 4. Perfil de uniformidad (Pielou y diversidades normalizadas)",
+              digits = 3)
+```
+
+```{r}
+#| fig-cap: "Paso 4. Perfil de uniformidad (Pielou y pendientes normalizadas) para M, P y RM"
+mostrar_figura("casoA3_fig_paso4_uniformidad.png")
+```
+
+#### 4.4 iNEXT.3D (2021): misma lógica de Hill, salidas más ricas y perfiles-q
+
+##### a. Información base del ensamblaje (TDInfo)
+
+```{r}
+mostrar_tabla(casoA3$result2a,
+              caption = "iNEXT.3D: información base del ensamblaje (TDInfo)",
+              digits = 1)
+```
+
+##### b. Estimadores estandarizados por tamaño de muestra (TDiNextEst)
+
+```{r}
+mostrar_tabla(casoA3$result2b,
+              caption = "iNEXT.3D: estimadores estandarizados por tamaño de muestra — size-based (primeras 12 filas)",
+              digits = 2)
+```
+
+##### c. Estimaciones observadas y asintóticas (TDAsyEst)
+
+```{r}
+mostrar_tabla(casoA3$result2c,
+              caption = "iNEXT.3D: estimaciones observadas y asintóticas por zona y orden q (TDAsyEst)",
+              digits = 2)
+```
+
+#### 4.5–4.6 Figuras desde iNEXT.4steps
+
+#### 4.7 Figuras desde iNEXT.3D (TD)
+
+##### a. Perfil de diversidad alfa taxonómica (TD) con datos de abundancia
+
+```{r}
+#| fig-cap: "Curvas size-based de TD por ensamblaje (iNEXT.3D)"
+mostrar_figura("casoA3_fig_inext3d_sizebased.png")
+```
+
+##### b. Curvas de completitud de la muestra
+
+```{r}
+#| fig-cap: "Curvas de completitud de la muestra por ensamblaje (iNEXT.3D)"
+mostrar_figura("casoA3_fig_inext3d_completitud.png")
+```
+
+##### c. Curvas R/E basadas en cobertura
+
+```{r}
+#| fig-cap: "Curvas de rarefacción y extrapolación basadas en cobertura por ensamblaje (iNEXT.3D)"
+mostrar_figura("casoA3_fig_inext3d_cobertura.png")
+```
+
+##### d. Perfiles de orden q (observado vs asintótico)
+
+```{r}
+mostrar_tabla(casoA3$result2d.,
+              caption = "Resumen de perfiles-q de TD (ObsAsy3D): diversidad observada y asintótica",
+              digits = 2, n = 9)
+```
+
+```{r}
+#| fig-cap: "Perfiles de diversidad taxonómica (q-profiles): diversidad observada vs asintótica"
+mostrar_figura("casoA3_fig_obsasy_perfiles_q.png")
+```
+
+```{r}
+comp <- tibble(
+  Paquete  = c("iNEXT (2016)", "iNEXT.4steps (2020)", "iNEXT.3D (2021)"),
+  Contexto = c(
+    "Marco base de rarefacción/extrapolación y estandarización para diversidad de Hill.",
+    "Flujo en 4 pasos: completitud → asintótico → R/E por cobertura → uniformidad.",
+    "Extensión para TD, FD y PD. Perfiles-q y figuras comparativas entre zonas."
+  ),
+  Entradas = c(
+    "Matriz de abundancia o incidencia por ensamblaje.",
+    "Matriz de abundancia o incidencia (énfasis en summary por pasos y figuras integradas).",
+    "Matriz de abundancia o incidencia; para FD/PD se suma matriz de distancias/árbol."
+  ),
+  Salidas  = c(
+    "Curvas R/E, estimaciones estandarizadas, cobertura; tablas (N, S.obs, f1, f2).",
+    "Tablas por pasos 1–4 + figuras alineadas.",
+    "Perfiles de diversidad (q = 0, 1 y 2) y gráficas comparativas entre zonas."
+  ),
+  Enfoque  = c(
+    "Fundamenta la necesidad de estandarizar comparaciones cuando N difiere.",
+    "Columna vertebral del capítulo: organiza el análisis en secuencia única.",
+    "Enriquece TD y prepara la transición hacia FD y PD bajo el mismo marco de Hill."
+  )
+)
+mostrar_tabla(comp,
+              caption = "Comparación de iNEXT (2016), iNEXT.4steps (2020) e iNEXT.3D (2021): aportes y complementariedad",
+              digits = 0)
+```
+
+---
+
+## B. Caso guiado: Diversidad beta y gamma con peces en ríos de México
+
+### 1. Diversidad beta y gamma con la propuesta de Whittaker
+
+#### b. Organización de los datos
+
+```{r}
+mostrar_tabla(as.data.frame(casoB1$gamma.est),
+              caption = "Estimadores de diversidad gamma: n = localidades, Riqueza = S obs., Chao, Jack1 y Bootstrap con sus errores estándar",
+              digits = 1)
+```
+
+#### c. Diversidad gamma (*γ*)
+
+La diversidad gamma observada corresponde al número total de especies registradas en el ensamblaje completo (impresa en consola durante la ejecución del script).
+
+#### d. Diversidad alfa promedio (*α*) por cada zona
+
+```{r}
+mostrar_tabla(as.data.frame(casoB1$alfa.est),
+              caption = "Estimadores de diversidad (S.obs, Chao1, ACE) y diversidad alfa promedio (Whittaker, 1960)",
+              digits = 1)
+```
+
+#### e. Diversidad beta (*β*)
+
+```{r}
+mostrar_tabla(casoB1$tab_beta_wb,
+              caption = "Diversidad beta observada y estimada (Whittaker): cociente gamma/alfa",
+              digits = 3)
+```
+
+#### f. Diversidad beta entre parejas de zonas (*β_W*)
+
+```{r}
+mostrar_tabla(casoB1$beta.est,
+              caption = "Índices de diversidad beta entre pares de zonas (Jaccard, Sørensen y Whittaker)",
+              digits = 3)
+```
+
+---
+
+### 2. Diversidad beta con la varianza en la composición de especies
+
+#### a. Diversidad beta general
+
+```{r}
+mostrar_tabla(casoB1$tab_dbeta,
+              caption = "Diversidad beta general (beta.div, Hellinger): SSTotal y BDTotal",
+              digits = 4)
+```
+
+#### b. Contribución de las especies a la diversidad beta — SCBD
+
+```{r}
+mostrar_tabla(casoB1$p_scbd,
+              caption = "Especies que más varían en las tres zonas (SCBD ≥ promedio y p < 0.05)",
+              digits = 3)
+```
+
+#### c. Contribución de las localidades a la diversidad beta — LCBD
+
+```{r}
+mostrar_tabla(casoB1$tab_lcbd,
+              caption = "Valores LCBD por localidad con prueba de permutación (p_holm = p ajustado por Holm)",
+              digits = 4)
+```
+
+#### d. Visualización de las localidades y su contribución a beta
+
+```{r}
+#| fig-cap: "Aportes de diversidad beta general con datos de abundancia (LCBD) por cada estación evaluada. El tamaño del punto es proporcional al LCBD; *** indica localidades con LCBD significativo."
+mostrar_figura("casoB1_fig_lcbd_georef.png")
+```
+
+---
+
+### 3. Diversidad beta en sus componentes de reemplazo o recambio, diferencia de riqueza
+
+#### a. Beta general con datos binarios (Podani & Schmera, 2011)
+
+```{r}
+if (!is.null(casoB2$beta.pod)) {
+  part <- round(casoB2$beta.pod$part, 3)
+  mostrar_tabla(as.data.frame(t(part)),
+                caption = "Estadísticos generales de la partición beta de Podani (Jaccard binario): BTotal, Repl, RichDiff",
+                digits = 3)
+}
+```
+
+```{r}
+#| fig-cap: "Patrón espacial de diferencias de riqueza de especies respecto al sitio de referencia 42"
+mostrar_figura("casoB2_fig_dif_riqueza_sitio42.png")
+```
+
+```{r}
+#| fig-cap: "Patrón espacial de los componentes de recambio y diferencia de riqueza respecto al sitio 42"
+mostrar_figura("casoB2_fig_componentes_apilados.png")
+```
+
+#### b. Beta por parejas de sitios (Familia Podani & Schmera, 2011)
+
+```{r}
+#| fig-cap: "Beta de Jaccard, diferencia de riqueza y recambio por pares de sitios vecinos"
+mostrar_figura("casoB2_fig_beta_parejas_vecinas.png")
+```
+
+#### c. Gráficos triangulares o símplex (Legendre 2014)
+
+```{r}
+#| fig-cap: "Gráficos triangulares de diversidad beta: (a) Jaccard, (b) Sørensen, (c) Ruzicka, (d) porcentaje de diferencias"
+mostrar_figura("casoB2_fig_triangulos_podani.png")
+```
+
+#### d. Clasificación de zonas por componentes de beta
+
+```{r}
+#| fig-cap: "Clasificación de las zonas según beta total, diferencia de riqueza y recambio (UPGMA, Jaccard binario)"
+mostrar_figura("casoB2_fig_dendogramas_zonas.png")
+```
+
+#### e. Clasificación de sitios por componentes de beta
+
+```{r}
+#| fig-cap: "Clasificación no jerárquica de los sitios por diversidad beta total, recambio y anidamiento (PAM + PCoA)"
+mostrar_figura("casoB2_fig_pam_pcoa_sitios.png")
+```
+
+#### f. Efecto de variables ambientales sobre componentes de beta (Legendre 2014)
+
+```{r}
+mostrar_tabla(casoB2$tab_rsq,
+              caption = "db-RDA: R² y p (anova) para recambio y diferencia de riqueza",
+              digits = 4)
+```
+
+```{r}
+mostrar_tabla(casoB2$amb2,
+              caption = "Variables ambientales con efecto significativo sobre la diferencia de riqueza (envfit, p < 0.05)",
+              digits = 4)
+```
+
+```{r}
+#| fig-cap: "Relación entre las variables ambientales y la diferencia de riqueza como componente de la diversidad beta de Podani (db-RDA)"
+mostrar_figura("casoB2_fig_dbrda_riqueza.png")
+```
+
+---
+
+### 4. Diversidad beta con estandarización de muestras y números efectivos q = 0, 1 y 2
+
+#### a. Organización de los datos
+
+```{r}
+mostrar_tabla(head(casoB3$result_b3),
+              caption = "Estimadores generales de diversidad alfa para las tres zonas comparadas (iNEXT, q = 0)",
+              digits = 1)
+```
+
+#### c. Organización de los datos por parejas de zonas
+
+```{r}
+mostrar_tabla(head(casoB3$biol.pares$M_vs_P, 6),
+              caption = "Resumen de la tabla de abundancias para la pareja de zonas M vs P (primeras 6 filas)",
+              digits = 0)
+```
+
+```{r}
+mostrar_tabla(head(casoB3$diversidad_abun_cov$M_vs_P$beta, 4),
+              caption = "Resumen de cuatro primeras filas con estimadores generales de diversidad beta para la pareja M vs P (basado en cobertura)",
+              digits = 3)
+```
+
+#### d. Componentes de diversidad gamma — *γ* y alfa — *α* por parejas de zonas
+
+```{r}
+#| fig-cap: "Rarefacción basada en el tamaño de la muestra y extrapolación 2n — diversidad gamma y alfa por parejas de zonas"
+mostrar_figura("casoB3_fig_inextbeta_tamano.png")
+```
+
+#### e. Visualización de diversidades gamma, alfa y beta con estandarización
+
+```{r}
+#| fig-cap: "Rarefacción y extrapolación basada en cobertura — diversidad gamma, alfa y beta por parejas de zonas (q = 0, 1 y 2)"
+mostrar_figura("casoB3_fig_inextbeta_cobertura.png")
+```
+
+---
+
+# Archivos generados
+
+## Tablas exportadas
+
+```{r}
+archivos_tab <- tibble(Archivo = list.files(tab_dir, full.names = FALSE))
+mostrar_tabla(archivos_tab, caption = "Archivos exportados en outputs/tablas/", digits = 0)
+```
+
+## Figuras exportadas
+
+```{r}
+archivos_fig <- tibble(Archivo = list.files(fig_dir, full.names = FALSE))
+mostrar_tabla(archivos_fig, caption = "Archivos exportados en outputs/figuras/", digits = 0)
+```
+
+---
+
+# Sesión de trabajo
+
+```{r}
+sessionInfo()
+```

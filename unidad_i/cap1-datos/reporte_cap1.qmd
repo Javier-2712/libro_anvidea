@@ -1,0 +1,350 @@
+---
+title: "ANVIDEA - Reporte reproducible"
+subtitle: "Capítulo 1. Fundamentos de manipulación de datos"
+author: "Javier Rodríguez-Barrios"
+date: last-modified
+lang: es
+
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: false
+    theme: cosmo
+    code-fold: false
+    embed-resources: true
+
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+::: {.callout-note}
+## Nota para el lector
+
+Este reporte complementa el Capítulo 1 de ANVIDEA. Su propósito es mostrar, de forma reproducible, las principales salidas generadas por los scripts del capítulo, siguiendo la secuencia didáctica de los casos guiados.
+:::
+
+```{r}
+#| include: false
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(htmltools)
+
+ruta_figuras  <- file.path("outputs", "figuras")
+ruta_tablas   <- file.path("outputs", "tablas")
+ruta_reportes <- file.path("outputs", "reportes")
+
+resA <- readRDS(file.path(ruta_reportes, "resultado_casoA.rds"))
+resB <- readRDS(file.path(ruta_reportes, "resultado_casoB.rds"))
+
+tabla_html <- function(df, caption = NULL, digits = 2, max_filas = NULL) {
+  if (is.null(df) || !is.data.frame(df) || ncol(df) == 0 || nrow(df) == 0) {
+    return(htmltools::HTML("<p><em>Tabla no disponible en esta ejecución.</em></p>"))
+  }
+  if (!is.null(max_filas)) df <- head(df, max_filas)
+  kableExtra::kbl(df, caption = caption, digits = digits,
+                  booktabs = TRUE, format = "html") %>%
+    kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria")
+}
+
+mostrar_figura <- function(fig, titulo = NULL, width = "85%") {
+  ruta <- file.path(ruta_figuras, fig)
+  if (!is.null(titulo)) cat("**", titulo, "**\n\n", sep = "")
+  if (file.exists(ruta)) {
+    cat("![](", ruta, "){fig-align='center' out-width='", width, "'}\n", sep = "")
+  } else {
+    cat("_Figura no disponible._\n")
+  }
+}
+```
+
+# Caso A. Mesozooplancton estuarino
+
+## 1. Selección y filtrado
+
+```{r}
+resA$datos_select %>%
+  tabla_html("Tabla 1. Selección de variables relevantes usando select().", max_filas = 12)
+```
+
+```{r}
+resA$datos_filtro %>%
+  tabla_html("Tabla 2. Filtrado de observaciones con temperatura superior a 28 °C.", max_filas = 12)
+```
+
+```{r}
+resA$biol_rel %>%
+  tabla_html("Tabla 3. Resumen de la tabulación de los datos con el comando mutate().", max_filas = 12)
+```
+
+## 3. Resumen estadístico de datos agrupados
+
+```{r}
+resA$datos_resumidos %>%
+  tabla_html("Tabla 4. Resumen estadístico de abundancia por estación y tamaño de malla.", max_filas = 12)
+```
+
+```{r}
+resA$datos_resumidos1 %>%
+  tabla_html("Tabla 5. Resumen estadístico de abundancia por estación, tamaño y capa.", max_filas = 12)
+```
+
+## 4. Transformación de datos
+
+```{r}
+resA$datos_largo %>%
+  tabla_html("Tabla 6. Datos en formato largo (variables ambientales apiladas).", max_filas = 12)
+```
+
+```{r}
+resA$datos_ancho %>%
+  tabla_html("Tabla 7. Datos reconvertidos a formato ancho.", max_filas = 12)
+```
+
+```{r}
+resA$biol_transformado %>%
+  tabla_html("Tabla 8. Comparación de datos originales y transformados.", max_filas = 12)
+```
+
+## 5. Transposición de datos
+
+```{r}
+resA$datos_transp %>%
+  tabla_html("Tabla 9. Matriz de abundancia: grupos taxonómicos (filas) × estaciones (columnas).", max_filas = 12)
+```
+
+```{r}
+resA$datos_transp1 %>%
+  tabla_html("Tabla 10. Reconversión de la matriz transpuesta al formato ancho.", max_filas = 12)
+```
+
+## 6. Unión de datos
+
+```{r}
+resA$biol1 %>%
+  tabla_html("Tabla 11. Integración de una variable categórica regional mediante left_join().", max_filas = 12)
+```
+
+## 7. Conversión de variables a factores
+
+```{r}
+resA$biol1 %>%
+  dplyr::select(Station, Size, Layers, Abundance, Temperature, Salinity, Region) %>%
+  head(12) %>%
+  tabla_html("Tabla 12. Resumen de la base de datos con variables etiquetadas como factores.")
+```
+
+## 8. Abreviar nombres de grupos biológicos
+
+```{r}
+resA$tabla_abrev %>%
+  tabla_html("Tabla 13. Resumen de la base de datos con nombres abreviados de las especies.", max_filas = 12)
+```
+
+```{r}
+resA$biol_ancho %>%
+  tabla_html("Tabla 14. Resumen de los datos en formato ancho con taxones abreviados en columnas.", max_filas = 12)
+```
+
+## 9. Seleccionar los 5 taxones más abundantes
+
+```{r}
+resA$abundantes %>%
+  tabla_html("Tabla 15. Organización de los cinco taxones por sus niveles de abundancia total.")
+```
+
+```{r}
+resA$biol_selec %>%
+  tabla_html("Tabla 16. Resumen de la organización de los datos en formato ancho para los taxones dominantes.", max_filas = 12)
+```
+
+## 10. Visualización de factores
+
+```{r results='asis'}
+mostrar_figura("casoA_fig_estacion.png",
+  "Figura 1. Variación en la abundancia del mesozooplancton para las seis estaciones evaluadas.")
+```
+
+```{r results='asis'}
+mostrar_figura("casoA_fig_capas.png",
+  "Figura 2. Variación de la abundancia del mesozooplancton para los dos niveles de profundidad.")
+```
+
+```{r results='asis'}
+mostrar_figura("casoA_fig_capas_facetas.png",
+  "Figura 3. Variación de la abundancia del mesozooplancton por niveles de profundidad, separadas por facetas.")
+```
+
+## 11. Categorizar una variable continua
+
+```{r results='asis'}
+mostrar_figura("casoA_fig_salinidad_terciles.png",
+  "Figura 4. Variación de la abundancia del mesozooplancton según terciles de salinidad.")
+```
+
+```{r}
+resA$resumen_salinidad %>%
+  tabla_html("Tabla 17. Resumen estadístico de la distribución de la salinidad.")
+```
+
+```{r}
+resA$biol_sal %>%
+  tabla_html("Tabla 18. Organización de los datos por diferentes categorías de salinidad.", max_filas = 12)
+```
+
+```{r}
+resA$tabla_cruce_salinidad %>%
+  tabla_html("Tabla 19. Tabla de frecuencia cruzada entre categoría de salinidad y zona estuarina.")
+```
+
+---
+
+# Caso B. Macroinvertebrados bentónicos fluviales
+
+## Carga de datos
+
+```{r}
+tibble(
+  hoja     = c("Taxones1", "Taxones2", "Fisicoquímica"),
+  filas    = c(resB$dim_inv1[1], resB$dim_inv2[1], resB$dim_fq[1]),
+  columnas = c(resB$dim_inv1[2], resB$dim_inv2[2], resB$dim_fq[2])
+) %>%
+  tabla_html("Tabla 20. Dimensiones generales de las hojas utilizadas en el Caso B.")
+```
+
+## 1. Selección y filtrado
+
+```{r}
+resB$inv1a %>%
+  tabla_html("Tabla 21. Resumen de la base de datos con los tres taxones seleccionados.", max_filas = 12)
+```
+
+```{r}
+resB$inv2a %>%
+  tabla_html("Tabla 22. Organización de las abundancias para los tres sitios evaluados.", max_filas = 12)
+```
+
+## 2. Creación de nuevas variables
+
+```{r}
+resB$inv1 %>%
+  tabla_html("Tabla 23. Resumen con la nueva variable Abundancia por sitio y microhábitat.", max_filas = 12)
+```
+
+## 3. Resumen estadístico por sitios
+
+```{r}
+resB$inv1b %>%
+  tabla_html("Tabla 24. Promedios de abundancia por cada sitio evaluado.")
+```
+
+## 4. Transformación de datos
+
+```{r}
+resB$inv2_log %>%
+  tabla_html("Tabla 25. Transformación log(x + 1) aplicada a la matriz biológica.", max_filas = 12)
+```
+
+## 5. Transposición de datos
+
+```{r}
+resB$inv2_long %>%
+  tabla_html("Tabla 26. Conversión de Taxones2 desde formato ancho a formato largo.", max_filas = 12)
+```
+
+## 6. Unión de datos
+
+```{r}
+resB$inv2_join %>%
+  tabla_html("Tabla 27. Unión entre datos bióticos y fisicoquímicos mediante Sitio.", max_filas = 12)
+```
+
+## 8. Abreviar nombres de grupos biológicos
+
+```{r}
+resB$diccionario_abrev %>%
+  tabla_html("Tabla 28. Diccionario de abreviaciones para nombres taxonómicos.")
+```
+
+## 9. Selección de los taxones más abundantes
+
+```{r}
+resB$inv2_dom5 %>%
+  tabla_html("Tabla 29. Cinco familias con mayor abundancia total (dominantes) en Taxones2.")
+```
+
+## 10. Visualización
+
+```{r results='asis'}
+mostrar_figura("casoB_fig_dom_familias.png",
+  "Figura 5. Distribución de las familias más abundantes de macroinvertebrados acuáticos.")
+```
+
+## 11. Categorizar una variable continua
+
+```{r}
+resB$fq_cat %>%
+  tabla_html("Tabla 30. Oxígeno disuelto categorizado (Bajo/Medio/Alto) por sitio.", max_filas = 12)
+```
+
+```{r}
+resB$tabla_oxigeno %>%
+  tabla_html("Tabla 31. Frecuencia de observaciones por categoría de oxígeno disuelto.")
+```
+
+## 12. Dominancia y Condición Ambiental
+
+```{r}
+resB$inv_dom_ox %>%
+  tabla_html("Tabla 32. Integración entre familias dominantes y categorías de oxígeno disuelto.", max_filas = 12)
+```
+
+```{r results='asis'}
+mostrar_figura("casoB_fig_dom_ox.png",
+  "Figura 6. Respuesta promedio (±EE) de las cinco familias dominantes a categorías de oxígeno disuelto.")
+```
+
+## 13. Gradientes Continuos y Comunidad
+
+```{r}
+resB$famil_ambiente %>%
+  tabla_html("Tabla 33. Integración entre abundancia total, riqueza y variables ambientales.", max_filas = 12)
+```
+
+```{r results='asis'}
+mostrar_figura("casoB_fig_ab_ox.png",
+  "Figura 7. Relación entre abundancia total y oxígeno disuelto.")
+```
+
+```{r results='asis'}
+mostrar_figura("casoB_fig_riq_cond.png",
+  "Figura 8. Relación entre riqueza de familias y conductividad.")
+```
+
+```{r results='asis'}
+mostrar_figura("casoB_fig_riq_ancho.png",
+  "Figura 9. Relación entre riqueza de familias y ancho del tramo.")
+```
+
+---
+
+# Archivos generados
+
+```{r}
+tibble(archivo = list.files(ruta_figuras)) %>%
+  tabla_html("Figuras exportadas en outputs/figuras.")
+```
+
+```{r}
+tibble(archivo = list.files(ruta_tablas)) %>%
+  tabla_html("Tablas exportadas en outputs/tablas.")
+```
+
+# Sesión de trabajo
+
+```{r}
+sessionInfo()
+```

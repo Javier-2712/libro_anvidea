@@ -1,0 +1,237 @@
+
+
+## A. Caso guiado: Diversidad alfa de peces en ríos de México
+
+### Cargar paquetes y lectura de bases de datos
+
+```{r, warning=FALSE, message=FALSE, eval=FALSE}
+library(tidyverse)    # Para diferentes operaciones
+library(readxl)   # Para la lectura de archivos de Excel
+library(corrplot) # Para las figuras de elipses
+library(vegan)    # Estimadores de diversidad
+library(ggrepel)  # Rótulos a los puntos de figuras en ggplot2
+library(kableExtra)   # Edición de las tablas
+library(viridis)
+library(dplyr)
+# Instalar la última versión de github para iNEXT
+# install.packages('devtools')
+library(devtools)
+#install_github('AnneChao/iNEXT.3D')
+library(iNEXT.3D)
+#install_github('AnneChao/iNEXT.4steps')
+library(iNEXT.4steps)
+library(iNEXT)
+```
+
+
+### 3. Comparación de zonas con GLMs y Permanovas
+
+#### a. Prueba con distribución Poisson y Binomial Negativa para una especie (GLM)
+
+```{r}
+#| message: false
+#| warning: false
+
+library(MASS)
+
+# Ajuste Poisson
+poisson <- glm(Pclm ~ Sites1, 
+                  family = "poisson", 
+                  data = biol1b) # biol1b, creada en la prueba de independencia.
+summary(poisson)
+```
+
+```{r, echo=FALSE}
+#| message: false
+#| warning: false
+
+# Ajuste Binomial Negativo
+mod_p <- glm(Pclm ~ Sites1, 
+             data = biol1b, 
+             family = poisson(link = "log"))
+
+mod_nb <- glm.nb(Pclm ~ Sites1, 
+                 data = biol1b, 
+                 start = coef(mod_p),
+                 control = glm.control(maxit = 200))
+summary(mod_nb)
+
+```
+
+```{r, echo=FALSE}
+#| message: false
+#| warning: false
+
+# Otra opción de diagnóstico binomial
+library(glmmTMB)
+
+
+# Modelo binomial negativo con efectos aleatorios - MUCHO más robusto
+bin_neg <- 
+  glmmTMB(Pclm ~ Sites1,
+          family = nbinom2,
+          data = biol1b)
+
+summary(bin_neg)
+```
+
+
+#### b. Evaluación conjunta del efecto de la zona sobre todas las especies (manyGLM)
+
+```{r, echo=FALSE}
+#| message: false
+#| warning: false
+
+# Librería requerida
+library(mvabund)
+
+# Excluir la primera columna (Sites1)
+Especies <- mvabund(biol1[,-1])  
+
+# GLM multivariado Poisson
+poisson <- 
+  manyglm(Especies ~ Sites1, 
+                   data = biol1, 
+          family = "poisson")
+summary(poisson)
+```
+
+
+#### c. Comparación de muestras con PERMANOVAS
+
+```{r, echo=FALSE}
+#| message: false
+#| warning: false
+
+library(vegan)
+
+# Eliminar posibles NA o datos faltantes en la tabla
+biol1 <- 
+  biol1 %>% 
+  na.omit()
+
+# Reemplazar los NA por 0
+biol1 <- 
+  biol1 %>%
+  mutate(across(-1, ~replace_na(., 0)))
+
+# Matriz de abundancias (sin columna Sites1)
+bray.dis <- vegdist(biol1[, 2:ncol(biol1)])
+
+# PERMANOVA por zona
+biol.permanova <- adonis2(bray.dis ~ Sites1, 
+                  data = biol1, permutations = 999)
+biol.permanova
+```
+
+
+#### d. Prueba de comparaciones múltiples del Pemanova
+
+```{r}
+#| message: false
+#| warning: false
+
+# Librería requerida
+library(RVAideMemoire)
+
+# Prueba Post Hoc del PERMANOVA con el paquete "RVAideMemoire"
+pairwise.perm.manova(bray.dis,biol1$Sites1, nperm=1000)
+```
+
+#### e. Análisis SIMPER
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+# Matriz de abundancias sin el factor de sitio
+biol3 <- 
+  biol1 %>% 
+  dplyr::select(-Sites1)
+
+# Análisis SIMPER
+simper <- 
+  simper(biol3, 
+         group = biol1$Sites1, 
+         permutations = 999)
+
+# Zonas comparadas - Para este caso las combinaciones generan son tres tablas
+# Tabla 1: "M_P", Tabla 2: "M_RM", Tabla 3: "P_RM"
+names(summary(simper))
+```
+
+```{r}
+#| label: tbl-c7-9
+#| tbl-cap: "a. Diez primeras especies ordenadas por valor-p (menor a mayor) en el SIMPER de zonas M vs P"
+#| echo: false
+#| message: false
+#| warning: false
+
+# 1) Simper de Tabla 1: "M_P"
+simper.M_P <- 
+  summary(simper)$"M_P" %>% 
+  as.data.frame() %>% 
+  rownames_to_column("Especies") %>% 
+  arrange(p) %>%                 # Ordenar por p de menor a mayor
+  slice_head(n = 10)
+  
+# Tabla ordenada
+simper.M_P %>% 
+  kbl(align = "lcccc", 
+      booktabs = TRUE, 
+      digits = 3) %>% 
+  kable_classic(full_width = T)
+
+```
+
+```{r}
+#| label: tbl-c7-10
+#| tbl-cap: "b. Diez primeras especies ordenadas por valor-p (menor a mayor) en el SIMPER de zonas M vs. RM"
+#| echo: false
+#| message: false
+#| warning: false
+
+# 2) Simper de Tabla 2: "M_RM"
+simper.M_RM <- 
+  summary(simper)$"M_RM" %>% 
+  as.data.frame() %>% 
+  rownames_to_column("Especies") %>% 
+  arrange(p) %>%                 # Ordenar por p de menor a mayor
+  slice_head(n = 10) 
+
+# Tabla 2: "M_RM" en formato kbl
+simper.M_RM %>% 
+  kbl(align = "lcccc", 
+      booktabs = TRUE, 
+      digits = 3) %>% 
+  kable_classic(full_width = T)
+
+```
+
+```{r}
+#| label: tbl-c7-11
+#| tbl-cap: "c. Diez primeras especies ordenadas por valor-p (menor a mayor) en el SIMPER de zonas M vs. RM"
+#| echo: false
+#| message: false
+#| warning: false
+
+# 3) Simper de Tabla 3: "P_RM"
+simper.P_RM <- 
+  summary(simper)$"P_RM" %>% 
+  as.data.frame() %>% 
+  rownames_to_column("Especies") %>% 
+  arrange(p) %>%                 # Ordenar por p de menor a mayor
+  slice_head(n = 10) 
+
+# Tabla 3: "P_RM" en formato kbl
+simper.P_RM %>% 
+  kbl(align = "lcccc", 
+      booktabs = TRUE, 
+      digits = 3) %>% 
+  kable_classic(full_width = T)
+```
+
+
+
+

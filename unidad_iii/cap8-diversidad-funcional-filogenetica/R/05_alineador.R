@@ -1,10 +1,11 @@
 # =========================================================
 # ANVIDEA - Unidad III
 # Capítulo 8 - Diversidad funcional y filogenética
-# Archivo: 05_alineador_final.R
+# Archivo: 05_alineador.R
 # Propósito: alinear matrices de abundancia por pares con un árbol
 #            filogenético, reordenando especies, rellenando ausencias
 #            con ceros y generando un reporte de la alineación.
+# Basado en: alineador.R (Chao Lab / ANVIDEA)
 # =========================================================
 
 if (!requireNamespace("ape", quietly = TRUE)) {

@@ -1,6 +1,6 @@
-Capítulo 8 - Archivos requeridos
+Capítulo 8 — Archivos requeridos en data/raw/
 
-Ubique en esta carpeta:
+Ubique aquí los archivos de entrada antes de ejecutar los scripts:
 
 1. datos.c8.xlsx
    Hojas esperadas:
@@ -8,9 +8,22 @@ Ubique en esta carpeta:
    - tax1
    - rasgos
    - coord
-   - amb
 
-2. arbol_filo_alfa.rds
-3. arbol_filo_beta.rds
+2. Rao.R
+   Función original para la partición de la diversidad de Rao
+   (incluida en este repositorio).
 
-No cambie los nombres de los archivos, a menos que también ajuste las rutas dentro de los scripts.
+3. arbol_filo_alfa.rds
+   Árbol filogenético para los análisis alfa (Caso A y B.1).
+
+4. arbol_filo_beta.rds
+   Árbol filogenético para los análisis beta (Caso B.2).
+
+5. biol_PD_beta.rds
+   Matriz de abundancias para el análisis beta filogenético (Caso B.2).
+
+No cambie los nombres de los archivos, a menos que también ajuste las rutas
+dentro de los scripts.
+
+Para más detalles sobre la organización de los datos y los requisitos de
+cada archivo, consulte el README del capítulo y las páginas 497-498 del libro.

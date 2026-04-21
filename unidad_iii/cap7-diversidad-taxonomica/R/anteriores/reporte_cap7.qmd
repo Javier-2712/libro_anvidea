@@ -1,0 +1,343 @@
+---
+title: "ANVIDEA - Reporte reproducible"
+subtitle: "Capítulo 6. Patrones de distribución y estimación de la densidad"
+author: "Javier Rodríguez-Barrios"
+date: today
+lang: es
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    embed-resources: false
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+::: {.callout-note}
+## Nota para el lector
+Este reporte complementa el Capítulo 6 de **ANVIDEA**. Su propósito no es solo listar archivos generados, sino **mostrar e interpretar** las principales salidas producidas por los casos guiados del capítulo, manteniendo una lógica cercana al libro y útil para estudiantes que están aprendiendo a relacionar cálculos, tablas, figuras e interpretación ecológica.
+:::
+
+```{r}
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+
+ruta_rds <- file.path("outputs", "reportes", "resultado_cap6.rds")
+if (!file.exists(ruta_rds)) {
+  stop("No se encontró el archivo resultado_cap6.rds en: ", normalizePath(ruta_rds, mustWork = FALSE))
+}
+
+res <- readRDS(ruta_rds)
+
+fig_dir <- file.path("outputs", "figuras")
+tab_dir <- file.path("outputs", "tablas")
+
+fig_existe <- function(nombre) file.exists(file.path(fig_dir, nombre))
+
+mostrar_tabla <- function(x, caption = NULL, digits = 3, n = NULL) {
+  if (is.null(x)) {
+    cat("*No disponible en el objeto consolidado.*\n")
+  } else {
+    if (!is.null(n)) x <- head(x, n)
+    x %>%
+      kbl(booktabs = TRUE, longtable = TRUE, digits = digits, caption = caption) %>%
+      kable_classic(full_width = FALSE, html_font = "Cambria")
+  }
+}
+
+casoA <- res$casoA
+casoB <- res$casoB
+
+resumen_general <- tibble(
+  caso = c("Caso A", "Caso B"),
+  descripcion = c(
+    "Patrones de distribución espacial",
+    "Estimación de la densidad mediante métodos de distancia"
+  ),
+  estado = c(if (!is.null(casoA)) "Disponible" else "No disponible",
+             if (!is.null(casoB)) "Disponible" else "No disponible")
+)
+```
+
+# Resumen general del capítulo
+
+En este capítulo se integran dos aproximaciones complementarias de la ecología de poblaciones. En el **Caso A** se evalúa cómo se distribuyen los individuos en el espacio mediante frecuencias, modelos probabilísticos e índices de dispersión. En el **Caso B** se estima la densidad poblacional a partir de distancias observadas en campo, comparando tres métodos clásicos: **Holgate, King y Hayne**.
+
+```{r}
+mostrar_tabla(resumen_general, "Casos guiados procesados en este reporte", digits = 0)
+```
+
+# Caso A. Patrones de distribución espacial
+
+## Propósito del análisis
+
+El objetivo de este caso es decidir si la distribución de los individuos en las unidades de muestreo se aproxima a un patrón **aleatorio**, **agregado** o **regular**, usando para ello:
+
+- frecuencias observadas de individuos por unidad de muestreo;
+- ajuste a la distribución de **Poisson**;
+- ajuste a la **Binomial Negativa**;
+- índices de dispersión que resumen el comportamiento espacial.
+
+## Descripción de la muestra
+
+Las frecuencias observadas constituyen el punto de partida del análisis, pues muestran cuántas unidades muestrales presentaron 0, 1, 2, 3 o más individuos.
+
+```{r}
+mostrar_tabla(casoA$tab_freq, "Frecuencia observada de individuos por unidad muestral", digits = 0)
+```
+
+```{r}
+if (!is.null(casoA$tab_freq)) {
+  total_unidades <- sum(casoA$tab_freq$frecuencia, na.rm = TRUE)
+  total_individuos <- sum(casoA$tab_freq$individuos * casoA$tab_freq$frecuencia, na.rm = TRUE)
+  media_muestral <- total_individuos / total_unidades
+  cat(paste0(
+    "La muestra resume ", total_unidades, " unidades de observación y ",
+    total_individuos, " individuos en total, con un promedio de ",
+    round(media_muestral, 3), " individuos por unidad muestral."
+  ))
+}
+```
+
+## Ajuste a la distribución de Poisson
+
+La distribución de Poisson representa el modelo clásico de una disposición **aleatoria** de individuos en el espacio. Si el ajuste es razonable, las frecuencias esperadas por Poisson deberían parecerse a las observadas.
+
+```{r}
+mostrar_tabla(casoA$tab_pois, "Frecuencias observadas y esperadas bajo Poisson", digits = 3)
+```
+
+### Agrupación para la prueba de bondad de ajuste
+
+Cuando algunas clases tienen frecuencias esperadas bajas, conviene agruparlas para aplicar con mayor estabilidad la prueba de chi-cuadrado.
+
+```{r}
+mostrar_tabla(casoA$tab_pois_agrupada, "Frecuencias agrupadas para la prueba de chi-cuadrado (Poisson)", digits = 3)
+```
+
+### Interpretación preliminar del ajuste a Poisson
+
+```{r}
+if (!is.null(casoA$resumen_ajustes) && "modelo" %in% names(casoA$resumen_ajustes)) {
+  fila_pois <- casoA$resumen_ajustes %>% filter(str_detect(tolower(modelo), "poisson"))
+  if (nrow(fila_pois) > 0) {
+    cat("El ajuste a Poisson se usa como referencia de aleatoriedad. Su comparación con la Binomial Negativa permitirá decidir si existe evidencia de agregación espacial.")
+  }
+}
+```
+
+## Ajuste a la Binomial Negativa
+
+La Binomial Negativa suele describir mejor distribuciones **agregadas** o contagiosas, porque incorpora un parámetro adicional asociado a la concentración de individuos en ciertas unidades muestrales.
+
+```{r}
+mostrar_tabla(casoA$tab_bn, "Frecuencias observadas y esperadas bajo Binomial Negativa", digits = 3)
+```
+
+### Agrupación para la prueba de bondad de ajuste
+
+```{r}
+mostrar_tabla(casoA$tab_bn_agrupada, "Frecuencias agrupadas para la prueba de chi-cuadrado (Binomial Negativa)", digits = 3)
+```
+
+## Comparación entre modelos
+
+La comparación de ajustes permite decidir cuál distribución representa mejor los datos observados. En general, si la **Binomial Negativa** supera a Poisson, ello sugiere una tendencia hacia la **agregación espacial**.
+
+```{r}
+mostrar_tabla(casoA$resumen_ajustes, "Resumen comparativo de los ajustes probabilísticos", digits = 3)
+```
+
+```{r}
+if (!is.null(casoA$resumen_ajustes) && all(c("modelo", "AIC") %in% names(casoA$resumen_ajustes))) {
+  mejor <- casoA$resumen_ajustes %>% arrange(AIC) %>% slice(1)
+  cat(paste0(
+    "Con base en el criterio AIC, el modelo con mejor desempeño relativo fue **",
+    mejor$modelo,
+    "**. Esta comparación debe interpretarse junto con los índices de dispersión y la inspección gráfica de las frecuencias."
+  ))
+}
+```
+
+## Índices de dispersión
+
+Los índices de dispersión resumen el patrón espacial de la población y permiten reforzar la interpretación obtenida con los ajustes probabilísticos.
+
+```{r}
+mostrar_tabla(casoA$indices_disp, "Índices de dispersión del patrón espacial", digits = 3)
+```
+
+```{r}
+if (!is.null(casoA$indices_disp)) {
+  ind <- casoA$indices_disp[1, , drop = FALSE]
+  texto_patron <- NULL
+  if ("ID" %in% names(ind)) {
+    if (is.finite(ind$ID) && ind$ID > 1) texto_patron <- "agregado"
+    if (is.finite(ind$ID) && abs(ind$ID - 1) < 0.1) texto_patron <- "aproximadamente aleatorio"
+    if (is.finite(ind$ID) && ind$ID < 1) texto_patron <- "regular"
+  }
+  if (!is.null(texto_patron)) {
+    cat(paste0(
+      "El índice de dispersión (ID) sugiere un patrón **", texto_patron,
+      "**, aunque esta conclusión debe integrarse con los demás indicadores del análisis."
+    ))
+  }
+}
+```
+
+## Figura síntesis del Caso A
+
+La siguiente figura permite comparar visualmente las frecuencias observadas con las esperadas bajo los modelos evaluados.
+
+```{r}
+ruta_fig_a <- c(
+  file.path(fig_dir, "casoA_distribucion_poisson_bn.png"),
+  file.path(fig_dir, "cap6_poisson_vs_binomial_negativa.png"),
+  file.path(fig_dir, "casoA_fig_poisson.png"),
+  file.path(fig_dir, "casoA_fig_binomial_negativa.png")
+)
+ruta_fig_a <- ruta_fig_a[file.exists(ruta_fig_a)][1]
+
+if (length(ruta_fig_a) == 0 || is.na(ruta_fig_a)) {
+  cat("*No se encontró una figura síntesis exportada para el Caso A.*")
+} else {
+  knitr::include_graphics(ruta_fig_a)
+}
+```
+
+## Síntesis interpretativa del Caso A
+
+En conjunto, este caso permite decidir si la distribución observada de los individuos se aproxima mejor a una situación aleatoria o a una agregada. La decisión final no debe basarse en una sola tabla, sino en la convergencia entre **frecuencias**, **bondad de ajuste**, **AIC** e **índices de dispersión**.
+
+# Caso B. Estimación de la densidad
+
+## Propósito del análisis
+
+El segundo caso guiado se centra en la **estimación de la densidad poblacional** a partir de distancias. Este enfoque es útil cuando no se dispone de conteos directos por área y se trabaja con información de proximidad entre individuos o entre puntos de muestreo e individuos.
+
+## Método de Holgate
+
+Este método utiliza la distancia cuadrática como base para estimar la densidad. El resumen siguiente presenta los datos empleados y la densidad estimada.
+
+```{r}
+mostrar_tabla(casoB$datos_holgate, "Datos empleados en el método de Holgate", digits = 3, n = 10)
+```
+
+```{r}
+mostrar_tabla(casoB$res_holgate, "Resumen del método de Holgate", digits = 4)
+```
+
+## Método de King
+
+El método de King se basa en la distancia media observada y permite obtener una estimación de la densidad por unidad de área.
+
+```{r}
+mostrar_tabla(casoB$datos_king_hayne, "Datos empleados en los métodos de King y Hayne", digits = 3, n = 10)
+```
+
+```{r}
+mostrar_tabla(casoB$res_king, "Resumen del método de King", digits = 4)
+```
+
+## Método de Hayne
+
+El método de Hayne utiliza el inverso de la distancia, por lo que suele ser más sensible a observaciones pequeñas. Esto puede producir diferencias importantes frente a otros métodos.
+
+```{r}
+mostrar_tabla(casoB$res_hayne, "Resumen del método de Hayne", digits = 4)
+```
+
+## Comparación entre métodos
+
+La comparación conjunta de las densidades estimadas permite valorar la sensibilidad de cada método y discutir cuál podría ser más razonable para el sistema ecológico analizado.
+
+```{r}
+mostrar_tabla(casoB$resumen_densidad_metodos, "Comparación entre métodos de estimación de densidad", digits = 4)
+```
+
+```{r}
+if (!is.null(casoB$resumen_densidad_metodos) && all(c("metodo", "densidad_ha") %in% names(casoB$resumen_densidad_metodos))) {
+  mayor <- casoB$resumen_densidad_metodos %>% arrange(desc(densidad_ha)) %>% slice(1)
+  menor <- casoB$resumen_densidad_metodos %>% arrange(densidad_ha) %>% slice(1)
+  cat(paste0(
+    "Entre los métodos comparados, **", mayor$metodo, "** produjo la mayor estimación de densidad por hectárea, mientras que **",
+    menor$metodo, "** produjo la menor. Esta diferencia es útil para discutir supuestos, sensibilidad y posibles sesgos asociados al procedimiento de muestreo."
+  ))
+}
+```
+
+## Figuras del Caso B
+
+### Histograma para el método de King
+
+```{r}
+ruta_king <- c(
+  file.path(fig_dir, "casoB_histograma_king.png"),
+  file.path(fig_dir, "cap6_histograma_king.png"),
+  file.path(fig_dir, "casoB_fig_hist_king.png")
+)
+ruta_king <- ruta_king[file.exists(ruta_king)][1]
+if (length(ruta_king) == 0 || is.na(ruta_king)) cat("*No se encontró el archivo correspondiente.*") else knitr::include_graphics(ruta_king)
+```
+
+### Histograma para el método de Hayne
+
+```{r}
+ruta_hayne <- c(
+  file.path(fig_dir, "casoB_histograma_hayne.png"),
+  file.path(fig_dir, "cap6_histograma_hayne.png"),
+  file.path(fig_dir, "casoB_fig_hist_hayne.png")
+)
+ruta_hayne <- ruta_hayne[file.exists(ruta_hayne)][1]
+if (length(ruta_hayne) == 0 || is.na(ruta_hayne)) cat("*No se encontró el archivo correspondiente.*") else knitr::include_graphics(ruta_hayne)
+```
+
+### Comparación gráfica entre métodos
+
+```{r}
+ruta_comp <- c(
+  file.path(fig_dir, "casoB_comparacion_metodos_densidad.png"),
+  file.path(fig_dir, "cap6_metodos_densidad_distancias.png"),
+  file.path(fig_dir, "casoB_fig_comparacion_densidad.png")
+)
+ruta_comp <- ruta_comp[file.exists(ruta_comp)][1]
+if (length(ruta_comp) == 0 || is.na(ruta_comp)) cat("*No se encontró el archivo correspondiente.*") else knitr::include_graphics(ruta_comp)
+```
+
+## Síntesis interpretativa del Caso B
+
+La comparación entre Holgate, King y Hayne muestra que la densidad poblacional no es un valor único e independiente del método, sino una **estimación** condicionada por los supuestos matemáticos y por la forma en que se resume la información de distancias. Esta es una oportunidad pedagógica importante para discutir incertidumbre, sensibilidad metodológica y alcance ecológico de cada estimador.
+
+# Archivos generados
+
+## Tablas exportadas
+
+```{r}
+archivos_tablas <- tibble(
+  archivo = list.files(tab_dir, full.names = FALSE)
+)
+mostrar_tabla(archivos_tablas, "Archivos encontrados en outputs/tablas/", digits = 0)
+```
+
+## Figuras exportadas
+
+```{r}
+archivos_figuras <- tibble(
+  archivo = list.files(fig_dir, full.names = FALSE)
+)
+mostrar_tabla(archivos_figuras, "Archivos encontrados en outputs/figuras/", digits = 0)
+```
+
+# Conclusión general del capítulo
+
+La ejecución reproducible del Capítulo 6 permite articular dos dimensiones clave de la ecología de poblaciones: por una parte, la **organización espacial** de los individuos y, por otra, la **cuantificación de su densidad**. En conjunto, los dos casos guiados muestran que la interpretación ecológica surge de la relación entre datos, modelos, supuestos y representación gráfica, no solo de una fórmula aislada.
+
+# Sesión de trabajo
+
+```{r}
+sessionInfo()
+```

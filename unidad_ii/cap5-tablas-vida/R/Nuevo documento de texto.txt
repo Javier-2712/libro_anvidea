@@ -1,0 +1,55 @@
+Listo, te adjunto el caso guiado A2.
+
+Qué opinas de ir pensando en esta arquitectura del capítulo:
+
+"
+
+cap5-tablas-vida/
+
+├── README.md
+
+├── run_cap5.R
+
+├── limpiar_outputs.R
+
+├── reporte_cap5.qmd
+
+├── data/
+
+│   └── raw/
+
+│       └── datos.c5.xlsx
+
+├── outputs/
+
+│   ├── figuras/
+
+│   ├── tablas/
+
+│   └── reportes/
+
+├── R/
+
+│   ├── 00_setup.R
+
+│   ├── 01_casoA1_tabla_vida_edad.R
+
+│   ├── 02_casoA2_tabla_vida_gotelli.R
+
+│   ├── 03_casoB_modelo_leslie.R
+
+│   ├── 04_casoC_modelo_lefkovitch.R
+
+│   ├── 05_funciones_auxiliares.R
+
+│   ├── 06_06_render_reporte.R
+
+│   └── 07_07_guardar_salidas_cap5.R
+
+└── scripts_cap5/
+
+    ├── 5_t.v_edad_estado.qmd
+
+    └── 5_t.v_edad_estado_scripts.qmd
+
+"

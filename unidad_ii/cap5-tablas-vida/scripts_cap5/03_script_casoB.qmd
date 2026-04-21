@@ -1,0 +1,489 @@
+
+
+
+## Casos guiados en dinámica poblacional estructurada
+
+## B. Caso guiado: Proyección de poblaciones estructuradas por edad (Leslie)
+
+------------------------------------------------------------------------
+
+#### Paso 1. Estimadores de estructura de edad: $F_{(pre)},\ F_{(post)},\ S_{(x)},\ c_{(x)},\  v_{(x)}$.
+
+```{r, echo=FALSE}
+#-------
+# Se incluyen en el siguiente kbl() como:  
+# "e^{rx}/lx","e^{-ry}·ly·my)", "Σ(e^{-ry}·ly·my)"  
+# Se excluyen para resumir el tamaño de la tabla
+#-------
+
+# Impresión de la tabla
+tabla2 %>%
+  kbl(digits = 2,
+    col.names = c(
+      "x","Nx","lx","mx","Sx",
+      "F(pre)","F(post)",
+      "lx·e^{-rx}","c(x)",
+      "v(x)","v(x) norm"
+    ),
+      booktabs  = TRUE) %>% 
+  kable_classic(full_width = FALSE) %>% 
+  kable_styling(
+    full_width = FALSE,
+    font_size  = 10,
+    latex_options = c("repeat_header")  
+  )
+```
+
+------------------------------------------------------------------------
+
+#### Paso 2. Matrices de Leslie: $L$ (pre y post reproductivas)
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+# Cargar la base de datos "tabla2"
+library(readr)
+tabla2 <- read_xlsx("datos.c5.xlsx", sheet = "t.vida")
+
+# -----------------------------
+# Vectores necesarios
+# -----------------------------
+edades  <- tabla2$x        # edades: 0,1,2,3,4
+Fpre    <- tabla2$Fpre     # fecundidades pre-reproductivas
+Fpost   <- tabla2$Fpost    # fecundidades post-reproductivas
+Sx      <- tabla2$Sx       # supervivencia de x -> x+1  (S0, S1, ..., S_(k-1); último suele ser 0)
+k       <- length(edades)  # aquí: 5
+
+# Chequeos mínimos
+stopifnot(k >= 2, length(Fpre) >= k, length(Fpost) >= k, length(Sx) >= k-1)
+
+# =============================
+# Matriz de Leslie PRE (4x4)
+#  - Trunca la última edad (no aporta fecundidad/continuación)
+#  - Subdiagonal inicia en S1 (transición 1->2, 2->3, 3->4 dentro del truncamiento)
+# =============================
+k_pre       <- k - 1                 # 4
+edades_pre  <- edades[1:k_pre]       # 0..3
+Fpre_pre    <- Fpre[1:k_pre]         # Fpre para 0..3
+
+# Subdiagonal PRE: S1, S2, S3 (longitud = k_pre-1)
+stopifnot(length(Sx) >= k_pre)       # necesitas al menos S3
+Sx_pre      <- Sx[2:k_pre]
+
+L_pre <- matrix(0, nrow = k_pre, ncol = k_pre)
+L_pre[1, ] <- Fpre_pre
+if (k_pre > 1) {
+  L_pre[cbind(2:k_pre, 1:(k_pre - 1))] <- Sx_pre
+}
+
+dimnames(L_pre) <- list(paste0("Edad_", edades_pre),
+                        paste0("Edad_", edades_pre))
+
+# =============================
+# Matriz de Leslie POST (5x5)
+#  - Completa (todas las edades)
+#  - Subdiagonal inicia en S0 (transición 0->1)
+# =============================
+L_post <- matrix(0, nrow = k, ncol = k)
+L_post[1, ] <- Fpost
+if (k > 1) {
+  # subdiagonal: filas 2:k, columnas 1:(k-1) reciben S0..S_(k-2)
+  L_post[cbind(2:k, 1:(k - 1))] <- Sx[1:(k - 1)]
+}
+
+dimnames(L_post) <- list(paste0("Edad_", edades),
+                         paste0("Edad_", edades))
+
+# -----------------------------
+# Impresión
+# -----------------------------
+kable(L_pre,
+      booktabs = TRUE,
+      digits = 2,
+      align = "c") %>%
+  kable_styling(full_width = FALSE,
+                position = "center",
+                font_size = 9,
+                latex_options = c("hold_position", "scale_down"))
+
+kable(L_post,
+      booktabs = TRUE,
+      digits = 2,
+      align = "c") %>%
+  kable_styling(full_width = FALSE,
+                position = "center",
+                font_size = 9,
+                latex_options = c("hold_position", "scale_down"))
+```
+
+------------------------------------------------------------------------
+
+#### Paso 3. Modelación matricial multi-edad (pre y post reproductiva)
+
+##### a.) Proyección post-reproductiva
+
+------------------------------------------------------------------------
+
+**Paso 1.** Cargar el vector de Edades $(N_t)$ y el número de periodos a
+proyectar en el modelo $(t)$.
+
+```{r, echo=FALSE}
+# Población inicial (hipotética)
+Nt <- tabla_v$Nx
+Nt
+
+# Número de periodos a proyectar en el modelo
+t <- 12
+t
+```
+
+**Paso 2.** Función `modelo_pob` para automatizar
+$(N_{(t+1)} = L \cdot N_{(t)})$
+
+```{r, echo=FALSE}
+# Funcion (modelo_pob) para modelar la población por las diferentes Edades en el tiempo.
+# 1) Elementos de la modelación (Matriz de Leslie - L, Vector de Abundancias - Nt y Periodos a modelar - t)
+library(purrr)  # proporciona set_names()
+
+modelo_pob <- function(L, Nt, t) {
+  k <- length(Nt)
+  out <- matrix(NA_real_, nrow = t + 1, ncol = k)
+  out[1, ] <- Nt
+  for (i in 1:t) out[i + 1, ] <- L %*% out[i, ]
+  as.data.frame(out) %>% 
+    purrr::set_names(paste0("Edad_", seq_len(k)))
+}
+```
+
+**Paso 3.** Simulación de la proyección $(N_{(t+1)} = L\ . N_{(t)})$
+(@tbl-c5-17)
+
+```{r, echo=FALSE}
+#| label: tbl-c5-17
+#| tbl-cap: "Resumen de la simulación de la proyección del vector de edades, para los seis primeros intervalos de tiempo"
+
+# 1) Usar la función creada para el producto L x Nt
+simulacion <- modelo_pob(as.matrix(L_post), Nt, t)
+
+# 2) Crear la columna Tiempo
+simulacion <- simulacion %>%
+  mutate(Tiempo = 0:(nrow(simulacion)-1))
+
+# 3) Reordenar columnas para que Tiempo sea la primera columna
+simulacion <- simulacion %>%
+  select(Tiempo, everything())
+
+# 4) Visualización rápida (redondeo)
+colnames(simulacion) <- c("Tiempo", "Edad_0","Edad_1",
+                          "Edad_2","Edad_3","Edad_4")
+
+# 5) Mostrar un resumen redondeado
+head(round(simulacion)) %>%
+  kbl(booktabs  = TRUE, 
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+
+```
+
+```{r, echo=FALSE}
+#| label: tbl-c5-18
+#| tbl-cap: "Resumen de la simulación post-reproductiva en formato largo"
+
+# 6) Convertir a formato largo
+simulacion_l <- simulacion %>%
+  pivot_longer(cols = -Tiempo, 
+               names_to = "Edad", 
+               values_to = "Abundancia") %>%
+  mutate(Abundancia = round(Abundancia, 0))
+
+# Mostrar un resumen de la simulación en formato largo
+head(simulacion_l) %>%
+  kbl(booktabs  = TRUE, 
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+**Paso 4.** Figura de la proyección multi-Edad
+
+```{r, echo=FALSE}
+#| label: fig-c5-9
+#| fig-cap: Proyección post-reproductiva de la población por las diferentes edades censadas
+#| fig-pos: 'H'
+
+ggplot(simulacion_l, aes(x = Tiempo, y = Abundancia, color = Edad)) +
+  geom_point(size = 3) +
+  geom_line() +
+  labs(x = "Períodos de tiempo (años)",
+       y = "Densidad (Nx)",
+       color = "Edades",
+       title = "Proyección Post-Reproductiva") +
+  scale_x_continuous(breaks = seq(min(simulacion_l$Tiempo),
+                                  max(simulacion_l$Tiempo), by = 2)) +
+  theme_bw() +
+  theme(axis.text = element_text(size = 13),
+        axis.title.x = element_text(size = 13),
+        axis.title.y = element_text(size = 13),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+```
+
+------------------------------------------------------------------------
+
+**Paso 5.** Tasa de crecimiento asintótica ($\lambda$), distribución
+estable por Edades $c_x$ y valor reproductivo normalizado $v_x^{norm}$
+del censo post-reproductivo.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# =========================================
+# Autovalores / Autovectores de L_post
+# =========================================
+A <- as.matrix(L_post)
+
+# 1) Autovalor y autovector derecho (estructura estable)
+eigR <- eigen(A)
+
+posR   <- which.max(Mod(eigR$values))     # índice del autovalor dominante
+lambda <- Re(eigR$values[posR])           # λ (dominante)
+w      <- Re(eigR$vectors[, posR])        # autovector derecho asociado
+cx     <- w / sum(w)                      # distribución estable c_x
+
+# 2) Autovector izquierdo (valor reproductivo)
+eigL <- eigen(t(A))
+
+posL   <- which.max(Mod(eigL$values))     # dominante para la transpuesta
+v      <- Re(eigL$vectors[, posL])        # autovector izquierdo asociado
+v_norm <- v / v[1]                        # normalización: v0 = 1
+
+if (sum(cx) < 0) cx <- -cx
+if (v_norm[1] < 0) v_norm <- -v_norm
+
+# 3) Tasa instantánea
+r <- log(lambda)
+
+# ----------- Salidas ordenadas -----------
+cat("a) Tasa instantánea de aumento (r)\n\n")
+print(round(r, 6))
+
+cat("\n\nb) Tasa finita post-reproductiva (lambda)\n\n")
+print(round(lambda, 6))
+
+cat("\n\nc) Distribución estable de edades (c_x)\n\n")
+print(round(setNames(cx, rownames(A)), 5))
+
+cat("\n\nd) Valor reproductivo normalizado (v_x^norm)\n\n")
+print(round(setNames(v_norm, rownames(A)), 5))
+```
+
+------------------------------------------------------------------------
+
+##### b.) Proyección pre-reproductiva
+
+-   **Paso 1.** Cargar el vector de Edades $(N_t)$
+
+-   **Paso 2.** Función `modelo_pob` para automatizar
+    $(N_{t+1} = L \cdot N_{t})$
+
+**Paso 3.** Simulación de la proyección $(N_{t+1} = L\ . N_{t})$
+
+```{r, echo=FALSE}
+#| label: tbl-c5-19
+#| tbl-cap: "Resumen de la simulación de la proyección del vector de edades, para los seis primeros intervalos de tiempo"
+
+# 1) Usar la función creada para el producto L x Nt
+Nt_pre <- Nt[1:4]   
+t_pre  <- 12
+
+simulacion <- modelo_pob(as.matrix(L_pre), Nt_pre, t_pre)
+
+
+# 2) Crear la columna Tiempo
+simulacion <- 
+  simulacion %>%
+  mutate(Tiempo = 0:(nrow(simulacion)-1))
+
+# 3) Reordenar columnas para que Tiempo sea la primera columna
+simulacion <- 
+  simulacion %>%
+  select(Tiempo, everything())
+
+# 4) Visualización rápida (redondeo)
+colnames(simulacion) <- c("Tiempo", "Edad_0","Edad_1",
+                          "Edad_2", "Edad_3")
+# 5) Mostrar un resumen redondeado
+head(round(simulacion)) %>%
+  kbl(booktabs  = TRUE, 
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+
+```
+
+
+```{r, message=FALSE, echo=FALSE}
+#| label: tbl-c5-20
+#| tbl-cap: "Resumen de la simulación en formato largo"
+
+# 3) Convertir a formato largo
+simulacion_l <- 
+  simulacion %>%
+  pivot_longer(cols = -Tiempo, 
+               names_to = "Edad", 
+               values_to = "Abundancia") %>%
+  mutate(Abundancia = round(Abundancia, 0))
+
+# Mostrar un resumen de la simulación en formato largo
+head(simulacion_l) %>%
+  kbl(booktabs  = TRUE,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+**Paso 4.** Figura de la proyección multi-Edad (@fig-c5-10)
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#| label: fig-c5-10
+#| fig-cap: Proyección pe-reproductiva de la población por las diferentes edades censadas
+#| fig-pos: 'H'
+
+ggplot(simulacion_l, aes(x = Tiempo, y = Abundancia, color = Edad)) +
+  geom_point(size = 3) +
+  geom_line() +
+  labs(x = "Períodos de tiempo (años)",
+       y = "Densidad (Nx)",
+       color = "Edades",
+       title = "Proyección Pre-Reproductiva") +
+  scale_x_continuous(breaks = seq(min(simulacion_l$Tiempo),
+                                  max(simulacion_l$Tiempo), by = 2)) +
+  theme_bw() +
+  theme(axis.text = element_text(size = 13),
+        axis.title.x = element_text(size = 13),
+        axis.title.y = element_text(size = 13),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+```
+
+------------------------------------------------------------------------
+
+**Paso 6.** Tasa de crecimiento asintótica ($\lambda$), distribución
+estable por Edades $c_x$ y valor reproductivo normalizado $v_x^{norm}$
+del censo pre-reproductivo.
+
+```{r, echo=FALSE}
+# =========================================
+# Autovalores / Autovectores de L_pre
+# =========================================
+A <- as.matrix(L_pre)
+
+# 1) Autovalor y autovector derecho (estructura estable)
+eigR <- eigen(A)
+
+posR   <- which.max(Mod(eigR$values))
+lambda <- Re(eigR$values[posR])
+w      <- Re(eigR$vectors[, posR])
+cx     <- w / sum(w)
+
+# 2) Autovector izquierdo (valor reproductivo)
+eigL <- eigen(t(A))
+
+posL   <- which.max(Mod(eigL$values))
+v      <- Re(eigL$vectors[, posL])
+v_norm <- v / v[1]     # v0 = 1
+
+if (sum(cx) < 0) cx <- -cx
+if (v_norm[1] < 0) v_norm <- -v_norm
+
+# 3) Tasa instantánea
+r <- log(lambda)
+
+# ----------- Salidas ordenadas -----------
+cat("a) Tasa instantánea de aumento (r)\n\n")
+print(round(r, 6))
+
+cat("\n\nb) Tasa finita pre-reproductiva (lambda)\n\n")
+print(round(lambda, 6))
+
+cat("\n\nc) Distribución estable de edades (c_x)\n\n")
+print(round(setNames(cx, rownames(A)), 4))
+
+cat("\n\nd) Valor reproductivo normalizado (v_x^norm)\n\n")
+print(round(setNames(v_norm, rownames(A)), 4))
+```
+
+------------------------------------------------------------------------
+
+#### Paso 4. Cálculos especiales. Análisis de Sensibilidad y Elasticidad
+
+###### a.) Análisis de Sensibilidad
+
+**Paso 1**. Cargar la matriz de transición de Leslie ($L_{post}$).
+
+```{r, echo=FALSE}
+L <- as.matrix(L_post)
+round(L,2)
+```
+
+
+**Paso 2**. Cálculo del estimador de sensibilidad de la matriz
+
+```{r, echo=FALSE}
+# ---------------------------------------------------------
+# Matriz de proyección (Leslie post-reproductiva)
+L <- as.matrix(L_post)
+
+# ---------------------------------------------------------
+# 1) Autovalor dominante (λ) y autovector derecho (w)
+# - λ: tasa finita asintótica de crecimiento poblacional.
+# - w: estructura estable de edades (vector propio derecho).
+eigR  <- eigen(L)
+posR  <- which.max(Mod(eigR$values))     # índice del autovalor dominante 
+lambda <- Re(eigR$values[posR])          # λ (parte real)
+w     <- Re(eigR$vectors[, posR])        # w: autovector derecho asociado a λ
+
+# ---------------------------------------------------------
+# 2) Autovector izquierdo (v)
+# - v: valor reproductivo por edad (vector propio izquierdo).
+eigL <- eigen(t(L))
+posL <- which.max(Mod(eigL$values))      # índice dominante en L^T
+v    <- Re(eigL$vectors[, posL])         # v: autovector izquierdo asociado a λ
+
+# ---------------------------------------------------------
+# 3) Ajuste de signo (opcional)
+# Este paso solo evita signos negativos
+# en w y v para facilitar la interpretación ecológica.
+if (sum(w) < 0) w <- -w
+if (sum(v) < 0) v <- -v
+
+# ---------------------------------------------------------
+# 4) Normalización biortogonal: v^T w = 1
+v <- v / as.numeric(t(v) %*% w)
+
+# ---------------------------------------------------------
+# 5) Matriz de sensibilidad S_ij
+S <- outer(v, w)
+round(S, 3)
+```
+
+------------------------------------------------------------------------
+
+###### b.) Análisis de Elasticidad
+
+**Paso 1**. Cargar la matriz de transición de Leslie ($L$).
+
+```{r, message=FALSE, echo=FALSE}
+L <- as.matrix(L_post)
+round(L,2)
+```
+
+**Paso 2**. Cálculo de la matriz de elasticidad $e_{ij}$.
+
+```{r, echo=FALSE}
+E <- (L / lambda) * S
+round(E, 3)
+```
+
+```{r}
+sum(E)
+```
+
+
+------------------------------------------------------------------------
+
+
+

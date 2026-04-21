@@ -1,0 +1,258 @@
+
+## B. Caso guiado: Diversidad beta y gamma con peces en ríos de México
+
+```{r}
+#| warning: false
+#| message: false
+
+library(knitr) 
+library(purrr)
+library(tibble)
+library(tidyverse)    # Para diferentes operaciones
+library(readxl)       # Para la lectura de archivos de Excel
+library(corrplot)     # Para las figuras de elipses
+library(vegan)        # Estimadores de diversidad
+library(ggrepel)      # Rótulos a los puntos de figuras en ggplot2
+library(kableExtra)   # Edición de las tablas
+
+# Diversidad beta
+library(betapart)   # Para diversidad beta de Baselga
+library(adespatial) # Para diversidad beta de Podani
+library(ggplot2)    # Para la edición de figuras
+library(caret)      # Para convertir datos a binarios
+library(factoextra) # Para los dendogramas
+library(gridExtra)  # Proyecta varias imágenes en un solo panel 
+
+library(iNEXT.beta3D)
+library(iNEXT)
+```
+
+
+### 4. Diversidad beta con estandarización de muestras y números efectivos q = 0, 1 y 2
+
+#### a. Organización de los datos
+
+```{r}
+#| label: tbl-c7-27
+#| tbl-cap: "Resumen de las seis primeras filas de abundancia por sitio"
+#| warning: false
+#| message: false
+#| echo: false
+
+# biol: matriz Especies x Sitio (columnas = sitios, filas = especies)
+biol <- 
+  read_xlsx("datos.c7.xlsx", sheet = "tax")
+  
+biol <-  
+  biol %>% 
+  dplyr::select(-1) %>%      # Elimina la primera columna (Sites)
+  # Abrevia nombres de especies/variables, excepto la columna de sitios
+  rename_with(~ abbreviate(.x, minlength = 4), -Sites1) %>%
+  # Largo → sumar por (Sitio, Especie) por si hay duplicados
+  pivot_longer(-Sites1, 
+               names_to = "Especies", 
+               values_to = "Abundancia") %>%
+  group_by(Sites1, Especies) %>%
+  summarise(Abundance = sum(Abundancia, na.rm = TRUE), .groups = "drop") %>%
+  # Ancho: columnas = sitios, filas = especies
+  pivot_wider(names_from = Sites1, 
+              values_from = Abundance, 
+              values_fill = 0)
+# Vista rápida
+biol %>%
+  head() %>%
+  kbl(booktabs = T, longtable = T) %>%
+  kable_classic(full_width = FALSE)
+```
+
+#### b. Componente de diversidad alfa
+
+```{r}
+#| label: tbl-c7-28
+#| tbl-cap: "Estimadores generales de diversidad alfa para las tres zonas comparadas"
+#| warning: false
+#| message: false
+#| echo: false
+#
+# iNEXT por Estaciones
+biol <- as.data.frame(biol)
+result= iNEXT(biol[,-1],
+              q=0, datatype="abundance")
+
+# Algunos insumos de iNEXT para tabular
+result = result$DataInfo[,c(1:3,5,6)]
+
+
+# Edición de los nombres de las columnas 
+colnames(result) = c("Sitio", "N", "Riqueza", "f1","f2")
+
+# Impresión de la tabla con los seis (6) primeros datos (filas)
+result %>%
+  kbl(booktabs = T,longtable = T) %>%
+      kable_classic(full_width = F)
+
+```
+
+#### c. Organización de los datos por parejas de zonas
+
+```{r}
+#| label: tbl-c7-29
+#| tbl-cap: "Resumen de la tabla de abundancias para una pareja de zonas (M vs. P)"
+#| warning: false
+#| message: false
+#| echo: false
+
+# biol  = viene como tabla ancha: Especies (filas) + sitios (M, P, RM)
+# biol1 = filas: las especies y columnas: las zonas
+biol1 <- as.data.frame(biol)
+
+# Fila = especie
+rownames(biol1) <- biol1$Especies
+biol1$Especies  <- NULL
+
+# Pares de sitios (solo columnas de sitios)
+sitios <- colnames(biol1)                    # p.ej. c("M","P","RM")
+pares  <- combn(sitios, 2, simplify = FALSE) 
+
+# Lista con cada par y nombres "M_vs_P", etc.
+biol.pares <- setNames(
+  lapply(pares, function(p) biol1[, p, drop = FALSE]),
+  sapply(pares, function(p) paste(p, collapse = "_vs_"))
+)
+
+# Ejemplo de inspección
+head(biol.pares$M_vs_P) %>% 
+  kbl(booktabs = T,longtable = T) %>% 
+  kable_classic(full_width = FALSE)
+
+# De la misma forma se puede tabular las otras combinaciones: $M_vs_RM y $P_vs_RM
+```
+
+
+```{r}
+#| label: tbl-c7-30
+#| tbl-cap: "Resumen de catro primeras filas con estimadores generales de diversidad beta para la pareja de zonas M y P, con estimadores de abundancia basada en coberturas"
+#| warning: false
+#| message: false
+#| echo: false
+
+# Diversidad con abundancia. Rarefacción/Extrapolación- R/E Analysis. 
+diversidad_abun_cov = iNEXTbeta3D(data = biol.pares, 
+                              diversity = 'TD', 
+                              datatype = 'abundance', 
+                              base = "coverage", 
+                              nboot = 10)
+
+
+# Insumos numéricos
+head(diversidad_abun_cov$M_vs_P$beta, 4) %>% 
+  kbl(booktabs = T, digits = 3) %>% 
+  kable_classic(full_width = F)
+# De la misma forma se puede analizar las otras combinaciones: $M_vs_RM y $P_vs_RM
+```
+
+#### d. Componentes de diversidad gamma- $\gamma$ y alfa- $\alpha$ por parejas de zonas
+
+```{r}
+#| label: fig-c7-22a
+#| fig-cap: "Rarefacción basada en el tamaño de la muestra (curvas sólidas) y extrapolación (curvas discontinuas) con diversidad gamma y diversidad alfa."
+#| warning: false
+#| message: false
+#| echo: false
+#| fig-pos: 'H'
+#| fig-width: 5
+#| fig-height: 7
+
+# Grafica: verás una curva ($\alpha$, $\gamma$) por cada par de sitios
+diversidad_abun = iNEXTbeta3D(data = biol.pares, 
+                              diversity = 'TD', 
+                              datatype = 'abundance', 
+                              base = "size", nboot = 10)
+
+
+# Figura en versión del paquete iNEXTbeta3D
+# ggiNEXTbeta3D(diversidad_abun)
+
+
+# Figura con ajustes de etiquetas y leyendas
+ggiNEXTbeta3D(diversidad_abun) +
+  # Simbolos \u25B2 ▲ \u25CF ● \u25B3 △ \u25CB ○
+  labs(
+    x = "Número de individuos",
+    y = "Diversidad taxonómica",
+    title = "(a) Rarefacción basada en el tamaño de la muestra y extrapolación 2n",
+    subtitle = paste(
+      "Comparación de las parejas de zonas M_vs_P, M_vs_RM, P_vs_RM",
+      "▲ Gamma (tamaño 2n)  ● Gamma (tamaño n)  △ Alfa (tamaño 2n)  ○ Alfa (tamaño n)",
+      sep = "\n"
+    )
+  ) +
+  # Escala de líneas (mantiene las etiquetas en español)
+  scale_linetype_manual(
+    values = c(1, 2),
+    labels = c("Rarefacción", "Extrapolación")
+  ) +
+  # Tema general limpio
+  theme_bw() +
+  theme(
+    axis.title = element_text(size = 11, face = "bold"),
+    strip.text = element_text(face = "bold"),
+    axis.text  = element_text(size = 10),
+    plot.title = element_text(size = 13, face = "bold", colour = "blue4"),
+    panel.grid = element_blank(),
+    legend.position = "bottom",
+    legend.box = "vertical",     # ← una leyenda debajo de la otra
+    legend.title = element_blank(),  # ← elimina "Dataset" y "Method"
+    plot.margin = margin(8, 10, 8, 8)
+  )
+```
+
+#### e. Visualización de diversidades gamma $\gamma$, alfa- $\alpha$ y beta- $\beta$ con estandarización
+
+```{r}
+#| label: fig-c7-23
+#| fig-cap: "Rarefacción basada en la cobertura (curvas sólidas) y extrapolación (curvas punteadas) con diversidad gamma, alfa y beta, basadas en las especies de peces para parejas de zonas de montaña (M), planicies (P) y desembocadura (RM), para q = 0, 1 y 2."
+#| warning: false
+#| message: false
+#| echo: false
+#| fig-height: 6
+#| fig-pos: 'H'
+
+# Figura en versión del paquete iNEXTbeta3D
+# ggiNEXTbeta3D(diversidad_abun_cov)
+
+
+# Figura con ajustes de etiquetas y leyendas
+ggiNEXTbeta3D(diversidad_abun_cov) +
+  # Simbolos \u25B2 ▲ \u25CF ● \u25B3 △ \u25CB ○
+  labs(
+    x = "Cobertura de las muestras",
+    y = "Diversidad taxonómica",
+    title = "(b) Rarefacción y extrapolación basada en cobertura para diversidad gamma, alfa y beta",
+    subtitle = paste(
+      "Comparación de las parejas de zonas M_vs_P, M_vs_RM, P_vs_RM",
+      "▲ Gamma (tamaño 2n)  ● Gamma (tamaño n)  △ Alfa (tamaño 2n)  ○ Alfa (tamaño n)",
+      sep = "\n"
+    )
+  ) +
+  scale_linetype_manual(values = c(1, 2),
+                        labels = c("Rarefacción", "Extrapolación")) +
+  theme_bw() +
+  theme(
+    axis.title = element_text(size = 11, face = "bold"),
+    strip.text = element_text(face = "bold"),
+    axis.text  = element_text(size = 10),
+    plot.title = element_text(size = 13, face = "bold", colour = "blue4"),
+    plot.subtitle = element_text(size = 10, 
+                                 margin = margin(b = 6), lineheight = 1.1),
+    panel.grid = element_blank(),
+    legend.position = "bottom",
+    legend.box = "vertical",
+    legend.title = element_blank(),
+    plot.margin = margin(8, 10, 8, 8)
+  )
+```
+
+
+
+

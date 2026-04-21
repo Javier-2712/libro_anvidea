@@ -1,0 +1,675 @@
+
+
+## A. Caso guiado: Diversidad alfa de peces en ríos de México
+
+### Cargar paquetes y lectura de bases de datos
+
+```{r, warning=FALSE, message=FALSE, eval=FALSE}
+library(tidyverse)    # Para diferentes operaciones
+library(readxl)   # Para la lectura de archivos de Excel
+library(corrplot) # Para las figuras de elipses
+library(vegan)    # Estimadores de diversidad
+library(ggrepel)  # Rótulos a los puntos de figuras en ggplot2
+library(kableExtra)   # Edición de las tablas
+library(viridis)
+library(dplyr)
+# Instalar la última versión de github para iNEXT
+# install.packages('devtools')
+library(devtools)
+#install_github('AnneChao/iNEXT.3D')
+library(iNEXT.3D)
+#install_github('AnneChao/iNEXT.4steps')
+library(iNEXT.4steps)
+library(iNEXT)
+```
+
+
+### 4. Diversidad alfa con números efectivos de Hill.
+
+##### Estructura mínima de los datos (abundancia)
+
+
+```{r}
+#| label: tbl-c7-12
+#| tbl-cap: "Matriz de abundancias con la organización requerida para los tres paquetes de iNEXT"
+#| echo: false
+#| message: false
+#| warning: false
+
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(kableExtra)
+
+biol <- read_xlsx("datos.c7.xlsx", sheet = "tax")
+
+# (Opcional pero útil) Verifica nombres:
+# names(biol)
+
+biol_sit <- biol %>%
+  # elimina columna "Sites" si existe, sin romper si no existe
+  dplyr::select(-tidyselect::any_of("Sites")) %>%
+  # agrupa por zona (Sites1) y suma SOLO columnas numéricas (abundancias)
+  dplyr::group_by(Sites1) %>%
+  dplyr::summarise(dplyr::across(where(is.numeric), ~sum(.x, na.rm = TRUE)),
+                   .groups = "drop") %>%
+  # largo: zona-especie
+  tidyr::pivot_longer(
+    cols = -Sites1,
+    names_to = "Especies",
+    values_to = "Abundancia"
+  ) %>%
+  # ancho: columnas = zonas (M, P, RM), filas = especies
+  tidyr::pivot_wider(
+    names_from  = Sites1,
+    values_from = Abundancia,
+    values_fill = 0
+  ) %>%
+  tibble::column_to_rownames("Especies") %>%
+  as.data.frame()
+
+biol_sit %>%
+  head(8) %>%
+  kbl(booktabs = TRUE, longtable = FALSE) %>%
+  kable_classic(full_width = FALSE)
+
+```
+
+
+#### 4.2 iNEXT (2016): rarefacción/extrapolación como base comparativa
+
+
+```{r}
+#| label: tbl-c7-13
+#| tbl-cap: "Estimadores generales de diversidad alfa (iNEXT, q = 0)"
+#| echo: false
+#| message: false
+#| warning: false
+
+library(iNEXT)
+# Librería requerida
+library(kableExtra)
+library(iNEXT)
+
+# iNEXT por Estaciones
+result= iNEXT(biol_sit,q=0, datatype="abundance")
+
+# Algunos insumos de iNEXT para tabular
+result = result$DataInfo[,c(1:3,5,6)]
+
+# Edición de los nombres de las columnas 
+colnames(result) = c("zona", "N", "Riqueza", "f1","f2")
+
+# Impresión de la tabla con los seis (6) primeros datos (filas)
+result %>%
+  kbl(booktabs = T,longtable = F) %>%
+      kable_classic(full_width = F)
+```
+
+
+#### 4.3 iNEXT.4steps (2020): diversidad alfa en cuatro pasos
+
+```{r}
+#| label: chao-4steps-run
+#| message: false
+#| warning: false
+
+library(iNEXT.4steps)
+
+# Lectura de la base de datos 
+chao.sit <- 
+  biol_sit %>%  # Excluir la columna Especies
+  as.data.frame() %>%
+  # Asegurar que todas sean numéricas
+  mutate(across(everything(), as.numeric))     
+
+# Resultados de la prueba de diversidad alfa en 4 pasos
+result1 <- iNEXT4steps(data = chao.sit, 
+                       datatype = "abundance")
+# result1$summary
+```
+
+##### a. Paso 1: perfil de completitud
+
+```{r}
+#| label: tbl-c7-14
+#| tbl-cap: "Paso 1. Perfil de completitud en las tres estaciones evaluadas"
+#| echo: false
+#| message: false
+#| warning: false
+
+# Paso 1. Perfil de completitud
+result1$summary$"STEP 1. Sample completeness profiles" %>%
+  kbl(booktabs = T,longtable = F) %>%
+  kable_classic(full_width = F)
+```
+
+##### b. Paso 2: perfil asintótico (observada vs estimada)
+
+```{r}
+#| label: tbl-c7-15
+#| tbl-cap: "Paso 2. Perfil asintótico (observada vs estimada) y especies sin detectar"
+#| echo: false
+#| message: false
+#| warning: false
+
+asinto <- result1$summary$"STEP 2b. Observed diversity values and asymptotic estimates"
+
+asinto <- asinto %>%
+  mutate(sin.det = round(TD_asy - TD_obs))
+
+asinto_tab <- data.frame(
+  Ensamblaje = asinto$Assemblage,
+  Estimador  = asinto$qTD,
+  D.Observada= asinto$TD_obs,
+  D.Estimada = asinto$TD_asy,
+  Sin.Det    = asinto$sin.det
+) %>%
+  mutate(
+    Estimador = dplyr::recode(as.character(Estimador),
+      "Species richness"  = "q=0, Riqueza",
+      "Shannon diversity" = "q=1, Shannon",
+      "Simpson diversity" = "q=2, Simpson"
+    )
+  )
+
+asinto_tab %>%
+  kbl(booktabs = TRUE, longtable = FALSE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+##### c. Paso 3: perfil no asintótico (rarefacción/extrapolación por cobertura)
+
+
+```{r}
+#| label: tbl-c7-16
+#| tbl-cap: "Paso 3. Perfil no asintótico para los tres Estaciones evaluados"
+#| echo: false
+#| message: false
+#| warning: false
+
+result1$summary$"STEP 3. Non-asymptotic coverage-based rarefaction and extrapolation analysis" %>%
+  kbl(booktabs = TRUE, longtable = FALSE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+##### d. Paso 4: uniformidad
+
+
+```{r}
+#| label: tbl-c7-17
+#| tbl-cap: "Paso 4. Perfil de uniformidad (Pielou y diversidades normalizadas)"
+#| echo: false
+#| message: false
+#| warning: false
+
+result1$summary$"STEP 4. Evenness among species abundances of orders q = 1 and 2 at Cmax based on the normalized slope of a diversity profile" %>%
+  kbl(booktabs = TRUE, longtable = FALSE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+
+#### 4.4 iNEXT.3D (2021): misma lógica de Hill, salidas más ricas y perfiles-q
+
+```{r}
+#| label: load-inext3d
+#| message: false
+#| warning: false
+
+library(iNEXT.3D)
+```
+
+
+##### a. Información base del ensamblaje (TDInfo)
+
+```{r}
+#| label: tbl-c7-18
+#| tbl-cap: "iNEXT.3D: información base del ensamblaje (TDInfo)"
+#| message: false
+#| warning: false
+#| echo: false
+
+# iNEXT.3D por Estaciones
+result2 <- iNEXT3D(biol_sit, 
+                        diversity = "TD", 
+                        q = c(0,1,2), 
+                        datatype = "abundance")
+
+# Algunos insumos de iNEXT para tabular
+result2a = result2$TDInfo[,c(1:3,6,7)]
+
+# Edición de los nombres de las columnas 
+colnames(result2a) = c("zona", "N", "Riqueza", "f1","f2")
+
+# Impresión de la tabla con los seis (6) primeros datos (filas)
+result2a %>%
+  kbl(booktabs = TRUE,
+      longtable = F) %>%
+      kable_classic(full_width = F)
+```
+
+##### b. Estimadores estandarizados por tamaño de muestra (TDiNextEst)
+
+```{r}
+#| label: tbl-c7-19
+#| tbl-cap: "iNEXT.3D: estimadores estandarizados por tamaño de muestra (size-based)"
+#| message: false
+#| warning: false
+#| echo: false
+
+# Insumos de iNEXT para tabular
+result2b = result2$TDiNextEst$size_based[,1:8]
+
+# Edición de los nombres de las columnas 
+colnames(result2b) = c("Zona", "Orden.q", "m", "Método", "qTD",
+                      "qTD.LI", "qTD.LS", "CM")
+
+# Impresión de la tabla con los seis (6) primeros datos (filas)
+result2b %>%
+  head() %>%
+  kbl(digits = 2,
+      booktabs = TRUE, longtable = TRUE) %>%
+  kable_classic(full_width = F)
+```
+
+------------------------------------------------------------------------
+
+##### c. Estimaciones observadas y asintóticas (TDAsyEst)
+
+```{r}
+#| label: tbl-c7-20
+#| tbl-cap: "iNEXT.3D: estimaciones observadas y asintóticas (TDAsyEst)"
+#| message: false
+#| warning: false
+#| echo: false
+
+# Insumos de iNEXT para tabular
+result2c = result2$TDAsyEst
+
+# Edición de los nombres de las columnas 
+colnames(result2c) = c("Zona", "qTD", "TD_obs",	"TD_asy", 
+                      "e.e.", "qTD.LI", "qTD.LS")
+
+# Impresión de la tabla con los seis (6) primeros datos (filas)
+result2c %>%
+  head() %>%
+  kbl(digits = 2, booktabs = TRUE, longtable = FALSE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+
+#### 4.5 Figuras con iNEXT.4steps
+
+#### 4.6 Figuras desde iNEXT.4steps
+
+##### a. Figuras del perfil asintótico (paso 1)
+
+```{r}
+#| label: fig-c7-6
+#| fig-cap: "Perfil de Completitud de las estaciones"
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-height: 4
+#| fig-pos: 'H'
+
+# Figura del paso 1. Completitud de las muestras.
+result1$figure[[1]] +
+    scale_x_continuous(
+    limits = c(0, 2),  # Rango del eje x
+    breaks = seq(0, 2, by = 1)) +  # Intervalos del eje
+    labs(x="Orden q", y="Completitud de la muestra", 
+       title = "Paso 1. Perfil de Completitud",
+       subtitle = "Comparación de las zonas por órdenes de diversidad (q)"
+) +
+    theme(panel.grid=element_blank(),
+          plot.title = element_text(size = 13, 
+                                    face = "bold", colour = "blue4"),
+          plot.subtitle = element_text(size = 11, colour = "gray30"),
+          axis.title = element_text(size = 11, face = "bold"),
+          axis.text = element_text(size = 10),
+          legend.position = "bottom",
+          legend.title = element_blank(),
+          legend.text = element_text(size = 10)
+          )
+```
+
+##### b. Figuras del perfil asintótico (paso 2)
+
+```{r}
+#| label: fig-c7-7
+#| fig-cap: "Perfil de rarefacción y extrapolación por Estaciones"
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-height: 5
+#| fig-pos: 'H'
+
+result1$figure[[2]] +
+  labs(
+    x = "Abundancia",
+    y = "Diversidad (número efectivo de especies)",
+    title = "Paso 2.1. Tamaño basado en rarefacción/extrapolación",
+    subtitle = "Curvas por zonas para q = 0 (riqueza), q = 1 (Shannon) y q = 2 (Simpson)"
+  ) +
+  scale_linetype_manual( values = c(1, 2),
+                        labels = c("Rarefacción", "Extrapolación")) +
+  theme_bw() +
+  theme(
+    plot.title = element_text(size = 13, 
+                                    face = "bold", colour = "blue4"),
+    panel.grid = element_blank(),
+    legend.position = "bottom",
+  )
+```
+
+##### c. Figuras del perfil no asintótico (paso 3)
+
+```{r}
+#| label: fig-c7-8
+#| fig-cap: "Perfil de diversidad no asintótico para los Estaciones evaluados"
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-height: 5
+#| fig-pos: 'H'
+
+# Paso 3. Figura del perfil no asintótico basado en rarefacción/extrapolación
+result1$figure[[4]] +
+  labs(
+    x = "Cobertura de las estaciones",
+    y = "Diversidad (número efectivo de especies)",
+    title = "Paso 3. Perfil no asintótico por cobertura",
+    subtitle = "Comparación de M, P y RM a Cmax ≈ 1 para q = 0 (riqueza), q = 1 (Shannon) y q = 2 (Simpson)"
+  ) +
+  # Línea guía en Cmax≈1
+  geom_vline(xintercept = 1, linetype = 3, 
+             linewidth = 0.5, color = "grey50") +
+  annotate("text", x = 1, y = Inf, label = "Cmax = 1", 
+           vjust = 1.3, hjust = 1.05,
+           size = 3, color = "grey35") +
+  # Etiquetas de líneas
+  scale_linetype_manual(
+    "", values = c(1, 2),
+    labels = c("Rarefacción", "Extrapolación")
+  ) +
+  # Estética global
+  theme_bw(base_size = 14) +
+  theme(
+    panel.grid = element_blank(),
+    axis.title = element_text(size = 11, face = "bold"),
+    axis.text  = element_text(size = 10),
+    plot.title = element_text(size = 13, face = "bold", colour = "blue4"),
+    plot.subtitle = element_text(size = 11, colour = "gray30"),
+    strip.text = element_text(face = "bold"),
+    legend.position = "bottom",
+    legend.title = element_blank(),
+    legend.text = element_text(size = 10),
+    plot.margin = margin(8, 10, 8, 8)
+  ) +
+  # Limites y ticks del eje x (0–1)
+  scale_x_continuous(limits = c(0, 1), 
+                     breaks = seq(0, 1, by = 0.25), 
+                     expand = expansion(add = 0.02))
+```
+
+
+##### d. Figuras del perfil de uniformidad (paso 4)
+
+```{r}
+#| label: fig-c7-9
+#| fig-cap: "Paso 4. Perfil de uniformidad (Pielou y pendientes normalizadas) para M, P y RM."
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-height: 4
+#| fig-pos: 'H'
+
+# Paso 4. Figura del perfil de uniformidad
+result1$figure[[5]] +
+  scale_x_continuous(limits = c(0, 2), breaks = seq(0, 2, by = 1)) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.25), 
+                     expand = expansion(add = 0.01)) +
+  labs(
+    x = "Orden q",
+    y = "Uniformidad",
+    title = "Paso 4. Perfil de Uniformidad",
+    subtitle = "Comparación de M, P y RM a Cmax ≈ 1; mayor valor = distribución de abundancias más equitativa"
+  ) +
+  # Guía visual en q = 1
+  geom_vline(xintercept = 1, linetype = 3, linewidth = 0.5, color = "grey55") +
+  annotate("text", x = 1, y = 1, label = "q = 1", vjust = -0.6, size = 3.1, color = "grey40") +
+  # Estética general
+  theme_bw(base_size = 14) +
+  theme(
+    panel.grid = element_blank(),
+    axis.title = element_text(size = 11, face = "bold"),
+    axis.text  = element_text(size = 10),
+    plot.title = element_text(size = 13, face = "bold", colour = "blue4"),
+    plot.subtitle = element_text(size = 10, colour = "gray30"),
+    legend.position = "bottom",
+    legend.title = element_blank(),
+    legend.text = element_text(size = 10),
+    plot.margin = margin(8, 10, 8, 8)
+  )
+```
+
+
+#### 4.7 Figuras desde iNEXT.3D (TD)
+
+##### a. Perfil de diversidad alfa taxonómica (TD) con datos de abundancia
+
+```{r}
+#| label: fig-c7-10
+#| fig-cap: "Curvas size-based de TD por ensamblaje (iNEXT.3D)."
+#| message: false
+#| warning: false
+#| fig-pos: 'H'
+#| fig-height: 5
+
+ggiNEXT3D(result2, 
+          type = 1, 
+          facet.var = "Assemblage") +
+  labs(x = "Número de individuos", 
+       y = "Diversidad taxonómica",
+       title = "Tamaño basado en rarefacción/extrapolación",
+       subtitle = "Curvas por zonas para 0 (riqueza), 1 (Shannon) y 2 (Simpson)") +
+  scale_linetype_discrete(labels = c("Rarefacción", "Extrapolación")) +
+  theme_bw() +
+  theme(
+    plot.title = element_text(size = 14, 
+                              face = "bold", colour = "blue4"),
+    plot.subtitle = element_text(size = 11, colour = "gray30"),
+    panel.grid = element_blank(),
+    axis.text  = element_text(size = 11),
+    axis.title = element_text(size = 12, face = "bold"),
+    legend.position = "bottom",
+    legend.title = element_blank(),
+  )
+```
+
+
+##### b. Figura de estimación estandarizada de la diversidad taxonómica
+
+```{r}
+#| label: fig-c7-11
+#| fig-cap: "Curvas de completitud de la muestra para datos de abundancia, diferenciadas por ensamblaje."
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-pos: 'H'
+#| fig-height: 5
+
+# curvas de completitud de muestra (sample completeness curves)
+# para datos de incidencia. 
+# Estas curvas son útiles para determinar si la diversidad observada
+# está subestimada y si es necesario extrapolar más allá del esfuerzo actual.
+ggiNEXT3D(
+  result2,
+  type      = 2,
+  color.var = "Assemblage"
+) +
+  labs(
+    title = "Curvas de completitud de las zonas",
+    subtitle = "Curvas por zonas para riqueza de especies",
+    x = "Número de individuos",
+    y = "Cobertura de la muestra",
+    color = "Ensamblaje",
+    shape = "Ensamblaje",
+    linetype = "Tipo de curva",
+) +
+  scale_linetype_discrete(labels = c("Rarefacción", "Extrapolación")) +
+  theme_bw() +
+theme(
+    plot.title = element_text(size = 14, 
+                              face = "bold", colour = "blue4"),
+    plot.subtitle = element_text(size = 11, colour = "gray30"),
+    panel.grid = element_blank(),
+    axis.text  = element_text(size = 11),
+    axis.title = element_text(size = 12, face = "bold"),
+    legend.position = "bottom",
+    legend.title = element_blank(),
+  )
+
+# También se puede cargar así
+# fig[[2]]
+```
+
+
+##### c. Figura de estimación asintótica de la diversidad taxonómica
+
+```{r}
+#| label: fig-c7-12
+#| fig-cap: "Curvas de rarefacción y extrapolación basadas en cobertura para datos de abundancia, separadas por ensamblaje."
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-pos: 'H'
+#| fig-height: 5
+
+ggiNEXT3D(result2, type = 3, 
+          facet.var = "Assemblage") +
+  labs(
+       title = "Curvas R/E basadas en cobertura de las muestras",
+       subtitle = "Curvas asintóticas",
+       x = "Cobertura de la muestra", 
+       y = "Diversidad taxonómica") +
+  scale_linetype_discrete(labels = c("Rarefacción", "Extrapolación")) +
+  theme(
+    plot.title = element_text(size = 14, 
+                              face = "bold", colour = "blue4"),
+    plot.subtitle = element_text(size = 12, colour = "gray30"),
+    panel.grid = element_blank(),
+    axis.text  = element_text(size = 11),
+    axis.title = element_text(size = 12, face = "bold"),
+    legend.position = "bottom",
+    legend.title = element_blank(),
+  )
+```
+
+
+##### d. Perfiles de orden q (observado vs asintótico)
+
+```{r}
+#| label: tbl-c7-13a
+#| tbl-cap: "Resumen de perfiles-q de TD (ObsAsy3D)"
+#| message: false
+#| warning: false
+#| echo: false
+
+result2d <- ObsAsy3D(biol_sit, 
+                          diversity = "TD", 
+                          datatype = "abundance", 
+                          q = c(0,1,2))
+
+# Edición de los nombres de las columnas 
+
+result2d. <- result2d
+colnames(result2d.) = c("Zona", "Orden.q", "qTD", "ee", 
+                       "qTD.LI", "qTD.LS", "Método")
+
+# Impresión de la tabla con los seis (6) primeros datos (filas)
+result2d. %>%
+  head() %>%
+  kbl(digits = 2, booktabs = TRUE, longtable = FALSE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+```{r}
+#| label: fig-c7-14
+#| fig-cap: "Perfiles de diversidad taxonómica (q-profiles) basados en estimaciones observadas y asintóticas."
+#| message: false
+#| warning: false
+#| fig-pos: 'H'
+#| fig-height: 5
+
+ggObsAsy3D(result2d) +
+  labs(
+       title = "Perfiles de orden q",
+       subtitle = "especies comunes y/o raras (q≈0) hacia dominantes (q≈2)",
+       x = "Orden q", 
+       y = "Diversidad taxonómica", 
+       linetype = "Tipo de estimación") +
+  scale_linetype_discrete(labels = c("Asintótica", "Observada")) +
+  theme(
+    plot.title = element_text(size = 14, 
+                              face = "bold", colour = "blue4"),
+    plot.subtitle = element_text(size = 12, colour = "gray30"),
+    panel.grid = element_blank(),
+    axis.text  = element_text(size = 12),
+    axis.title = element_text(size = 13, face = "bold"),
+    legend.position = "bottom",
+    legend.title = element_blank(),
+  )
+```
+
+
+```{r}
+#| label: tbl-c7-21
+#| tbl-cap: "Comparación de iNEXT (2016), iNEXT.4steps (2020) e iNEXT.3D (2021): aportes y complementariedad"
+#| echo: false
+#| message: false
+#| warning: false
+
+library(tibble)
+
+comp <- tibble(
+  Paquete = c("iNEXT (2016)", "iNEXT.4steps (2020)", "iNEXT.3D (2021)"),
+  Contexto = c(
+    "Marco base de rarefacción/extrapolación y estandarización (tamaño y cobertura) para diversidad de Hill.",
+    "Flujo didáctico y operativo en 4 pasos: completitud → asintótico → R/E por cobertura → uniformidad.",
+    "Extensión para comparar dimensiones (TD, y en capítulos posteriores FD y PD) con salidas tabulares/ gráficas y perfiles-q."
+  ),
+  Entradas = c(
+    "Matriz de abundancia o incidencia por ensamblaje.",
+    "Matriz de abundancia o incidencia por ensamblaje (énfasis en 'summary' por pasos y figuras integradas).",
+    "Matriz de abundancia o incidencia; (para FD/PD se suma matriz de distancias/árbol, según el caso)."
+  ),
+  Salidas = c(
+    "Curvas R/E, estimaciones estandarizadas, cobertura; tablas (N, S.obs, f1, f2).",
+    "Tablas por PASOS 1–4 + conjunto de figuras alineadas con esos pasos.",
+    "Perfiles de diversidad (q = 0, 1 y 2) y representaciones gráficas que facilitan la comparación entre zonas y la interpretación de dominancia y uniformidad."
+  ),
+  Enfoque = c(
+    "Fundamenta la necesidad de estandarizar comparaciones entre zonas cuando N difiere.",
+    "Columna vertebral del capítulo: organiza el análisis y la interpretación en una secuencia única.",
+    "Enriquece TD y prepara la transición hacia diversidad funcional y filogenética bajo el mismo marco de Hill."
+  )
+)
+
+comp %>%
+  kbl(booktabs = TRUE, longtable = FALSE, escape = TRUE) %>%
+  kable_classic(full_width = FALSE) %>%
+  kableExtra::kable_styling(latex_options = c("hold_position", "scale_down"),
+                            font_size = 9) %>%
+  kableExtra::column_spec(1, width = "2.3cm") %>%
+  kableExtra::column_spec(2, width = "3.0cm") %>%
+  kableExtra::column_spec(3, width = "3.0cm") %>%
+  kableExtra::column_spec(4, width = "3.4cm") %>%
+  kableExtra::column_spec(5, width = "3.4cm")
+
+```
+
+
+

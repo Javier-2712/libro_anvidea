@@ -1,0 +1,857 @@
+---
+title: "ANVIDEA - Reporte reproducible"
+subtitle: "Capítulo 4 — Modelos de crecimiento poblacional"
+author: "Javier Rodríguez-Barrios"
+date: last-modified
+lang: es
+
+output-dir: "outputs/reportes"
+
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: false
+    theme: cosmo
+    code-fold: false
+    embed-resources: true
+
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+# Presentación
+
+Este reporte corresponde al **Capítulo 4 — Modelos de crecimiento poblacional** del proyecto **ANVIDEA**. Su propósito es ofrecer una versión operativa y reproducible de los contenidos del capítulo, conservando la lógica conceptual del libro y articulándola con scripts independientes que pueden ejecutarse localmente.
+
+A diferencia de otros capítulos basados en bases de datos empíricas, aquí se trabaja principalmente con **simulación ecológica**.
+
+::: {.callout-tip}
+## Lo que desarrolla este capítulo
+
+1. **Comprender el balance demográfico de las poblaciones**.
+2. **Analizar el crecimiento bajo condiciones ideales** mediante el **modelo exponencial**.
+3. **Incorporar la regulación ambiental** a través del **modelo logístico**.
+4. **Interpretar la dinámica del crecimiento poblacional**.
+5. **Explorar el efecto de los parámetros demográficos**.
+:::
+
+```{r}
+#| label: setup-c4
+#| include: false
+library(tidyverse)
+library(kableExtra)
+
+# Función auxiliar: solución analítica del modelo logístico
+logistico_N <- function(t, N0, r, K) {
+  K / (1 + ((K - N0) / N0) * exp(-r * t))
+}
+```
+
+------------------------------------------------------------------------
+
+# A. Modelo exponencial
+
+## A.1 Modelo exponencial continuo
+
+$$
+N(t) = N_0 \, e^{rt}
+$$
+
+------------------------------------------------------------------------
+
+#### Ejemplo 1 — Curva con r positivo (fitoplancton)
+
+$$
+T_d = \frac{\ln 2}{r} = \frac{0.6931}{0.4} \approx 1.73\;\text{horas}
+\qquad
+N(20) = 10\, e^{0.4 \cdot 20} \approx 2.98 \times 10^{4}\;\text{individuos}
+$$
+
+```{r}
+#| label: fig-c4-3
+#| fig-cap: Crecimiento exponencial en tiempo continuo para la muestra de la población de fitoplancton.
+
+N0 <- 10; r <- 0.4; t <- seq(0, 20, by = 0.5)
+tabla <- tibble(t, N = N0 * exp(r * t))
+
+ggplot(tabla, aes(t, N)) +
+  geom_line(linewidth = 1.1) +
+  labs(title    = "Crecimiento exponencial continuo",
+       subtitle = "N(t) = N0. e^(r.t)  con r = 0.4",
+       x = "Tiempo (t)", y = "Tamaño poblacional (N)") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 2 — r negativo: decrecimiento (peces)
+
+$$
+T_{1/2} = \frac{\ln(1/2)}{r} = \frac{-0.6931}{-0.2} \approx 3.47\;\text{días}
+\qquad
+N(30) = 120\, e^{-0.2 \cdot 30} \approx 0.30\;\text{individuos}
+$$
+
+```{r}
+#| label: fig-c4-4
+#| fig-cap: Patrón de reducción de la población de peces.
+
+N0 <- 120; r <- -0.2; t <- seq(0, 30, by = 1)
+tabla <- tibble(t, N = N0 * exp(r * t))
+
+ggplot(tabla, aes(t, N)) +
+  geom_line(linewidth = 1.1) +
+  labs(title    = "Decrecimiento (continuo)",
+       subtitle = "r = -0.2",
+       x = "Tiempo", y = "Tamaño poblacional") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 3 — Comparación de múltiples r (insectos)
+
+$$
+\begin{aligned}
+r=0.1:&\quad N(20)=50\, e^{2} \approx 3.70\times10^{2}\\
+r=0.3:&\quad N(20)=50\, e^{6} \approx 2.02\times10^{4}\\
+r=0.5:&\quad N(20)=50\, e^{10}\approx 1.10\times10^{6}
+\end{aligned}
+$$
+
+```{r}
+#| label: fig-c4-5
+#| fig-cap: Patrón de crecimiento en poblaciones de insectos.
+
+N0 <- 50; t <- seq(0, 20, by = 0.25); r <- c(0.1, 0.3, 0.5)
+tabla <- map_dfr(r, function(r) tibble(t, r = r, N = N0 * exp(r * t)))
+
+ggplot(tabla, aes(t, N, group = factor(r), linetype = factor(r))) +
+  geom_line(linewidth = 1.05) +
+  labs(title    = "Patrón de aumento de la población",
+       linetype = "Valores de r",
+       x = "Tiempo (t)", y = "Tamaño poblacional (N)") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 4 — Tiempo de duplicación (Td) y semirreducción (T½)
+
+```{r}
+#| label: tbl-c4-1a
+#| tbl-cap: "Visualización de Td con r>0 y T½ con r<0 en función de r."
+
+r_val <- c(-0.50, -0.25, -0.10, 0.10, 0.25, 0.50)
+tab <- tibble(
+  r   = r_val,
+  Td  = if_else(r > 0, log(2) / r,   NA_real_),
+  Tsr = if_else(r < 0, log(0.5) / r, NA_real_)
+)
+tab_largo <- tab %>%
+  pivot_longer(cols = c(Td, Tsr), names_to = "Metrica", values_to = "Tiempo") %>%
+  filter(!is.na(Tiempo))
+
+tab_largo %>%
+  head() %>%
+  kbl(booktabs = TRUE, digits = 2, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+```{r}
+#| label: fig-c4-6
+#| fig-cap: "Visualización de Td con r>0 y T½ con r<0 en función del crecimiento instantáneo r."
+#| warning: false
+
+ggplot(tab_largo, aes(x = r, y = Tiempo, shape = Metrica, linetype = Metrica)) +
+  geom_point(size = 2.6) +
+  geom_line() +
+  labs(title = "Escenarios de crecimiento exponencial continuo",
+       x     = "r (tasa crec. instantáneo)", y = "Tiempo") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 5 — Velocidad instantánea dN/dt = rN (invertebrados)
+
+$$
+\frac{dN}{dt} = rN = 0.2 \times 30 = 6\;\text{individuos/día}
+\qquad
+N(25) = 30\, e^{0.2 \cdot 25} \approx 4.45 \times 10^{3}\;\text{invertebrados}
+$$
+
+```{r}
+#| label: fig-c4-7
+#| fig-cap: Patrón de crecimiento exponencial para la población de invertebrados.
+
+N0 <- 30; r <- 0.2; t <- seq(0, 25, by = 0.5)
+N <- N0 * exp(r * t); dNdt <- r * N
+tabla <- tibble(t, N, dNdt)
+
+ggplot(tabla, aes(t, dNdt)) +
+  geom_line(linewidth = 1.1) +
+  labs(title = "Velocidad de cambio o de aumento (dN/dt = r.N)",
+       x = "Tiempo (t)", y = "Velocidad de aumento (dN/dt)") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 6 — Estimar r con dos observaciones
+
+```{r}
+#| label: tbl-c4-2
+#| tbl-cap: "Estimación de r a partir de valores (N0, Nt, t)."
+
+resultados <- tribble(
+  ~N0, ~Nt, ~t,
+   40, 120, 10,
+   80,  20,  8,
+   50,  50, 12,
+   30, 200, 15
+) %>% mutate(r = log(Nt / N0) / t)
+
+resultados %>%
+  head() %>%
+  kbl(booktabs = TRUE, digits = 2, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+```{r}
+#| label: fig-c4-8
+#| fig-cap: "Trayectorias poblacionales estimadas a partir de r calculado con cuatro escenarios."
+#| warning: false
+
+tabla1 <- resultados %>%
+  rowwise() %>%
+  mutate(curva = list(tibble(tiempo = 0:t, N = N0 * exp(r * (0:t))))) %>%
+  unnest(curva)
+
+ggplot(tabla1, aes(x = tiempo, y = N,
+                   color = factor(Nt),
+                   group = interaction(N0, Nt, t))) +
+  geom_line(linewidth = 1.1) +
+  geom_point(data = resultados, aes(x = t, y = Nt),
+             size = 3, shape = 21, fill = "white") +
+  labs(title = "Estimación de r con las observaciones",
+       x = "Tiempo (t)", y = "Tamaño poblacional (N)",
+       color = "Nt observado") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 7 — Estimar r en una población bacteriana
+
+$$
+r = \frac{\ln(N_t/N_0)}{t} = \frac{\ln(800/100)}{10} = \frac{\ln 8}{10} \approx 0.2089\;\text{bacterias/bacterias·hora}
+$$
+
+```{r}
+#| label: fig-c4-9
+#| fig-cap: "Crecimiento continuo estimado en bacterias."
+
+N0 <- 100; Nt <- 800; t_max <- 10
+r <- log(Nt / N0) / t_max
+t <- seq(0, t_max, by = 0.1)
+tabla <- tibble(t, N = N0 * exp(r * t))
+
+ggplot(tabla, aes(t, N)) +
+  geom_line(linewidth = 1.1) +
+  geom_point(data = tibble(t = t_max, N = Nt),
+             size = 3, shape = 21, fill = "white") +
+  labs(title    = "Crecimiento exponencial continuo",
+       subtitle = paste0("N0=", N0, ", Nt=", Nt, ", t=", t_max,
+                         ", r\u2248", round(r, 3), " ind/ind\u00b7hora"),
+       x = "Tiempo (horas)", y = "Número de individuos") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+## A.2 Modelo exponencial discreto
+
+$$
+N_t = N_0 \, \lambda^t
+$$
+
+------------------------------------------------------------------------
+
+#### Ejemplo 1 — λ > 1: crecimiento (plantas)
+
+$$
+N_{(15)} = 50 \cdot 1.2^{15} \approx 818\;\text{plantas}
+$$
+
+```{r}
+#| label: fig-c4-10
+#| fig-cap: Proyección de crecimiento exponencial discreto.
+
+N0 <- 50; lambda <- 1.2; t <- 0:15
+tabla <- tibble(t, N = N0 * lambda^t)
+
+ggplot(tabla, aes(t, N)) +
+  geom_step(linewidth = 1, direction = "hv") +
+  geom_point(size = 2) +
+  labs(title = "Crecimiento discreto (lambda = 1.2)",
+       x = "Generaciones (t)", y = "Densidad poblacional (N)") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 2 — λ = 1: población estable
+
+$$
+N(t) = 100 \cdot 1^t = 100 \quad \text{para cualquier } t
+$$
+
+```{r}
+#| label: discreto-lambda-igual1
+
+N0 <- 100; lambda <- 1; t <- 0:10
+tibble(t, N = N0 * lambda^t) %>%
+  kbl(booktabs = TRUE, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 3 — λ < 1: decrecimiento (aves migratorias)
+
+$$
+N_{(12)} = 80 \cdot 0.7^{12} \approx 3.6\;\text{individuos}
+$$
+
+```{r}
+#| label: fig-c4-11
+#| fig-cap: Patrón de disminución o decrecimiento de las aves migratorias.
+
+N0 <- 80; lambda <- 0.7; t <- 0:12
+tabla <- tibble(t, N = N0 * lambda^t)
+
+ggplot(tabla, aes(t, N)) +
+  geom_step(linewidth = 1, direction = "hv") +
+  geom_point(size = 2) +
+  labs(title = "Decrecimiento discreto (lambda = 0.7)",
+       x = "Generaciones (t)", y = "Densidad poblacional (N)") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 4 — Comparación: continuo vs. discreto
+
+```{r}
+#| label: fig-comparativa-cont-disc
+#| fig-cap: Comparación de trayectorias continua y discreta con r = 0.2.
+
+N0 <- 30; r <- 0.2; t <- seq(0, 10, by = 1); lambda <- exp(r)
+datos_cont <- tibble(t, Modelo = "Continuo", N = N0 * exp(r * t))
+datos_disc <- tibble(t, Modelo = "Discreto", N = N0 * lambda^t)
+datos_comp <- bind_rows(datos_cont, datos_disc)
+
+ggplot(datos_comp, aes(t, N, shape = Modelo, linetype = Modelo)) +
+  geom_step(linewidth = 0.8, direction = "hv") +
+  geom_point(size = 2) +
+  labs(title = "Comparación de las trayectorias",
+       x = "Tiempo (t)", y = "Densidad de la población (N)") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 5 — Estimar λ a partir de escenarios
+
+$$
+\lambda = \left(\frac{N_t}{N_0}\right)^{1/t}
+$$
+
+```{r}
+#| label: tbl-c4-3
+#| tbl-cap: "Estimación de lambda a partir de (N0, Nt, t) en un conjunto de escenarios."
+
+escenarios <- tribble(
+  ~No, ~Nt, ~t,
+   60, 240,  6,
+  100, 100, 10,
+   80,  20,  8,
+   30, 300, 10
+)
+
+tab_lambda <- escenarios %>%
+  mutate(
+    Lambda = (Nt / No)^(1 / t),
+    Interpretacion = case_when(
+      Lambda > 1  ~ "Crecimiento (\u03bb>1)",
+      Lambda == 1 ~ "Estable (\u03bb=1)",
+      Lambda < 1  ~ "Decrecimiento (\u03bb<1)"
+    )
+  )
+
+tab_lambda %>%
+  head() %>%
+  kbl(booktabs = TRUE, digits = 2, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+```{r}
+#| label: fig-c4-12
+#| fig-cap: "Trayectorias discretas estimadas con lambda calculado a partir de dos observaciones."
+#| warning: false
+
+trayec_lambda <- tab_lambda %>%
+  rowwise() %>%
+  mutate(curva = list(tibble(tiempo = 0:t, N = No * Lambda^(0:t)))) %>%
+  unnest(curva)
+
+ggplot(trayec_lambda, aes(x = tiempo, y = N,
+                          group = interaction(No, Nt, t),
+                          shape = Interpretacion,
+                          linetype = Interpretacion)) +
+  geom_step(linewidth = 1, direction = "hv") +
+  geom_point(size = 2) +
+  labs(title    = "Estimación de \u03bb y trayectorias discreta N(t) = N0 \u00b7 \u03bb^t",
+       x = "Tiempo (t)", y = "tamaño poblacional (N)",
+       shape    = "Interpretación",
+       linetype = "Interpretación") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 6 — Reconstruir r a partir de λ
+
+$$
+r = \ln(\lambda)
+$$
+
+```{r}
+#| label: tbl-c4-4
+#| tbl-cap: "Conversión de λ a r y métricas derivadas."
+
+lambda_val <- c(0.6, 0.8, 1.0, 1.2, 1.5)
+
+tab_r <- tibble(lambda = lambda_val, r = log(lambda_val)) %>%
+  mutate(
+    clasificacion = case_when(
+      lambda > 1  ~ "Crecimiento",
+      lambda == 1 ~ "Estable",
+      TRUE        ~ "Decrecimiento"
+    ),
+    T_dup  = if_else(r > 0, log(2)   / r, as.numeric(NA)),
+    T_half = if_else(r < 0, log(0.5) / r, as.numeric(NA))
+  )
+
+tab_r %>%
+  head() %>%
+  kbl(booktabs = TRUE, digits = 2, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+```{r}
+#| label: fig-c4-13
+#| fig-cap: "Comparación de trayectorias: continuo (r = ln λ) vs. discreto (λ) para varios valores de λ."
+#| warning: false
+
+N0 <- 40; t_max <- 12
+tiempos_cont <- seq(0, t_max, by = 0.25)
+tiempos_disc <- 0:t_max
+
+curvas <- map_dfr(lambda_val, function(lmb) {
+  r_val <- log(lmb)
+  bind_rows(
+    tibble(Modelo = "Continuo", lambda = lmb, r = r_val,
+           t = tiempos_cont, N = N0 * exp(r_val * tiempos_cont)),
+    tibble(Modelo = "Discreto", lambda = lmb, r = r_val,
+           t = tiempos_disc, N = N0 * (lmb^tiempos_disc))
+  )
+})
+
+ggplot(curvas, aes(x = t, y = N)) +
+  geom_step(linewidth = 1, direction = "hv") +
+  geom_point(data = filter(curvas, Modelo == "Discreto"), size = 1.5) +
+  facet_wrap(~ lambda, scales = "free_y") +
+  labs(title    = "Trayectorias equivalentes: modelo continuo vs. discreto",
+       subtitle = "Relaci\u00f3n: lambda = e^r  \u21d4  r = ln(lambda)",
+       x = "Tiempo (t)", y = "tamaño de la poblaci\u00f3n (N)") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+# B. Modelo logístico
+
+$$
+\frac{dN}{dt} = rN\left(1-\frac{N}{K}\right)
+\qquad
+N(t) = \frac{K}{1 + \left(\frac{K-N_0}{N_0}\right)e^{-rt}}
+$$
+
+------------------------------------------------------------------------
+
+#### Ejemplo 1 — Tasa inicial dN/dt
+
+$$
+\left.\frac{dN}{dt}\right|_{t=0} = rN_0\left(1 - \frac{N_0}{K}\right)
+= 0.05 \times 500 \times \left(1 - \frac{500}{10000}\right) = 23.75
+$$
+
+```{r}
+#| label: ej1-logistico
+#| echo: true
+
+r <- 0.05; N0 <- 500; K <- 10000
+dNdt_0 <- r * N0 * (1 - N0 / K)
+dNdt_0
+
+# Segundo escenario
+r <- 0.04; N0 <- 200; K <- 5000
+r * N0 * (1 - N0 / K)
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 2 — Tamaño tras 6 meses (t = 180 días)
+
+```{r}
+#| label: ej2-logistico
+#| echo: true
+
+N0 <- 100; K <- 400; r <- 0.02; t <- 180
+N_t <- K / (1 + ((K - N0) / N0) * exp(-r * t))
+N_t
+
+# Tiempo requerido para alcanzar 80% de K
+N0 <- 50; K <- 500; r <- 0.1; Nstar <- 0.8 * K
+t_req <- (1 / r) * log(((K - N0) / N0) * (Nstar / (K - Nstar)))
+t_req
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 3 — Curva logística base (simulación)
+
+```{r}
+#| label: fig-logistico-base
+#| fig-cap: Modelo logístico de crecimiento poblacional (N0 = 20, r = 0.35, K = 500).
+
+N0 <- 20; r <- 0.35; K <- 500
+t  <- seq(0, 35, by = 0.25)
+tabla <- tibble(t, N = logistico_N(t, N0 = N0, r = r, K = K))
+
+ggplot(tabla, aes(t, N)) +
+  geom_line(linewidth = 1.1) +
+  geom_hline(yintercept = K, linetype = 2) +
+  labs(title    = "Modelo logístico de crecimiento poblacional",
+       subtitle = paste0("N0 = ", N0, ", r = ", r, ", K = ", K),
+       x = "Tiempo (t)", y = "tamaño poblacional (N)") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 4 — b'(N) cuadrática y d'(N) lineal
+
+```{r}
+#| label: ej4-tabla
+#| tbl-cap: "Valores de b' y d' en función de N (cada 5 unidades)."
+
+b_p <- function(N) 0.12 + 0.01 * N - 0.0001 * N^2
+d_p <- function(N) 0.18 + 0.008 * N
+N_vals <- seq(0, 50, by = 5)
+
+tab <- tibble(N    = N_vals,
+              `b'` = round(b_p(N_vals), 4),
+              `d'` = round(d_p(N_vals), 4))
+
+kbl(tab, booktabs = TRUE, digits = 2, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+```{r}
+#| label: fig-c4-14
+#| fig-cap: "b'(N) (cuadrática) y d'(N) (lineal). El máximo de b' ocurre en N = 50."
+
+tabla <- tibble(N = seq(0, 60, by = 1)) %>%
+  mutate(b = b_p(N), d = d_p(N)) %>%
+  pivot_longer(cols = c(b, d), names_to = "tasa", values_to = "valor")
+
+ggplot(tabla, aes(N, valor, linetype = tasa)) +
+  geom_line(linewidth = 1.1) +
+  geom_vline(xintercept = 50, linetype = 2) +
+  labs(y     = "Tasa espec\u00edfica",
+       title = "Tasas densodependientes") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 5 — Población tras 12 meses
+
+```{r}
+#| label: ej5-logistico
+#| echo: true
+
+N0 <- 150; K <- 3000; r <- 0.03; t <- 12
+K / (1 + ((K - N0) / N0) * exp(-r * t))
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 6 — Tiempo hasta 75% de K
+
+```{r}
+#| label: ej6-logistico
+#| echo: true
+
+N0 <- 50; K <- 800; r <- 0.08; Nstar <- 0.75 * K
+(1 / r) * log(((K - N0) / N0) * (Nstar / (K - Nstar)))
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 7 — K reducida por degradación
+
+```{r}
+#| label: ej7-logistico
+#| echo: true
+
+N0 <- 200; Kp <- 840; r <- 0.06; f <- 0.99; Nstar <- f * Kp
+t_99 <- (1 / r) * log(((Kp - N0) / N0) * (Nstar / (Kp - Nstar)))
+t_99
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 8 — Tamaño tras 24 h
+
+```{r}
+#| label: ej8-logistico
+#| echo: true
+
+r <- 0.07; K <- 50000; N0 <- 1000; t <- 24
+K / (1 + ((K - N0) / N0) * exp(-r * t))
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 9 — Equilibrio con b'(N) y d'(N): detección numérica
+
+```{r}
+#| label: ej9-equilibrio
+#| echo: true
+
+b2   <- function(N) 0.10 + 0.015 * N - 0.00015 * N^2
+d2   <- function(N) 0.12 + 0.006  * N
+f_eq <- function(N) b2(N) - d2(N)
+
+uniroot_all <- function(f, interval, n = 2000) {
+  xs          <- seq(interval[1], interval[2], length.out = n)
+  ys          <- f(xs)
+  sign_change <- which(diff(sign(ys)) != 0)
+  roots       <- purrr::map_dbl(sign_change,
+                                 ~ uniroot(f, c(xs[.x], xs[.x + 1]))$root)
+  unique(round(roots, 6))
+}
+
+roots <- uniroot_all(f_eq, c(0, 1000))
+roots
+```
+
+```{r}
+#| label: fig-c4-15
+#| fig-cap: "Intersección b'(N) = d'(N) define los estados de equilibrio."
+
+df <- tibble(N = seq(0, 300, by = 1), b = b2(N), d = d2(N))
+
+ggplot(df, aes(N)) +
+  geom_line(aes(y = b, linetype = "b'(N)"), linewidth = 1.1) +
+  geom_line(aes(y = d, linetype = "d'(N)"), linewidth = 1.1) +
+  geom_vline(xintercept = roots, linetype = 2) +
+  labs(y        = "Tasa espec\u00edfica (b' y d')",
+       x        = "tamaño de la poblaci\u00f3n (N)",
+       linetype = "",
+       title    = "Equilibrios por intersecci\u00f3n de tasas") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 10 — Tiempo para duplicar N0
+
+```{r}
+#| label: ej10-logistico
+#| echo: true
+
+r <- 0.05; K <- 1000; N0 <- 200; Nstar <- 2 * N0
+(1 / r) * log(((K - N0) / N0) * (Nstar / (K - Nstar)))
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 11 — Tasa dN/dt en t = 10 días
+
+```{r}
+#| label: ej11-logistico
+#| echo: true
+
+r <- 0.09; K <- 10000; N0 <- 500; t <- 10
+N10     <- K / (1 + ((K - N0) / N0) * exp(-r * t))
+dNdt_10 <- r * N10 * (1 - N10 / K)
+N10; dNdt_10
+```
+
+------------------------------------------------------------------------
+
+## B.2 Simulaciones — Efecto de los parámetros
+
+#### Efecto de la capacidad de carga (K)
+
+```{r}
+#| label: fig-logistico-efecto-K
+#| fig-cap: Efecto de distintos valores de K sobre la trayectoria logística.
+
+N0 <- 20; r <- 0.30; K_vals <- c(100, 300, 600)
+t  <- seq(0, 35, by = 0.25)
+
+tabla <- map_dfr(K_vals,
+  function(Ki) tibble(t, K = factor(Ki),
+                      N = logistico_N(t, N0 = N0, r = r, K = Ki)))
+
+ggplot(tabla, aes(t, N, linetype = K)) +
+  geom_line(linewidth = 1.05) +
+  labs(title    = "Efecto de la capacidad de carga (K)",
+       x = "Tiempo (t)", y = "tamaño poblacional (N)", linetype = "K") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+#### Efecto de la tasa intrínseca de crecimiento (r)
+
+```{r}
+#| label: fig-logistico-efecto-r
+#| fig-cap: Efecto de distintos valores de r sobre la trayectoria logística (K = 400).
+
+N0 <- 20; K <- 400; r_vals <- c(0.10, 0.25, 0.50)
+
+tabla <- map_dfr(r_vals,
+  function(ri) tibble(t, r = factor(ri),
+                      N = logistico_N(t, N0 = N0, r = ri, K = K)))
+
+ggplot(tabla, aes(t, N, linetype = r)) +
+  geom_line(linewidth = 1.05) +
+  geom_hline(yintercept = K, linetype = 2) +
+  labs(title    = "Efecto de la tasa intr\u00ednseca de crecimiento (r)",
+       x = "Tiempo (t)", y = "tamaño poblacional (N)", linetype = "r") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+#### Velocidad de crecimiento dN/dt = rN(1 - N/K)
+
+```{r}
+#| label: fig-logistico-dNdt
+#| fig-cap: Velocidad de crecimiento parabólica del modelo logístico. El máximo ocurre en N = K/2.
+
+r <- 0.50; K <- 400
+N_vals <- seq(0, K, length.out = 300)
+tabla  <- tibble(N = N_vals, dNdt = r * N_vals * (1 - N_vals / K))
+
+ggplot(tabla, aes(N, dNdt)) +
+  geom_line(linewidth = 1.1) +
+  geom_vline(xintercept = K / 2, linetype = 2) +
+  labs(title    = "Velocidad de crecimiento en el modelo logístico",
+       subtitle = "dN/dt = rN(1 - N/K)",
+       x = "tamaño poblacional (N)", y = "Velocidad de aumento (dN/dt)") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+#### Comparación: exponencial vs. logístico
+
+```{r}
+#| label: fig-exp-vs-log
+#| fig-cap: Comparación entre crecimiento exponencial y logístico (N0 = 20, r = 0.28, K = 300).
+
+N0 <- 20; r <- 0.28; K <- 300
+t2 <- seq(0, 30, by = 0.25)
+
+tabla <- tibble(t = t2,
+                Exponencial = N0 * exp(r * t2),
+                Logistico   = logistico_N(t2, N0 = N0, r = r, K = K)) %>%
+  pivot_longer(cols = c(Exponencial, Logistico),
+               names_to = "Modelo", values_to = "N")
+
+ggplot(tabla, aes(t, N, linetype = Modelo)) +
+  geom_line(linewidth = 1.05) +
+  geom_hline(yintercept = K, linetype = 2) +
+  labs(title    = "Comparación entre crecimiento exponencial y logístico",
+       x = "Tiempo (t)", y = "tamaño poblacional (N)", linetype = "Modelo") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+#### Influencia del tamaño inicial (N0)
+
+```{r}
+#| label: fig-logistico-efecto-N0
+#| fig-cap: Influencia del tamaño inicial N0 sobre la trayectoria logística (r = 0.30, K = 300).
+
+r <- 0.30; K <- 300; N0_vals <- c(10, 50, 150, 280)
+
+tabla <- map_dfr(N0_vals,
+  function(N0i) tibble(t = t2, N0 = factor(N0i),
+                       N  = logistico_N(t2, N0 = N0i, r = r, K = K)))
+
+ggplot(tabla, aes(t, N, linetype = N0)) +
+  geom_line(linewidth = 1.05) +
+  geom_hline(yintercept = K, linetype = 2) +
+  labs(title    = "Influencia del tamaño inicial en la trayectoria log\u00edstica",
+       x = "Tiempo (t)", y = "tamaño poblacional (N)", linetype = "N0") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+## B.3 Tabla resumen comparativa
+
+```{r}
+#| label: tbl-resumen-modelos
+#| tbl-cap: "Comparación entre el modelo exponencial y el modelo logístico."
+
+tribble(
+  ~Aspecto,                ~`Modelo exponencial`,          ~`Modelo logístico`,
+  "Supuesto central",      "No hay limitación ambiental",  "Existe limitación por recursos",
+  "Parámetro clave",       "r o \u03bb",                   "r y K",
+  "Forma de la curva",     "J",                            "Sigmoide",
+  "Regulación densidad",   "No",                           "Sí",
+  "Aplicación conceptual", "Potencial biótico",            "Crecimiento regulado"
+) %>%
+  kbl(booktabs = TRUE, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+------------------------------------------------------------------------
+
+# Errores comunes e interpretación ecológica
+
+Un error frecuente consiste en asumir que el crecimiento exponencial describe permanentemente a las poblaciones naturales. En realidad, suele representar fases tempranas o condiciones excepcionales (poblaciones invasoras, cultivos bacterianos, primeras etapas de recolonización).
+
+También es común interpretar $K$ como un valor fijo e inmutable. En ecosistemas reales, $K$ varía con el tiempo en función de la disponibilidad de recursos, la calidad del hábitat y las perturbaciones ambientales.
+
+Finalmente, conviene recordar que $r$ y $\lambda$ no son parámetros independientes: $\lambda = e^r$. Confundirlos conduce a errores de escala en las proyecciones poblacionales.
+
+------------------------------------------------------------------------
+
+# Transición hacia el siguiente capítulo
+
+Hasta aquí el análisis se ha centrado en el **tamaño total de la población** como variable de estado, asumiendo que todos los individuos son demográficamente equivalentes. El siguiente capítulo abordará la **estructura interna de las poblaciones** mediante tablas de vida y modelos matriciales, incorporando la edad o estadio de los individuos como dimensión analítica fundamental.

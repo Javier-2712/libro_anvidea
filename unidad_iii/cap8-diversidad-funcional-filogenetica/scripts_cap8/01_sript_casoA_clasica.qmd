@@ -1,0 +1,1034 @@
+
+## Caso guiado: Diversidad funcional y filogenética de peces en ríos de México
+
+## A. Propuestas clásicas de diversidad funcional y filogenética
+
+#### 1) Librerías requeridas
+
+```{r, echo=FALSE}
+#| message: false
+#| warning: false
+
+suppressPackageStartupMessages({
+  
+# --- Núcleo de datos ---
+  library(tidyverse)     # Para manipulación, visualización y programación.
+  # Nota: si se carga tidyverse, NO es necesario: dplyr, tidyr, purrr, 
+  # stringr o ggplot2.
+  
+# --- Entrada / salida ---
+  library(readxl)        # Leer archivos Excel (.xlsx)
+  library(writexl)       # Exportar data frames a Excel (.xlsx)
+  
+# --- Tablas en reportes ---
+  library(kableExtra)    # Mejorar el formato de tablas (kable) en reportes
+  
+# --- Diversidad funcional y herramientas afines ---
+  library(FD)            # Métricas de div. func. (FRic, FEve, FDiv, CWM, etc.)
+  library(factoextra)    # Visualiz. de clustering (jerárquico y particional).
+  
+# --- Gráficos y estética ---
+  library(ggplot2)       # Construir figuras (gramática de los gráficos)
+  library(RColorBrewer)  # Paletas de color para ggplot2
+  library(ggrepel)       # Etiquetas que no se sobreponen en gráficos
+  
+# --- Filogenia y taxonomía ---
+  library(ape)           # Manipulación de árboles filogenéticos
+  library(taxize)        # Resolución/validación de nombres e IDs taxonómicos
+  
+# --- Diversidad (números de Hill) ---
+  # Instalar si hace falta (desde GitHub):
+  # remotes::install_github("JohnsonHsing/iNEXT.3D")
+  # remotes::install_github("JohnsonHsing/iNEXTbeta3D")
+  library(iNEXT.3D)      # Números de Hill en 3 dimensiones (TD/FD/PD)
+  library(iNEXT.beta3D)   # Extensión para beta-diversidad (TD/FD/PD)
+})
+
+```
+
+#### 2) Organizacion de los datos
+
+##### 2.1 **Datos taxonómicos (`biol1`)**
+
+```{r}
+#| label: tbl-c8-1
+#| tbl-cap: "Resumen de la base de datos de abundancias, con las 10 primeras especies de peces con sus nombres abreviados"
+#| message: false
+#| warning: false
+#| echo: false
+
+library(readxl)
+library(dplyr)
+library(knitr)
+
+# Cargar datos desde Excel
+taxas <- read_xlsx("datos.c8.xlsx", sheet = "tax")
+
+# Matriz de abundancias con nombres abreviados
+biol1 <- 
+  taxas %>%
+  dplyr::select(-1, -2) %>%          # Quita Sites y Sites1
+  rename_with(~ abbreviate(.x, minlength = 4))
+
+# Subconjunto ilustrativo: 4 filas x 8 columnas
+biol1_head <- 
+  biol1 %>% 
+  dplyr::select(1:10) %>% 
+  head(4)
+
+# Tabla sencilla para PDF (sin longtabu)
+knitr::kable(
+  biol1_head,
+  booktabs = TRUE
+)
+```
+
+##### 2.2 **Datos funcionales (`rasgos1`)**
+
+```{r}
+#| label: tbl-c8-2
+#| tbl-cap: "Resumen de la base de datos de rasgos funcionales"
+#| message: false
+#| warning: false
+#| echo: false
+
+# Cargar datos desde Excel
+# Leer como tibble y convertir a data.frame (para poder usar rownames)
+rasgos <- read_xlsx("datos.c8.xlsx", sheet = "rasgos") %>% 
+    as.data.frame()
+
+# Usar la primera columna (abreviaturas) como nombres de fila
+# asegurar unicidad/validez
+rownames(rasgos) <- make.names(rasgos[[1]], unique = TRUE)  
+
+# eliminar la columna de abreviaturas
+rasgos <- rasgos[ , -1, drop = FALSE]       
+
+# str(rasgos)
+rasgos1 <- rasgos[ , 5:14]
+
+# Resumen de la base de datos de rasgos funcionales.
+head(rasgos1, 4) %>%
+  dplyr::select(1:7) %>% 
+  kbl(booktabs = TRUE, longtable = TRUE) %>%
+  kable_classic(full_width = F)
+
+```
+
+
+##### 2.3 **Datos de coordenadas de las localidades (`coord`)**
+
+```{r}
+#| label: tbl-c8-3
+#| tbl-cap: "Resumen de la base de datos de las coordenadas de las localidades"
+#| message: false
+#| warning: false
+#| echo: false
+
+coord <- read_xlsx("datos.c8.xlsx", sheet = "coord") %>% 
+  dplyr::select(6,7) %>% 
+  dplyr::rename(x= Longitude, y= Latitude)   # columnas de coordenadas
+
+# Resumen de la base de datos de coordenadas.
+head(coord, 4) %>%
+  kbl(booktabs = TRUE, digits = 3,
+      longtable = TRUE) %>%
+  kable_classic(full_width = F)
+```
+
+## A.1 Diversidad alfa funcional - enfoque de marco flexible
+
+```{r}
+#| label: tbl-c8-4
+#| tbl-cap: "Resumen de valores promedio ponderados por abundancia (CWM) de cada rasgo funcionales"
+#| message: false
+#| warning: false
+#| echo: false
+
+library(FD)
+
+# Calcular los valores promedio ponderados por abundancia (CWM) de cada rasgo funcional
+# para cada sitio, usando la matriz de rasgos (rasgos1) y la matriz de abundancias (biol1).
+d.func1 <- functcomp(rasgos1, as.matrix(biol1), CWM.type = "all")
+
+# Visualiza las primeras filas del resumen de CWMs en formato de tabla.
+head(d.func1, 4) %>%
+  dplyr::select(1:6) %>% 
+  kbl(booktabs = TRUE, digits = 2, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+#### 1) Diversidad funcional alfa con la función dbFD()
+
+```{r, echo=FALSE}
+#| message: false
+#| warning: false
+
+# Cálculo de índices de diversidad funcional con dbFD() del paquete FD
+# rasgos1 : matriz de rasgos funcionales (filas = especies, columnas = rasgos)
+# biol1   : matriz de ensamblajes (filas = sitios, columnas = especies)
+#           Las especies deben coincidir entre rasgos1 (filas) y biol1 (columnas)
+
+res <- 
+  dbFD(
+  rasgos1, 
+  as.matrix(biol1),
+  asym.bin   = 5:10,        # definir columnas con rasgos binarios asimétricos
+  stand.FRic = TRUE,        # estandarizar FRic (riqueza funcional) por No especies
+  corr       = "cailliez",  # corrección para asegurar distancias euclidianas en la PCoA
+  CWM.type   = "all",       # calcular todas las medias ponderadas por rasgo (CWMs)
+  calc.FDiv  = TRUE,        # incluir el cálculo de Divergencia Funcional (FDiv)
+  calc.FGR   = FALSE,       # calcula grupos funcionales (evita interactividad en Quarto)
+  messages   = FALSE        # suprimir mensajes durante la ejecución
+)
+
+
+# Ejemplo con diversidad funcional- (res$FRic)
+# Crear un data frame con los valores de FRic por sitio
+df_FRic <- tibble(
+  Sitio = rownames(biol1),
+  FRic  = as.numeric(res$FRic)
+)
+
+```
+
+```{r}
+#| message: false
+#| warning: false
+
+# Combina los índices principales calculados por dbFD()
+df_FD <- 
+  tibble(
+  Sitio = rownames(biol1),
+  FRic  = as.numeric(res$FRic),     # Riqueza funcional
+  FEve  = as.numeric(res$FEve),     # Uniformidad funcional
+  FDiv  = as.numeric(res$FDiv),     # Divergencia funcional
+  FDis  = as.numeric(res$FDis),     # Dispersión funcional
+  RaoQ  = as.numeric(res$RaoQ)      # Entropía de Rao (opcional)
+)
+```
+
+```{r, echo=FALSE}
+#| label: tbl-c8-5
+#| tbl-cap: "Índices de diversidad funcional con dbFD() del paquete FD"
+#| message: false
+#| warning: false
+
+# Visualizar las 8 primeras filas
+df_FD %>%
+  head(8) %>%
+  kbl(digits = 2, booktabs = TRUE,
+      longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+```
+
+#### 2) Clasificación de especies por sus estrategias funcionales
+
+```{r, echo=FALSE}
+#| message: false
+#| warning: false
+
+# Cálculo manual de los grupos funcionales (FGR) con Ward.D2
+# En este paso se agrupan las especies según su similitud funcional
+# (utilizando la matriz de disimilitudes de Gower y el método de Ward)
+
+d_trait <- gowdis(rasgos1,          # disimilitud funcional (mezcla de rasgos 
+                  asym.bin = 5:10)  # cuantitativos y binarios)
+hc      <- hclust(d_trait, 
+                  "ward.D2")        # dendrograma jerárquico - método de Ward
+grp     <- cutree(hc, k = 3)        # tres grupos funcionales 
+```
+
+```{r}
+#| label: fig-c8-1
+#| fig-cap: "Dendograma jerárquico para la clasificación de especies por sus estrategias funcionales"
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-pos: 'H'
+#| fig-width: 8
+#| fig-height: 4
+
+# Paquetes
+suppressPackageStartupMessages({
+  library(FD)
+  library(factoextra)
+  library(RColorBrewer)
+  library(stringr)
+  library(ggplot2)
+})
+
+# --- 1) Distancia funcional y clustering jerárquico
+x.dist <- gowdis(rasgos1)
+hc <- hclust(x.dist, method = "ward.D2")
+
+# --- 2) Limpieza de etiquetas
+hc$labels <- hc$labels %>%
+  str_replace_all("_", " ") %>%
+  str_squish()
+
+# --- 3) Número de grupos funcionales
+k <- 3
+
+# --- 4) Dendrograma sin rectángulos ni fondo
+p <- fviz_dend(
+  hc,
+  k = k,
+  cex = 0.55,                    # tamaño de etiquetas
+  lwd = 0.7,
+  k_colors = brewer.pal(max(k, 3), "Dark2"),
+  rect = FALSE,                 # <<< SIN RECTÁNGULOS
+  horiz = FALSE,
+  main = "Dendrograma funcional de especies",
+  ylab = "Distancia funcional (Ward.D2)",
+  xlab = ""
+) +
+  theme_classic(base_size = 14) +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA),
+    panel.grid = element_blank(),
+    axis.text.x = element_text(size = 10, angle = 90, vjust = 0.5, hjust = 1),
+    axis.text.y = element_text(size = 10),
+    plot.title = element_text(face = "bold", size = 15, hjust = 0.5)
+  )
+
+print(p)
+
+# --- 5) Exportar imagen en alta resolución
+# ggsave(
+#  "dendrograma_funcional_sin_rectangulos.png",
+#  p, wiTDh = 12, height = 9, dpi = 300, bg = "white"
+#)
+
+
+```
+
+
+```{r}
+#| label: fig-c8-2
+#| fig-cap: "Dendograma no jerárquico de k-medias para la clasificación de especies por sus estrategias funcionales"
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-pos: 'H'
+#| fig-width: 7
+#| fig-height: 6
+
+# Paquetes
+suppressPackageStartupMessages({
+  library(FD)        # gowdis
+  library(ape)       # pcoa
+  library(ggplot2)
+  library(ggrepel)
+  library(stringr)
+  library(dplyr)
+})
+
+# --- 1) Distancia funcional (Gower) desde rasgos (filas = especies)
+d_gow <- gowdis(rasgos1)  # si tienes ordinales/binarios asimétricos, ajusta args de gowdis()
+
+# --- 2) PCoA con corrección (garantiza euclidianidad)
+pc <- ape::pcoa(as.matrix(d_gow), correction = "cailliez")
+stopifnot(ncol(pc$vectors) >= 2)
+
+# % var. por eje para rótulos
+var1 <- round(100 * pc$values$Rel_corr_eig[1], 1)
+var2 <- round(100 * pc$values$Rel_corr_eig[2], 1)
+
+# Coordenadas para graficar (PCoA1-2)
+X <- as.data.frame(pc$vectors[, 1:2, drop = FALSE])
+colnames(X) <- c("PCoA1","PCoA2")
+X$Especie <- rownames(X)
+
+# Abreviaturas legibles (ajusta minlength si quieres más/menos letras)
+X$Abrev <- abbreviate(X$Especie %>% str_replace_all("_"," ") %>% str_squish(),
+                      minlength = 6, strict = TRUE)
+
+# --- 3) k-means con k = 3
+set.seed(123)
+km3 <- kmeans(scale(X[, c("PCoA1","PCoA2")]), centers = 3, nstart = 50)
+X$cluster <- factor(km3$cluster)
+
+# --- 4) Gráfico único (sin fondo gris, con etiquetas abreviadas y elipses de confianza)
+p <- ggplot(X, aes(PCoA1, PCoA2, color = cluster, label = Abrev)) +
+  stat_ellipse(type = "norm", level = 0.68, linewiTDh = 0.7, alpha = 0.12, show.legend = FALSE) +
+  geom_point(size = 2.1, show.legend = TRUE) +
+  ggrepel::geom_text_repel(size = 3.2, max.overlaps = 100, show.legend = FALSE) +
+  scale_color_brewer(palette = "Dark2") +
+  labs(
+    title = "Clúster k-medias en el espacio funcional (PCoA)",
+    x = paste0("PCoA1 (", var1, "%)"),
+    y = paste0("PCoA2 (", var2, "%)"),
+    color = "cluster"
+  ) +
+  theme_classic(base_size = 13) +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background  = element_rect(fill = "white", color = NA),
+    legend.position  = "bottom",
+    plot.title = element_text(face = "bold", hjust = 0.5)
+  )
+
+print(p)
+
+# --- 5) Exportar y (opcional) guardar tabla especie→grupo
+# ggsave("kmeans_funcional_k3_labels.png", p, wiTDh = 10, height = 7, dpi = 300, bg = "white")
+
+grupos_k3 <- X %>% 
+  dplyr::select(Especie, Abrev, cluster) %>% 
+  arrange(cluster, Especie)
+# write.csv(grupos_k3, "grupos_kmeans_k3.csv", row.names = FALSE)
+```
+
+#### 3) Clasificación de sitios por su diversidad funcional
+
+```{r}
+#| label: fig-c8-3
+#| fig-cap: "Mapas de distribución espacial de índices de diversidad funcional: (a) riqueza y equidad funcional (FRic, FEve); (b) divergencia y dispersión funcional (FDiv, FDis); (c) entropía cuadrática de Rao y riqueza de grupos funcionales (RaoQ, FGR)."
+#| fig-width: 8
+#| fig-height: 11
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-pos: 'H'
+
+# Paneles más altos y con menos márgenes internos
+par(mfrow = c(3, 2),              # 3 filas x 2 columnas
+    mar   = c(4.5, 4.5, 3, 1),    # márgenes de cada panel (abajo, izquierda, arriba, derecha)
+    oma   = c(0, 0, 0, 0),        # sin márgenes externos
+    cex.axis = 0.9,
+    cex.lab  = 1.2,
+    cex.main = 1.1)
+
+# ---- Figura 3a: Riqueza y equidad funcional ----
+plot(coord, 
+     asp = 1, 
+     pch = 21, 
+     cex.axis = 0.8, 
+     col = "white", 
+     bg = "brown", 
+     cex = res$FRic * 5, 
+     main = "3a) Riqueza funcional (FRic)", 
+     xlab = "Coordenadas x (km)", 
+     ylab = "Coordenadas y (km)"
+)
+lines(coord, col = "light blue")
+
+plot(coord, 
+     asp = 1, 
+     pch = 21, 
+     cex.axis = 0.8, 
+     col = "white", 
+     bg = "brown", 
+     cex = res$FEve * 6, 
+     main = "3a) Equidad funcional (FEve)", 
+     xlab = "Coordenadas x (km)", 
+     ylab = "Coordenadas y (km)"
+)
+lines(coord, col = "light blue")
+
+# ---- Figura 3b: Divergencia y dispersión funcional ----
+plot(coord, 
+     asp = 1, 
+     pch = 21, 
+     cex.axis = 0.8, 
+     col = "white", 
+     bg = "brown", 
+     cex = res$FDiv * 5, 
+     main = "3b) Divergencia funcional (FDiv)", 
+     xlab = "Coordenadas x (km)", 
+     ylab = "Coordenadas y (km)"
+)
+lines(coord, col = "light blue")
+
+plot(coord, 
+     asp = 1, 
+     pch = 21, 
+     cex.axis = 0.8, 
+     col = "white", 
+     bg = "brown", 
+     cex = res$FDis * 1.5, 
+     main = "3b) Dispersión funcional (FDis)", 
+     xlab = "Coordenadas x (km)", 
+     ylab = "Coordenadas y (km)"
+)
+lines(coord, col = "light blue")
+
+# ---- Figura 3c: RaoQ y riqueza de grupos funcionales ----
+plot(coord, 
+     asp = 1, 
+     pch = 21, 
+     cex.axis = 0.8, 
+     col = "white", 
+     bg = "brown", 
+     cex = res$RaoQ / 2, 
+     main = "3c) Entropía cuadrática de Rao (RaoQ)", 
+     xlab = "Coordenadas x (km)", 
+     ylab = "Coordenadas y (km)"
+)
+lines(coord, col = "light blue")
+
+plot(coord, 
+     asp = 1, 
+     pch = 21, 
+     cex.axis = 0.8, 
+     col = "white", 
+     bg = "brown", 
+     cex = res$FGR / 2, 
+     main = "3c) Riqueza de grupos funcionales (FGR)", 
+     xlab = "Coordenadas x (km)", 
+     ylab = "Coordenadas y (km)"
+)
+lines(coord, col = "light blue")
+
+```
+
+#### 4) Relación entre la diversidad alfa taxonómica y funcional
+
+
+```{r, echo=FALSE}
+#| message: false
+#| warning: false
+
+# Índices de diversidad alfa de los ensamblajes de peces
+N0 <- rowSums(biol1 > 0)          # Riqueza de especies (# de especies presentes)
+N0 <- specnumber(biol1)           # Riqueza de especies (con librería vegan)
+H <- diversity(biol1)             # Entropía de Shannon (base e)
+Hb2 <- diversity(biol1, base = 2) # Entropía de Shannon (base 2)
+N1 <- exp(H)                      # Diversidad de Shannon (base e)
+N1b2 <- 2^Hb2                     # Diversidad de Shannon (base 2)
+N2 <- diversity(biol1, "inv")     # Diversidad de Simpson 
+J <- H / log(N0)                  # Equidad de Pielou
+E10 <- N1 / N0                    # Equidad de Shannon (razón de Hill)
+E20 <- N2 / N0                    # Equidad de Simpson (razón de Hill)
+div <- data.frame(N0, H, Hb2, N1, N1b2, N2, E10, E20, J)
+#---
+```
+
+```{r}
+#| message: false
+#| warning: false
+ 
+# Índices funcionales al data frame 'div'
+div$FRic <- res$FRic   # Riqueza funcional
+div$FEve <- res$FEve   # Equidad funcional
+div$FDiv <- res$FDiv   # Divergencia funcional
+div$FDis <- res$FDis   # Dispersión funcional
+div$RaoQ <- res$RaoQ   # Entropía cuadrática de Rao
+div$FGR  <- res$FGR    # Riqueza de grupos funcionales
+
+# Crear el marco de datos final incluyendo los nombres de los sitios
+div <- data.frame(Sitios = taxas$Sites, div)
+```
+
+```{r, echo=FALSE}
+#| label: tbl-c8-7
+#| tbl-cap: "Resumen de índices de diversidad alfa taxonómica y funcional de los ensamblajes de peces evaluados, en los seis primeros sitios"
+#| message: false
+#| warning: false
+
+# Mostrar las primeras 4 filas de la tabla con formato estético
+head(div, 4) %>%
+  kbl(booktabs = TRUE, digits = 2,
+      longtable = TRUE) %>%
+  kable_classic(full_width = F)
+
+# Se puede guardar la tabla completa en formato Excel
+# write_xlsx(list(rasgoss = div), "div.xlsx")
+```
+
+
+## A.2 Diversidad taxonómica, funcional y filogenética - enfoque de entropía cuadrática de Rao
+
+#### 1) Construcción de la matriz de abundancia (`biol2`)
+
+```{r}
+#| label: tbl-c8-8
+#| tbl-cap: "Resumen de los Valores de abundancia de las especies de peces en cada localidad evaluada"
+#| message: false
+#| warning: false
+#| echo: false
+
+library(readxl)
+library(dplyr)
+
+# Cargar la base de datos taxonómica "tax"
+taxas <- read_xlsx("datos.c8.xlsx", sheet = "tax")
+
+# Abreviar los nombres de las especies y eliminar columnas no necesarias
+biol2 <- 
+  taxas %>%
+  dplyr::select(-1, -2) %>%          # excluye 'Sites' y 'Sites1'
+  rename_with(~ abbreviate(.x, minlength = 4))
+
+# Subconjunto ilustrativo: 4 filas x 10 columnas
+biol2_head <- 
+  biol2 %>% 
+  dplyr::select(1:10) %>% 
+  head(4)
+
+# Tabla sencilla para PDF (sin longtabu)
+knitr::kable(
+  biol2_head,
+  booktabs = F) %>%
+  kable_classic(full_width = FALSE)
+```
+
+#### 2) Organización de la matriz de rasgos (`rasgos2`)
+
+```{r}
+#| label: tbl-c8-9
+#| tbl-cap: "Resumen de los rasgos funcionales de las especies de peces en cada localidad evaluada"
+#| message: false
+#| warning: false
+#| echo: false
+
+# Este bloque carga la matriz de rasgos funcionales, 
+# asigna las abreviaturas como nombres de fila
+# y selecciona únicamente las columnas correspondientes a los rasgos.
+
+library(tibble)
+
+# Cargar la hoja de rasgos
+rasgos_raw <- read_xlsx("datos.c8.xlsx", sheet = "rasgos") %>%
+  as.data.frame()
+
+# Asignar abreviaturas como nombres de fila (columna 1 del archivo)
+rownames(rasgos_raw) <- make.names(rasgos_raw[[1]], unique = TRUE)
+
+# Seleccionar únicamente las columnas de rasgos (5 a 14)
+rasgos1 <- rasgos_raw[, 5:14, drop = FALSE]
+
+# Subconjunto ilustrativo: 4 filas x 8 columnas
+rasgos_head <- 
+  rasgos1 %>% 
+  dplyr::select(1:6) %>% 
+  head(4)
+
+# Tabla sencilla para PDF (sin longtabu)
+knitr::kable(
+  rasgos_head,
+  booktabs = F) %>%
+  kable_classic(full_width = FALSE)
+```
+
+#### 3) Identificación de especies problemáticas mediante NCBI
+
+```{r}
+#| message: FALSE
+#| warning: FALSE
+#| echo: false
+#| results: hide
+
+# Este bloque consulta la clasificación taxonómica en NCBI
+# para cada especie del archivo de rasgos, identifica cuáles
+# no fueron encontradas en la base de datos y genera sus
+# abreviaturas para poder excluirlas más adelante.
+
+library(taxize)
+
+# Vector de nombres científicos completos
+splist <- as.character(rasgos_raw$LatinName)
+
+# Función para silenciar mensajes y advertencias
+quiet <- function(x) {
+  suppressWarnings(suppressMessages(x))
+}
+
+# Consultar jerarquía taxonómica en NCBI sin imprimir nada 
+spcla <- quiet(classification(splist, db = "ncbi"))
+
+# Identificar especies no encontradas
+no_encontradas <- names(spcla)[
+  vapply(
+    spcla,
+    function(x) is.null(x) || all(is.na(x)),
+    logical(1)
+  )
+]
+```
+
+Se muestran las especies no identificadas por la base de datos "NCBI".
+
+```{r}
+# Abreviaturas de especies no encontradas
+no_encontradas_abrev <- abbreviate(no_encontradas, minlength = 4)
+no_encontradas_abrev
+
+```
+
+#### 4) Base de rasgos con la exclusión de las especies no encontradas
+
+```{r}
+#| label: tbl-c8-10
+#| tbl-cap: "Resumen de la base de datos con los rasgos funcionales sin las especies problemáticas de peces en cada localidad evaluada"
+#| message: FALSE
+#| warning: FALSE
+#| echo: false
+
+# Este bloque elimina de ambas matrices (biol1 y rasgos2) las
+# especies que no fueron encontradas en la clasificación NCBI.
+# Posteriormente fuerza los valores de abundancia a numéricos
+# y reemplaza cualquier NA por cero para garantizar matrices limpias.
+
+
+# Filtrar abundancias eliminando especies problemáticas
+biol2 <- 
+  biol1 %>%
+  dplyr::select(-any_of(no_encontradas_abrev)) %>%   # remueve columnas (especies) no encontradas
+  mutate(across(everything(), ~ suppressWarnings(as.numeric(.)))) %>% 
+  mutate(across(everything(), ~ tidyr::replace_na(., 0))) %>% 
+  as.matrix()
+
+# Filtrar rasgos eliminando las mismas especies
+rasgos2 <- rasgos1[
+  !(rownames(rasgos1) %in% no_encontradas_abrev),
+  , drop = FALSE
+]
+
+# Subconjunto ilustrativo: 4 filas x 8 columnas
+rasgos2_head <- 
+  rasgos2 %>% 
+  dplyr::select(1:6) %>% 
+  head(4)
+
+# Tabla sencilla para PDF (sin longtabu)
+knitr::kable(
+  rasgos2_head,
+  booktabs = F) %>%
+  kable_classic(full_width = FALSE)
+```
+
+#### 5) Matriz de distancia filogenética (`phylo.d`)
+
+```{r}
+#| label: tbl-c8-11
+#| tbl-cap: "Subconjunto ilustrativo de la matriz de distancia filogenética (cofenética) entre especies, derivada de la clasificación taxonómica obtenida en NCBI."
+#| message: FALSE
+#| warning: FALSE
+#| echo: false
+
+# Este bloque construye un árbol filogenético simplificado a partir de la
+# clasificación taxonómica (NCBI) y calcula la matriz de distancias
+# cofenéticas entre especies. Finalmente, reetiqueta filas y columnas 
+# para que coincidan exactamente con los nombres abreviados presentes en biol2.
+
+library(ape)
+
+# Construcción del árbol filogenético simplificado basado en taxize::classification
+tr <- class2tree(spcla)
+
+# Matriz de distancias filogenéticas (cofenética), escalada a ~0–1
+phylo.d <- cophenetic(tr$phylo) / 100
+
+# Reetiquetar filas y columnas para que coincidan con las especies abreviadas de biol2
+rownames(phylo.d) <- colnames(biol2)
+colnames(phylo.d) <- colnames(biol2)
+
+# --- Subconjunto ilustrativo para PDF ----
+# 4 primeras filas x 10 primeras columnas
+phylo_head <- phylo.d[1:10, 1:10]
+
+# Mostrar tabla simple (PDF-friendly)
+knitr::kable(
+  phylo_head,
+  digits = 3,
+  booktabs = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+```
+
+
+#### 6) Matriz de distancia funcional de Gower (`rasgos.d`)
+
+```{r}
+#| label: rao-p6-gower
+#| message: FALSE
+#| warning: FALSE
+#| echo: false
+
+# Este bloque calcula la matriz de disimilitud funcional basada en la
+# distancia de Gower (especies × especies). Se especifican las columnas 
+# binarias que deben tratarse como variables asimétricas (0/1).
+# Además, se genera un dendrograma funcional usando el método Ward.D2.
+
+library(FD)
+
+# Variables binarias presentes en la matriz de rasgos
+vars_bin <- c("omnivory","detritivory","herbivory",
+              "invertivory","piscivory")
+
+# Identificar su posición por índice dentro de rasgos2
+asym_idx <- match(vars_bin, colnames(rasgos2))
+
+# Matriz de disimilitud funcional según Gower
+rasgos.d <- gowdis(rasgos2, asym.bin = asym_idx)
+
+# Dendrograma funcional basado en la matriz anterior
+rasgos.gw <- hclust(rasgos.d, method = "ward.D2")
+
+# --- Subconjunto ilustrativo para PDF ----
+# Convertir a matriz para poder usar [fila, columna]
+rasgos_mat <- as.matrix(rasgos.d)
+
+# Mostrar tabla simple (PDF-friendly)
+rasgos_mat %>%
+  head(8) %>% 
+  as.data.frame() %>%
+  dplyr::select(1:8) %>%
+  knitr::kable(
+    digits = 3,
+    booktabs = TRUE, longtable = T
+  ) %>%
+  kable_classic(full_width = FALSE)
+
+```
+
+
+#### 7) Partición aditiva de la diversidad (TD, PD, FD)
+
+```{r}
+#| label: tbl-c8-12
+#| tbl-cap: "Diversidad taxonómica, funcional y filogenética, para las 6 primeras localidades."
+#| message: FALSE
+#| warning: FALSE
+#| echo: false
+
+# Diversidad particionada aditiva (taxonómica, filogenética y funcional)
+
+# Este bloque ejecuta la partición aditiva de la diversidad 
+# taxonómica (TD), funcional (FD) y filogenética (PD) utilizando 
+# la función Rao() (De Bello et al. 2010). 
+# Se emplean las tres matrices previamente alineadas:
+#  - biol2  → abundancias (especies × sitios)
+#  - rasgos.d → disimilitud funcional (Gower)
+#  - phylo.d  → disimilitud filogenética (cofenética).
+# Los valores de alpha-diversidad obtenidos para TD, PD y FD 
+# se incorporan al data frame “div” para su análisis y graficación.
+
+source("Rao.R")   # función proporcionada en el capítulo
+
+biol1.rao <- Rao(
+  sample = t(biol2),   # especies en columnas (se requiere trasponer)
+  dfunc  = rasgos.d,   # matriz funcional (Gower)
+  dphyl  = phylo.d,    # matriz filogenética (cofenética normalizada)
+  weight = FALSE,
+  Jost   = TRUE        # aplica corrección de Jost (2007)
+  
+  # Accesos típicos:
+# biol1.rao$TD$Gamma; biol1.rao$TD$Mean_Alpha; biol1.rao$TD$Beta_add; biol1.rao$TD$Beta_prop
+# biol1.rao$FD$... (si dfunc no es NULL)
+# biol1.rao$PD$... (si dphyl no es NULL)
+)
+
+# Crear un data frame con los índices de diversidad
+div_resumen <- tibble(
+  Sitio   = rownames(biol1),
+  alfaTD = biol1.rao$TD$Alpha,
+  alfaPD = biol1.rao$PD$Alpha,
+  alfaFD = biol1.rao$FD$Alpha
+)
+
+# Tabla con formato
+div_resumen %>%
+  head() %>% 
+  kbl(digits = 3,
+    booktabs = TRUE, longtable = T
+  ) %>%
+  kable_classic(full_width = FALSE)
+```
+
+
+#### 8) Tabulación y visualización de la diversidad con partición aditiva
+
+```{r, results='hide'}
+#| warning: false
+#| message: false
+#| echo: false
+
+# Nombres de los componentes devueltos por la función Rao()
+# names(biol1.rao)
+
+# Diversidad de especies (índices de Simpson)
+# names(biol1.rao$TD)               # lista de componentes dentro de TD
+
+# Diversidad alfa media de Simpson (diversidad promedio dentro de los ensamblajes)
+biol1.rao$TD$Mean_Alpha
+
+# Diversidad gamma de Simpson (diversidad total del conjunto de ensamblajes)
+biol1.rao$TD$Gamma
+
+# Diversidad beta aditiva (diferencia entre gamma y alfa)
+biol1.rao$TD$Beta_add
+
+# Comprobación alternativa de la partición aditiva
+biol1.rao$TD$Gamma - biol1.rao$TD$Mean_Alpha
+
+# Diversidad beta expresada como porcentaje de la diversidad gamma
+biol1.rao$TD$Beta_prop
+
+# Cálculo equivalente de la proporción beta\gamma
+biol1.rao$TD$Beta_add / biol1.rao$TD$Gamma
+
+# Diversidad beta multiplicativa (razón entre gamma y alfa)
+biol1.rao$TD$Gamma / biol1.rao$TD$Mean_Alpha
+
+```
+
+
+```{r, results='hide'}
+#| message: false
+#| warning: false
+#| echo: false
+
+# Diversidad filogenética (índice de Rao)
+# names(biol1.rao$PD)  # lista de insumos para diversidad filogenética
+
+# Diversidad alfa media de Rao (filogenética)
+biol1.rao$PD$Mean_Alpha
+
+# Diversidad gamma de Rao (filogenética)
+biol1.rao$PD$Gamma
+
+# Diversidad beta aditiva de Rao (filogenética)
+biol1.rao$PD$Beta_add
+
+# Verificación alternativa del cálculo aditivo (gamma – alfa)
+biol1.rao$PD$Gamma - biol1.rao$PD$Mean_Alpha
+
+# Diversidad beta filogenética expresada como porcentaje de la diversidad gamma
+biol1.rao$PD$Beta_prop
+
+# Cálculo equivalente de la proporción beta\gamma
+biol1.rao$PD$Beta_add / biol1.rao$PD$Gamma
+
+# Diversidad beta multiplicativa de Rao (filogenética)
+biol1.rao$PD$Gamma / biol1.rao$PD$Mean_Alpha
+```
+
+```{r, results='hide'}
+#| message: false
+#| warning: false
+#| echo: false
+
+# Diversidad funcional (índice de Rao)
+# names(biol1.rao$FD)  # lista de insumos para la diversidad funcional
+
+# Diversidad alfa media de Rao (funcional)
+biol1.rao$FD$Mean_Alpha
+
+# Diversidad gamma de Rao (funcional)
+biol1.rao$FD$Gamma
+
+# Diversidad beta aditiva de Rao (funcional)
+biol1.rao$FD$Beta_add
+
+# Verificación alternativa del cálculo (gamma – alfa)
+biol1.rao$FD$Gamma - biol1.rao$FD$Mean_Alpha
+
+# Diversidad beta funcional expresada como porcentaje de la diversidad gamma
+biol1.rao$FD$Beta_prop
+
+# Cálculo equivalente de la proporción beta\gamma
+biol1.rao$FD$Beta_add / biol1.rao$FD$Gamma
+
+# Diversidad beta multiplicativa de Rao (funcional)
+biol1.rao$FD$Gamma / biol1.rao$FD$Mean_Alpha
+
+
+# Variación de las diversidades alfa (taxonómica, filogenética y funcional)
+# a lo largo del gradiente espacial (p. ej. el río Doubs o sitios de muestreo).
+# biol1.rao$TD$Alpha  # diversidad alfa taxonómica
+# biol1.rao$PD$Alpha  # diversidad alfa filogenética
+# biol1.rao$FD$Alpha  # diversidad alfa funcional
+
+
+# Incorporar los índices de diversidad basados en Rao al marco de datos “div”
+div$alfaTD <- biol1.rao$TD$Alpha
+div$alfaPD <- biol1.rao$PD$Alpha
+div$alfaFD <- biol1.rao$FD$Alpha
+```
+
+```{r}
+#| label: tbl-c8-13
+#| tbl-cap: "Resumen de la diversidad alfa taxonómica, funcional y filogenética para cuatro localidades y los primeros 13 estimadores (columnas)."
+#| message: false
+#| warning: false
+#| echo: false
+
+# Mostrar las primeras filas de la tabla de diversidad
+# Incluye los índices tradicionales (Shannon, Simpson) y los derivados de Rao (TD, PD, FD).
+head(div, 4) %>%
+  dplyr::select(1:14) %>%
+  kbl(booktabs = TRUE, digits = 2,
+      longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+# Se puede guardar la tabla completa en Excel
+# write_xlsx(list(rasgoss = div), "div.xlsx")
+```
+
+
+```{r}
+#| label: fig-c8-4
+#| fig-cap: "Representación espacial de la diversidad alfa taxonómica, filogenética y funcional en los sitios de muestreo, mediante símbolos proporcionales."
+#| fig-width: 8
+#| fig-height: 10
+#| fig-pos: 'H'
+#| echo: false
+
+# Paneles más altos, proporciones balanceadas y menos márgenes
+par(
+  mfrow = c(2, 2),             # 2 filas x 2 columnas
+  mar   = c(4.5, 4.5, 3, 1),   # márgenes internos
+  oma   = c(0, 0, 0, 0),       # sin márgenes externos
+  cex.axis = 0.9,
+  cex.lab  = 1.0,
+  cex.main = 1.1
+)
+
+# ---- Diversidad Taxonómica ----
+plot(coord, 
+     asp = 1, 
+     pch = 21, 
+     col = "white", 
+     bg  = "brown", 
+     cex = biol1.rao$TD$Alpha / 4, 
+     main = "Diversidad Taxonómica", 
+     xlab = "Coordenadas x (km)", 
+     ylab = "Coordenadas y (km)"
+)
+lines(coord, col = "light blue")
+
+# ---- Diversidad Filogenética ----
+plot(coord, 
+     asp = 1, 
+     pch = 21, 
+     col = "white", 
+     bg  = "brown", 
+     cex = biol1.rao$PD$Alpha * 1.5, 
+     main = "Diversidad Filogenética", 
+     xlab = "Coordenadas x (km)", 
+     ylab = "Coordenadas y (km)"
+)
+lines(coord, col = "light blue")
+
+# ---- Diversidad Funcional ----
+plot(coord, 
+     asp = 1, 
+     pch = 21, 
+     col = "white", 
+     bg  = "brown", 
+     cex = biol1.rao$FD$Alpha * 2.5, 
+     main = "Diversidad Funcional", 
+     xlab = "Coordenadas x (km)", 
+     ylab = "Coordenadas y (km)"
+)
+lines(coord, col = "light blue")
+```
+
+
+
+
+

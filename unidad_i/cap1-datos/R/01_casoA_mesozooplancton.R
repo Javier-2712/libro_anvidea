@@ -1,349 +1,553 @@
 # =========================================================
-# ANVIDEA - Unidad I
-# Capítulo 1 - Fundamentos de manipulación de datos
-# Archivo: 01_casoA_mesozooplancton_ajustado.R
-# Propósito: desarrollar el caso de mesozooplancton estuarino
+# ANVIDEA - Capítulo 1
+# Fundamentos de manipulación de datos
+# ---------------------------------------------------------
+# Archivo : 01_casoA_mesozooplancton.R
+# Caso    : A. Mesozooplancton estuarino
 # =========================================================
 
-source("R/00_setup.R")
-source("R/03_funciones_auxiliares.R")
+cat("\n========================================\n")
+cat("Caso A - Mesozooplancton estuarino\n")
+cat("========================================\n")
 
 # ---------------------------------------------------------
-# 1. Cargar datos
+# Cargar paquetes
 # ---------------------------------------------------------
 
-plancton_path <- file.path(data_dir, "plancton.xlsx")
+# install.packages("tidyverse") # Instalar en caso de ser necesario
+library(tidyverse)   # Manipulación y visualización de datos
+library(readxl)      # Lectura de archivos Excel
+library(janitor)     # Limpieza de nombres de columnas
+library(kableExtra)  # Edición de tablas en Quarto
+library(viridis)     # Paletas de color perceptualmente uniformes
 
-if (!file.exists(plancton_path)) {
-  stop("No se encontró el archivo: ", plancton_path)
-}
 
-biol <- readxl::read_xlsx(plancton_path, sheet = "Riqueza")
+# ---------------------------------------------------------
+# Preparación de los datos
+# ---------------------------------------------------------
 
-columnas_requeridas <- c(
-  "Station", "Size", "Layers", "Groups",
-  "Abundance", "Temperature", "Salinity", "Density"
-)
+# Cargar datos desde Excel.
+biol <- read_xlsx(archivo_plancton, sheet = "Riqueza")
+# glimpse(biol)
+# summary(biol)
 
-faltantes <- setdiff(columnas_requeridas, names(biol))
-if (length(faltantes) > 0) {
-  stop(
-    "Faltan columnas requeridas en la hoja 'Riqueza': ",
-    paste(faltantes, collapse = ", ")
-  )
-}
+# Se recomienda verificar que Station, Size y Layers estén como factores
+# si serán usadas como agrupadoras en análisis posteriores.
 
-# Exploración básica
-dplyr::glimpse(biol)
-summary(biol)
+# biol <- biol %>%
+#   mutate(
+#     Station = as.factor(Station),
+#     Size    = as.factor(Size),
+#     Layers  = as.factor(Layers)
+#   )
 
-# Asegurar tipos de variables
+
+# ---------------------------------------------------------
+# 1. Selección y filtrado
+# ---------------------------------------------------------
+
+datos_select <-
+  biol %>%
+  select(Station, Size, Layers, Abundance, Temperature, Salinity)
+
+# Validar distribución: `head()` muestra las primeras filas del dataframe.
+head(datos_select, 4) %>%
+  kbl(booktabs = TRUE, digits = 2, longtable = TRUE) %>%
+  kable_classic(full_width = F)
+
+datos_filtro =
+  biol %>%
+  filter(Temperature > 28)
+
+head(datos_filtro, 4) %>%
+  kbl(booktabs = TRUE, digits = 2, longtable = TRUE) %>%
+  kable_classic(full_width = F)
+
+# Se construye `rel_Ab_Temp` dividiendo `Abundance` por `Temperature`.
+biol_rel =
+  biol %>%
+  mutate(rel_Ab_Temp = Abundance / Temperature)
+
+# Validar distribución: primeras filas del dataframe con la nueva variable.
+head(biol_rel, 4) %>%
+  dplyr::select(c(1:6, 9)) %>%
+  kbl(booktabs = TRUE, digits = 3, longtable = TRUE) %>%
+  kable_classic(full_width = F)
+
+
+# ---------------------------------------------------------
+# 3. Resumen estadístico de datos agrupados
+# ---------------------------------------------------------
+
+# Asegurar que las variables agrupadoras estén definidas como factores
 biol <- biol %>%
-  dplyr::mutate(
-    dplyr::across(c(Station, Size, Layers, Groups), as.factor),
-    dplyr::across(c(Abundance, Temperature, Salinity, Density), as.numeric)
+  mutate(
+    Station = as.factor(Station),
+    Size    = as.factor(Size)
   )
 
-if (any(is.na(biol$Abundance))) {
-  warning("Existen valores NA en 'Abundance'. Revise la base de datos.")
-}
-
-# ---------------------------------------------------------
-# 2. Selección y filtrado
-# ---------------------------------------------------------
-
-datos_select <- biol %>%
-  dplyr::select(Station, Size, Layers, Abundance, Temperature, Salinity)
-
-datos_filtro <- biol %>%
-  dplyr::filter(Temperature > 28)
-
-# ---------------------------------------------------------
-# 3. Creación de variables derivadas
-# ---------------------------------------------------------
-
-biol_rel <- biol %>%
-  dplyr::mutate(
-    rel_Ab_Temp = dplyr::if_else(
-      Temperature > 0,
-      Abundance / Temperature,
-      NA_real_
-    )
-  )
-
-# ---------------------------------------------------------
-# 4. Resúmenes agrupados
-# ---------------------------------------------------------
-
-datos_resumidos <- biol %>%
-  dplyr::group_by(Station, Size) %>%
-  dplyr::summarise(
-    datos_m   = mean(Abundance, na.rm = TRUE),
-    datos_de  = sd(Abundance, na.rm = TRUE),
-    datos_var = var(Abundance, na.rm = TRUE),
-    datos_n   = dplyr::n(),
+# Resumen estadístico de un factor "datos_resumidos" por estaciones
+datos_resumidos <-
+  biol %>%
+  group_by(Station, Size) %>%
+  summarise(
+    datos.m   = mean(Abundance, na.rm = TRUE),   # Media
+    datos.de  = sd(Abundance,   na.rm = TRUE),   # Desviación estándar
+    datos.var = var(Abundance,  na.rm = TRUE),   # Varianza
+    datos.n   = n(),                             # Tamaño de muestra
     .groups   = "drop"
   )
 
-datos_resumidos1 <- biol %>%
-  dplyr::group_by(Station, Size, Layers) %>%
-  dplyr::summarise(
-    datos_m   = mean(Abundance, na.rm = TRUE),
-    datos_de  = sd(Abundance, na.rm = TRUE),
-    datos_var = var(Abundance, na.rm = TRUE),
-    datos_n   = dplyr::n(),
-    datos_ee  = sd(Abundance, na.rm = TRUE) / sqrt(dplyr::n()),
+# Validar distribución: Muestra las primeras 4 filas de la tabla resumida.
+head(datos_resumidos, 4) %>%
+  kbl(booktabs = TRUE, digits = 2, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+# Resumen estadístico de tres factores "datos_resumidos1"
+datos_resumidos1 =
+  biol %>%
+  group_by(Station, Size, Layers) %>%
+  summarise(datos.m   = mean(Abundance, na.rm = TRUE),   # Medias
+            datos.de  = sd(Abundance,   na.rm = TRUE),   # Desviaciones
+            datos.var = var(Abundance,  na.rm = TRUE),   # Varianzas
+            datos.n   = n(),                             # Tamaño de la muestra
+            datos.ee  = sd(Abundance,   na.rm = TRUE) /  # Error estándar
+                        sqrt(n())
+            )
+
+# Validar distribución: Muestra las primeras filas de la tabla resumida.
+head(datos_resumidos1, 4) %>%
+  kbl(booktabs = TRUE, digits = 2, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+
+# ---------------------------------------------------------
+# 4. Transformación de datos
+# ---------------------------------------------------------
+
+# Convertir columnas "Temperature, Salinity, Density" de formato ancho a largo
+datos_largo <-
+  biol %>%
+  pivot_longer(
+    cols     = c(Temperature, Salinity, Density),  # Estas columnas en 1 sola
+    names_to  = "Environmental_Variable",           # Nombre de la nueva columna
+    values_to = "Value"                             # Valores de las columnas
+  )
+
+# Validar distribución: Primeras filas del dataframe en formato largo.
+head(datos_largo, 4) %>%
+  kbl(booktabs = TRUE, digits = 2, longtable = TRUE) %>%
+  kable_classic(full_width = F)
+
+# Convertir columnas "Temperature, Salinity, Density" de formato largo a ancho
+datos_ancho <-
+  datos_largo %>%
+  # Usa esta columna (Environmental_Variable) para crear nuevas columnas
+  pivot_wider(names_from  = Environmental_Variable,
+              values_from = Value,    # Valores de las nuevas columnas
+              values_fn   = first)    # Primer valor en caso de duplicados
+
+# Validar distribución: primeras filas del dataframe en formato ancho.
+head(datos_ancho, 4) %>%
+  kbl(booktabs = TRUE, digits = 2, longtable = TRUE) %>%
+  kable_classic(full_width = F)
+
+# Transformaciones usando mutate()
+biol_transformado <-
+  biol %>%
+  mutate(
+    log_abundancia     = log1p(Abundance),       # log(x + 1)
+    sqrt_abundancia    = sqrt(Abundance),        # raíz cuadrada
+    temp_estandarizada = as.numeric(scale(Temperature)),
+    sal_estandarizada  = as.numeric(scale(Salinity))
+  )
+
+# Comparar transformaciones
+biol_transformado %>%
+  select(Groups, Abundance, log_abundancia, sqrt_abundancia,
+         Temperature, temp_estandarizada) %>%
+  slice_head(n = 8) %>%
+  kbl(booktabs = TRUE, digits = 2, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+
+# ---------------------------------------------------------
+# 5. Transposición de datos
+# ---------------------------------------------------------
+
+# Agrupar a los taxones en filas y a las estaciones en columnas
+datos_transp <-
+  biol %>%
+  select(Station, Groups, Abundance) %>%
+  group_by(Station, Groups) %>%
+  summarise(
+    Abundance = sum(Abundance, na.rm = TRUE),  # Suma la ab. por grupo y estación
     .groups   = "drop"
-  )
-
-guardar_tabla_excel(datos_resumidos,  "tabla_01_resumen_abundancia_estacion_talla.xlsx")
-guardar_tabla_excel(datos_resumidos1, "tabla_02_resumen_abundancia_estacion_talla_capa.xlsx")
-
-# ---------------------------------------------------------
-# 5. Transformación de datos
-# ---------------------------------------------------------
-
-biol_largo <- biol %>%
-  tidyr::pivot_longer(
-    cols = c(Temperature, Salinity, Density),
-    names_to = "Variable",
-    values_to = "Valor"
-  )
-
-biol_ancho_amb <- biol_largo %>%
-  tidyr::pivot_wider(
-    names_from = Variable,
-    values_from = Valor
-  )
-
-biol_transf <- biol %>%
-  dplyr::mutate(
-    Temperature_log = log1p(Temperature),
-    Salinity_sqrt   = sqrt(pmax(Salinity, 0)),
-    Density_z       = as.numeric(scale(Density))
-  )
-
-# ---------------------------------------------------------
-# 6. Matriz taxón × estación
-# ---------------------------------------------------------
-
-biol_ancho <- biol %>%
-  dplyr::group_by(Groups, Station) %>%
-  dplyr::summarise(
-    Abundance = sum(Abundance, na.rm = TRUE),
-    .groups = "drop"
   ) %>%
-  tidyr::pivot_wider(
-    names_from = Station,
-    values_from = Abundance,
-    values_fill = 0
+  pivot_wider(
+    names_from  = Station,
+    values_from = Abundance,    # Convierte "Station" en nuevas columnas.
+    values_fill = 0             # Evita generar NA que pueden afectar análisis.
   )
 
-biol_largo2 <- biol_ancho %>%
-  tidyr::pivot_longer(
-    cols = -Groups,
-    names_to = "Station",
-    values_to = "Abundance"
+# Validar distribución: Muestra las primeras filas de la tabla transpuesta.
+head(datos_transp, 4) %>%
+  kbl(booktabs = TRUE, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+# Transponer la anterior usando pivot_longer y pivot_wider
+datos_transp1 <-
+  datos_transp %>%
+  pivot_longer(cols      = -1,              # Todas las columnas excepto la primera
+               names_to  = "Station",       # Los nombres de las columnas se almacenan
+               values_to = "value") %>%
+  # Usa la primera columna original para crear nuevas columnas
+  pivot_wider(names_from  = names(datos_transp)[1],
+              values_from = value)          # Valores se colocan en las nuevas columnas
+
+# Validar distribución: Muestra las primeras filas de la tabla transpuesta.
+head(datos_transp1, 4) %>%
+  dplyr::select(c(1:7)) %>%
+  kbl(booktabs = TRUE, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+
+# ---------------------------------------------------------
+# 6. Unión de datos
+# ---------------------------------------------------------
+
+# Se requiere a Station como factor
+biol$Station = as.factor(biol$Station)
+
+# Crear una base de datos adicional de regiones (nueva variable)
+Regiones =
+  tibble(Station = c("2",  "4",  "7",  "9", "13", "15"),
+         Region  = c("Norte", "Sur", "Este", "Oeste", "Central", "Otras"))
+
+# Unir bases de datos con `left_join()`
+biol1 =
+  biol %>%
+  left_join(Regiones, by = "Station")
+
+# Validar distribución: Muestra las primeras filas del dataframe combinado.
+head(biol1, 4) %>%
+  kbl(booktabs = TRUE, digits = 2, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+
+# ---------------------------------------------------------
+# 7. Conversión de variables a factores
+# ---------------------------------------------------------
+
+# Opción con Tidy, (across) para "Station, Size y Layers"
+biol <-
+  biol %>%
+  mutate(across(c(Station, Size, Layers), as.factor))
+
+# Validar distribución: Muestra las primeras filas del dataframe
+# con las variables convertidas.
+head(biol, 4) %>%
+  kbl(booktabs = TRUE, digits = 2, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+
+# ---------------------------------------------------------
+# 8. Abreviar nombres de grupos biológicos
+# ---------------------------------------------------------
+
+# Nueva columna "Abrev" al final, con abreviaturas de los taxas
+biol =
+  biol %>%
+  mutate(Abrev = abbreviate(Groups, minlength = 4))
+
+# Editar tabla: Muestra las primeras filas del dataframe con las abreviaturas.
+head(biol, 4) %>%
+  kbl(booktabs = TRUE, digits = 2, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+# Tabla adicional, con nombres completos y abreviados de los taxones
+tabla_abrev <-
+  cbind(Grupos = biol[, 4],
+        Abreviaturas = biol$Abrev)
+
+# Editar tabla: Muestra las primeras filas de la tabla de abreviaturas.
+head(tabla_abrev, 6) %>%
+  kbl(booktabs = TRUE, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+# Procesamiento para ajustar los datos en formato ancho
+biol_ancho <-
+  biol %>%
+  # Variables a factores
+  mutate(across(c(Station, Size, Layers), as.factor)) %>%
+  # Variables agrupadoras
+  group_by(Station, Size, Layers) %>%
+  # Promedios de las variables ambientales
+  summarize(
+    across(c(Temperature, Salinity, Density), ~ round(mean(.), 2)),
+    # Totales de las abundancias por cada factor
+    Abundance = list(setNames(tapply(Abundance, Abrev, sum,
+                                     default = 0), unique(Abrev))),
+    # Corregir algunos errores del agrupamiento
+    .groups = "drop") %>%
+  # Separar las abundancias en las columnas de cada taxon
+  unnest_wider(Abundance) %>%
+  # Crear columna Ref, tomando iniciales de tres factores
+  mutate(
+    Ref = paste0(substr(Station, 1, 2),
+                 substr(Size, 1, 1),
+                 substr(Layers, 1, 1))) %>%
+  # Pasar la columna de referencia (consec) a la 1a columna
+  select(Ref, everything())
+
+# Validar distribución: primeras filas del dataframe `biol_ancho`.
+head(biol_ancho, 4) %>%
+  dplyr::select(1:10) %>%
+  kbl(booktabs = TRUE, digits = 2, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+
+# ---------------------------------------------------------
+# 9. Seleccionar los 5 taxones más abundantes
+# ---------------------------------------------------------
+
+# Cinco (5) grupos taxonómicos más abundantes
+cols_taxa <- setdiff(names(biol_ancho),
+                     c("Ref", "Station", "Size", "Layers",
+                       "Temperature", "Salinity", "Density"))
+
+abundantes <-
+  biol_ancho %>%
+  ungroup() %>%          # Elimina cualquier agrupación previa
+  select(all_of(cols_taxa)) %>%
+  summarise(across(everything(),
+                   sum, na.rm = TRUE)) %>%  # Abundancia total de cada grupo
+  pivot_longer(cols      = everything(),
+               names_to  = "Grupo",
+               values_to = "Total") %>%     # Convierte a formato largo
+  arrange(desc(Total)) %>%                  # Ordena de mayor a menor
+  slice_head(n = 5)                         # 5 grupos más abundantes
+
+# Validar distribución
+head(abundantes, 5) %>%
+  kbl(booktabs = TRUE, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+# Filtrar en biol_ancho solo estos 5 taxones más abundantes
+biol_selec <-
+  biol_ancho %>%
+  select(Ref, Station, Size, Layers,
+         Temperature, Salinity, Density,
+         all_of(abundantes$Grupo))  # Mantiene solo los grupos seleccionados
+
+# Validar distribución
+head(biol_selec, 4) %>%
+  dplyr::select(1:10) %>%
+  kbl(booktabs = TRUE, digits = 2, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+
+# ---------------------------------------------------------
+# 10. Visualización de factores
+# ---------------------------------------------------------
+
+# Convertir variables a factores en caso que se requiera
+biol <-
+  biol %>%
+  mutate(across(c(Station, Size, Layers), as.factor))
+
+# Figura 1 — Gráfico de caja de la abundancia por estación
+fig_estacion <-
+  ggplot(biol, aes(x = factor(Station), y = Abundance)) +
+  geom_boxplot(aes(fill = factor(Station))) +
+  scale_y_continuous(trans = "log10") +  # Aplicar la transformación logarítmica
+  scale_fill_manual(values = c('#fc8d59','#ffffbf','#99d594',
+                               '#377eb8','#e78ac3','#7570b3')) +
+  labs(title = "Distribución de la Abundancia por Estación",
+       x = "Estaciones", fill = "Estaciones",
+       y = expression(log[10]~(Abundancia~indv.~m^-3))) +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
   )
 
-guardar_tabla_excel(biol_ancho, "tabla_03_matriz_taxon_estacion.xlsx")
+print(fig_estacion)
+# probar: scale_color_viridis(discrete = TRUE)
 
-# ---------------------------------------------------------
-# 7. Unión de datos bióticos y ambientales
-# ---------------------------------------------------------
+# Figura 2 — Cambiar etiquetas de Layers con recode_factor()
+biol <-
+  biol %>%
+  mutate(Layers = recode_factor(Layers,
+                                "Depth"   = "Profunda",
+                                "Surface" = "Superficial"))
 
-amb_station <- biol %>%
-  dplyr::group_by(Station) %>%
-  dplyr::summarise(
-    Temperature = mean(Temperature, na.rm = TRUE),
-    Salinity    = mean(Salinity, na.rm = TRUE),
-    Density     = mean(Density, na.rm = TRUE),
-    .groups     = "drop"
-  ) %>%
-  dplyr::mutate(Station = as.factor(Station))
-
-biol_station <- biol %>%
-  dplyr::group_by(Station) %>%
-  dplyr::summarise(
-    Abundance = mean(Abundance, na.rm = TRUE),
-    .groups = "drop"
-  ) %>%
-  dplyr::left_join(amb_station, by = "Station")
-
-guardar_tabla_excel(biol_station, "tabla_04_resumen_biotico_ambiental_por_estacion.xlsx")
-
-# ---------------------------------------------------------
-# 8. Abreviación de nombres de grupos
-# ---------------------------------------------------------
-
-diccionario_base <- biol %>%
-  dplyr::distinct(Groups) %>%
-  dplyr::mutate(
-    Abrev = stringr::str_replace_all(as.character(Groups), " ", "_") %>%
-      stringr::str_sub(1, 6)
+fig_capas <-
+  ggplot(biol, aes(x = factor(Station), y = Abundance)) +
+  geom_boxplot(aes(fill = Layers)) +
+  scale_y_continuous(trans = "log10") +  # Transformación logarítmica
+  labs(title = "Distribución de la Abundancia por Estación",
+       x = "Estaciones", fill = "Capas",
+       y = expression(log[10]~(Abundancia~indv.~m^-3))) +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
   )
 
-if (anyDuplicated(diccionario_base$Abrev)) {
-  diccionario_abrev <- diccionario_base %>%
-    dplyr::mutate(Abrev = make.unique(Abrev, sep = "_"))
-} else {
-  diccionario_abrev <- diccionario_base
-}
+print(fig_capas)
 
-biol_abrev <- biol %>%
-  dplyr::left_join(diccionario_abrev, by = "Groups")
+# Figura 3 — Con facetas por tamaño de malla
+# Cambiar etiquetas de Layers con recode_factor()
+biol <-
+  biol %>%
+  mutate(Layers = recode_factor(Layers,
+                                "Depth"   = "Profunda",
+                                "Surface" = "Superficial"))
 
-guardar_tabla_excel(diccionario_abrev, "tabla_05_diccionario_abreviaturas.xlsx")
-
-# ---------------------------------------------------------
-# 9. Cinco taxones más abundantes
-# ---------------------------------------------------------
-
-top5_taxones <- biol %>%
-  dplyr::group_by(Groups) %>%
-  dplyr::summarise(total = sum(Abundance, na.rm = TRUE), .groups = "drop") %>%
-  dplyr::slice_max(order_by = total, n = 5, with_ties = FALSE)
-
-biol_selec <- biol %>%
-  dplyr::semi_join(top5_taxones, by = "Groups")
-
-guardar_tabla_excel(top5_taxones, "tabla_06_top5_taxones.xlsx")
-
-# ---------------------------------------------------------
-# 10. Visualización básica
-# ---------------------------------------------------------
-
-p_estacion <- ggplot2::ggplot(biol, ggplot2::aes(x = Station, y = Abundance)) +
-  ggplot2::geom_boxplot(ggplot2::aes(fill = Station)) +
-  ggplot2::scale_y_continuous(trans = "log10") +
-  ggplot2::labs(
-    title = "Distribución de la abundancia por estación",
-    x = "Estación",
-    y = expression(log[10]~(Abundancia))
+fig_capas_facetas <-
+  ggplot(biol, aes(x = factor(Station), y = Abundance)) +
+  geom_boxplot(aes(fill = Layers)) +
+  labs(
+    x = "Estaciones", fill = "Capas",
+    y = expression(log[10]~(Abundancia~indv.~m^-3))
   ) +
-  ggplot2::theme_bw() +
-  ggplot2::theme(panel.grid = ggplot2::element_blank())
-
-biol_layers <- biol %>%
-  dplyr::mutate(
-    Layers = dplyr::recode_factor(
-      Layers,
-      "Depth" = "Profunda",
-      "Surface" = "Superficial"
-    )
+  scale_y_continuous(trans = "log10") +  # Aplicar la transformación logarítmica
+  scale_color_viridis(discrete = TRUE) +
+  facet_wrap(~ Size, nrow = 1, strip.position = "top") +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
   )
 
-p_layers <- ggplot2::ggplot(biol_layers, ggplot2::aes(x = Station, y = Abundance)) +
-  ggplot2::geom_boxplot(ggplot2::aes(fill = Layers)) +
-  ggplot2::scale_y_continuous(trans = "log10") +
-  ggplot2::labs(
-    title = "Distribución de la abundancia por estación y capa",
-    x = "Estación",
-    y = expression(log[10]~(Abundancia)),
-    fill = "Capa"
-  ) +
-  ggplot2::theme_bw() +
-  ggplot2::theme(panel.grid = ggplot2::element_blank())
+print(fig_capas_facetas)
 
-guardar_figura(p_estacion, "fig_01_abundancia_por_estacion.png")
-guardar_figura(p_layers, "fig_02_abundancia_por_estacion_y_capa.png")
 
 # ---------------------------------------------------------
-# 11. Categorización de salinidad
+# 11. Categorizar una variable continua
 # ---------------------------------------------------------
 
-q1 <- stats::quantile(biol$Salinity, 1/3, na.rm = TRUE)
-q2 <- stats::quantile(biol$Salinity, 2/3, na.rm = TRUE)
+# a.) Método basado en cuantiles (terciles)
 
-biol_terciles <- biol %>%
-  dplyr::mutate(
-    Salinity_Level = dplyr::case_when(
-      Salinity <= q1 ~ "Baja",
-      Salinity <= q2 ~ "Media",
-      TRUE ~ "Alta"
-    ),
-    Salinity_Level = factor(
-      Salinity_Level,
-      levels = c("Baja", "Media", "Alta"),
-      ordered = TRUE
-    )
+biol <-
+  biol %>%
+  mutate(Salinity_Level = case_when(
+    Salinity <= quantile(Salinity, 1/3, na.rm = TRUE) ~ "Baja",
+    Salinity <= quantile(Salinity, 2/3, na.rm = TRUE) ~ "Media",
+    Salinity <= quantile(Salinity, 3/3, na.rm = TRUE) ~ "Alta"
+  ))
+# Se puede resumir el nivel alto por el comando "TRUE ~ "Alta"".
+
+# Validar distribución
+head(biol, 4) %>%
+  dplyr::select(c(1:7, 10)) %>%
+  kbl(booktabs = TRUE, digits = 2, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+# Figura 4 — Distribución de la Abundancia por Niveles de Salinidad
+fig_salinidad_terciles <-
+  ggplot(biol, aes(x = Salinity_Level, y = Abundance)) +
+  geom_boxplot(aes(fill = Salinity_Level)) +
+  scale_y_continuous(trans = "log10") +  # Transformación logarítmica
+  scale_fill_manual(values = c('#fc8d59','#99d594','#377eb8')) +
+  labs(title = "Distribución de la Abundancia por Niveles de Salinidad",
+       x = "Niveles de Salinidad", fill = "Salinidad",
+       y = expression(log[10]~(Abundancia~indv.~m^-3))) +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
   )
 
-resumen_salinidad <- resumen_salinidad_fun(biol, "Salinity")
+print(fig_salinidad_terciles)
 
-biol_sal <- biol %>%
-  dplyr::mutate(
-    salinidad_categoria = dplyr::case_when(
+
+# b.) Método "manual" con apoyo de `summary()`
+
+summary(biol$Salinity)
+
+biol <-
+  biol %>%
+  mutate(Salinity_Level = case_when(
+    Salinity < 30                     ~ "Baja",
+    Salinity >= 30 & Salinity < 35    ~ "Media",
+    Salinity >= 35                    ~ "Alta"
+  ))
+# Se puede resumir el nivel alto por el comando "TRUE ~ "Alta"".
+
+# Validar distribución
+head(biol, 4) %>%
+  dplyr::select(c(1:7, 10)) %>%
+  kbl(booktabs = TRUE, digits = 2, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
+
+
+# c.) Método basado en `summarise()` + categorización ecológica (estuarina)
+
+# Analizar distribución de salinidad usando summarise()
+resumen_salinidad <-
+  biol %>%
+  summarise(
+    minimo  = min(Salinity,                    na.rm = TRUE),
+    q25     = quantile(Salinity, 0.25,         na.rm = TRUE),
+    mediana = median(Salinity,                 na.rm = TRUE),
+    q75     = quantile(Salinity, 0.75,         na.rm = TRUE),
+    maximo  = max(Salinity,                    na.rm = TRUE),
+    media   = mean(Salinity,                   na.rm = TRUE),
+    sd      = sd(Salinity,                     na.rm = TRUE)
+  )
+
+resumen_salinidad %>%
+  kbl(booktabs = TRUE, digits = 2) %>%
+  kable_classic(full_width = FALSE)
+
+# Crear categorías de salinidad usando mutate() y case_when()
+biol_sal <-
+  biol %>%
+  mutate(
+    salinidad_categoria = case_when(
       Salinity < 5  ~ "Dulce",
       Salinity < 18 ~ "Oligohalina",
       Salinity < 30 ~ "Mesohalina",
       Salinity < 40 ~ "Polihalina",
       TRUE          ~ "Euhalina"
     ),
-    zona_estuarina = dplyr::case_when(
+    zona_estuarina = case_when(
       Salinity < 15 ~ "Zona Fluvial",
       Salinity < 25 ~ "Zona de Mezcla",
       Salinity < 35 ~ "Zona Marina",
       TRUE          ~ "Zona Hipersalina"
     )
   ) %>%
-  dplyr::mutate(
-    salinidad_categoria = factor(
-      salinidad_categoria,
-      levels = c("Dulce", "Oligohalina", "Mesohalina", "Polihalina", "Euhalina"),
-      ordered = TRUE
-    )
+  mutate(
+    salinidad_categoria = factor(salinidad_categoria,
+                                 levels  = c("Dulce", "Oligohalina", "Mesohalina",
+                                             "Polihalina", "Euhalina"),
+                                 ordered = TRUE),
+    zona_estuarina = factor(zona_estuarina,
+                            levels  = c("Zona Fluvial", "Zona de Mezcla",
+                                        "Zona Marina", "Zona Hipersalina"),
+                            ordered = TRUE)
   )
 
-tabla_salinidad <- biol_sal %>%
-  dplyr::count(salinidad_categoria, zona_estuarina) %>%
-  tidyr::pivot_wider(
-    names_from = zona_estuarina,
-    values_from = n,
-    values_fill = 0
-  )
+# Validar distribución
+head(biol_sal) %>%
+  dplyr::select(c(1:5, 10:11)) %>%
+  kbl(booktabs = TRUE, digits = 2, longtable = TRUE) %>%
+  kable_classic(full_width = FALSE)
 
-p_salinidad <- ggplot2::ggplot(biol_terciles, ggplot2::aes(x = Salinity_Level, y = Abundance)) +
-  ggplot2::geom_boxplot(ggplot2::aes(fill = Salinity_Level)) +
-  ggplot2::scale_y_continuous(trans = "log10") +
-  ggplot2::labs(
-    title = "Abundancia según terciles de salinidad",
-    x = "Nivel de salinidad",
-    y = expression(log[10]~(Abundancia))
-  ) +
-  ggplot2::theme_bw() +
-  ggplot2::theme(panel.grid = ggplot2::element_blank())
+# Tabla de frecuencia, de contingencia o de validación cruzada
+tabla_cruce_salinidad <-
+  biol_sal %>%
+  count(salinidad_categoria, zona_estuarina) %>%
+  pivot_wider(names_from  = zona_estuarina,
+              values_from = n,
+              values_fill = 0)
 
-guardar_tabla_excel(resumen_salinidad, "tabla_07_resumen_salinidad.xlsx")
-guardar_tabla_excel(tabla_salinidad, "tabla_08_tabla_salinidad.xlsx")
-guardar_figura(p_salinidad, "fig_03_abundancia_por_terciles_salinidad.png")
+tabla_cruce_salinidad %>%
+  kbl(booktabs = TRUE) %>%
+  kable_classic(full_width = FALSE)
 
-# ---------------------------------------------------------
-# 12. Objeto de salida del caso
-# ---------------------------------------------------------
 
-resultados_casoA <- list(
-  datos_select = datos_select,
-  datos_filtro = datos_filtro,
-  biol_rel = biol_rel,
-  datos_resumidos = datos_resumidos,
-  datos_resumidos1 = datos_resumidos1,
-  biol_largo = biol_largo,
-  biol_ancho_amb = biol_ancho_amb,
-  biol_transf = biol_transf,
-  biol_ancho = biol_ancho,
-  biol_largo2 = biol_largo2,
-  biol_station = biol_station,
-  diccionario_abrev = diccionario_abrev,
-  top5_taxones = top5_taxones,
-  biol_selec = biol_selec,
-  resumen_salinidad = resumen_salinidad,
-  tabla_salinidad = tabla_salinidad,
-  p_estacion = p_estacion,
-  p_layers = p_layers,
-  p_salinidad = p_salinidad
-)
-
-message("Caso A completado. Revise outputs/tablas y outputs/figuras.")
-
-resultados_casoA
+cat("\nCaso A finalizado correctamente.\n")

@@ -1,5 +1,14 @@
-Ubique aquí los archivos de entrada para ejecutar los scripts del capítulo 1.
+Ubique aquí los archivos de entrada antes de ejecutar los scripts:
 
-Archivos esperados:
-- plancton.xlsx  (hoja: Riqueza)
-- invert.xlsx    (hojas: Taxones1, Taxones2, fquímicos)
+1. plancton.xlsx
+   Hojas esperadas:
+   - Riqueza
+
+2. invert.xlsx
+   Hojas esperadas:
+   - Taxones1
+   - Taxones2
+   - fquímicos
+
+No cambie los nombres de los archivos ni de las hojas, a menos que también
+ajuste las rutas dentro de los scripts.

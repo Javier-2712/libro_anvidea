@@ -185,7 +185,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#cómo-usar-este-material" id="toc-cómo-usar-este-material" class="nav-link" data-scroll-target="#cómo-usar-este-material">💻 ¿Cómo usar este material?</a></li>
   <li><a href="#acceso-al-código" id="toc-acceso-al-código" class="nav-link" data-scroll-target="#acceso-al-código">📂 Acceso al código</a></li>
   <li><a href="#selecciona-un-capítulo" id="toc-selecciona-un-capítulo" class="nav-link" data-scroll-target="#selecciona-un-capítulo">📘 Selecciona un capítulo</a></li>
-  <li><a href="#ejecución-rápida" id="toc-ejecución-rápida" class="nav-link" data-scroll-target="#ejecución-rápida">▶️ Ejecución rápida</a></li>
+  <li><a href="#ejecución-rápida-de-toda-la-unidad" id="toc-ejecución-rápida-de-toda-la-unidad" class="nav-link" data-scroll-target="#ejecución-rápida-de-toda-la-unidad">▶️ Ejecución rápida de toda la unidad</a></li>
   <li><a href="#información-de-la-unidad" id="toc-información-de-la-unidad" class="nav-link" data-scroll-target="#información-de-la-unidad">🔽 Información de la unidad</a></li>
   <li><a href="#propósito" id="toc-propósito" class="nav-link" data-scroll-target="#propósito">Propósito</a></li>
   <li><a href="#enlace-de-retorno" id="toc-enlace-de-retorno" class="nav-link" data-scroll-target="#enlace-de-retorno">Enlace de retorno</a></li>
@@ -220,13 +220,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="empezar-aquí" class="level2">
 <h2 class="anchored" data-anchor-id="empezar-aquí">🚀 Empezar aquí</h2>
 <ol type="1">
-<li>Descarga el repositorio<br>
-</li>
-<li>Abre la carpeta en RStudio<br>
-</li>
+<li>Descarga el repositorio</li>
+<li>Abre la carpeta <code>unidad_i/</code> en RStudio</li>
 <li>Ejecuta:</li>
 </ol>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"unidad_i/run_unidad1.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_unidad1.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <hr>
 </section>
 <section id="cómo-usar-este-material" class="level2">
@@ -244,12 +242,9 @@ Nota
 <p>Este portal no ejecuta código directamente.</p>
 <p>Para trabajar con los análisis de esta unidad:</p>
 <ol type="1">
-<li>Descarga el repositorio o abre la carpeta en GitHub<br>
-</li>
-<li>Guarda los archivos en tu computador<br>
-</li>
-<li>Abre la carpeta en RStudio<br>
-</li>
+<li>Descarga el repositorio o abre la carpeta en GitHub</li>
+<li>Guarda los archivos en tu computador</li>
+<li>Abre la carpeta <code>unidad_i/</code> en RStudio</li>
 <li>Ejecuta el script principal (<code>run_unidad1.R</code>)</li>
 </ol>
 <p>👉 Todos los análisis se realizan de forma local en R</p>
@@ -269,29 +264,74 @@ Nota
 <p>Explora cada capítulo de la unidad con acceso directo a sus scripts, datos y resultados:</p>
 <section id="capítulo-1-fundamentos-de-manipulación-de-datos" class="level3">
 <h3 class="anchored" data-anchor-id="capítulo-1-fundamentos-de-manipulación-de-datos">🔹 Capítulo 1 — Fundamentos de manipulación de datos</h3>
+<p>Versión reproducible y descargable del capítulo, diseñada para ejecutar los códigos completos que complementan el texto del libro y generar un reporte HTML de validación.</p>
+<p><strong>Contenido del capítulo:</strong></p>
 <ul>
-<li>📁 <a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap1-datos">Abrir carpeta del capítulo</a></li>
+<li><code>R/</code> scripts completos (casos A y B + funciones auxiliares + guardado + render)</li>
+<li><code>data/raw/</code> → <code>plancton.xlsx</code>, <code>invert.xlsx</code></li>
+<li><code>run_cap1.R</code> → ejecución automática</li>
+<li><code>limpiar_outputs.R</code> → reinicio de salidas</li>
+<li><code>reporte_cap1.qmd</code> → validación en HTML</li>
+</ul>
+<p><strong>Ejecución:</strong></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_cap1.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Esto generará:</strong></p>
+<ul>
+<li><p>tablas en <code>outputs/tablas/</code></p></li>
+<li><p>figuras en <code>outputs/figuras/</code></p></li>
+<li><p>reporte HTML en <code>outputs/reportes/</code></p></li>
+<li><p>📁 <a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap1-datos">Abrir carpeta del capítulo</a></p></li>
 </ul>
 <hr>
 </section>
 <section id="capítulo-2-visualización-gráfica-exploratoria" class="level3">
 <h3 class="anchored" data-anchor-id="capítulo-2-visualización-gráfica-exploratoria">🔹 Capítulo 2 — Visualización gráfica exploratoria</h3>
+<p>Versión reproducible del capítulo, con dos casos guiados que cubren correlogramas, histogramas, cajas y bigotes, y figuras de burbujas para datos ecológicos.</p>
+<p><strong>Contenido del capítulo:</strong></p>
 <ul>
-<li>📁 <a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap2-visualizacion-exploratoria">Abrir carpeta del capítulo</a></li>
+<li><code>R/</code> scripts completos (casos A y B + funciones auxiliares + guardado + render)</li>
+<li><code>data/raw/</code> → <code>plancton.xlsx</code>, <code>invert.xlsx</code></li>
+<li><code>run_cap2.R</code> → ejecución automática</li>
+<li><code>limpiar_outputs.R</code> → reinicio de salidas</li>
+<li><code>reporte_cap2.qmd</code> → validación en HTML</li>
+</ul>
+<p><strong>Ejecución:</strong></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_cap2.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Esto generará:</strong></p>
+<ul>
+<li><p>figuras en <code>outputs/figuras/</code></p></li>
+<li><p>tablas en <code>outputs/tablas/</code></p></li>
+<li><p>reporte HTML en <code>outputs/reportes/</code></p></li>
+<li><p>📁 <a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap2-visualizacion-exploratoria">Abrir carpeta del capítulo</a></p></li>
 </ul>
 <hr>
 </section>
 <section id="capítulo-3-visualización-gráfica-de-patrones-climáticos" class="level3">
 <h3 class="anchored" data-anchor-id="capítulo-3-visualización-gráfica-de-patrones-climáticos">🔹 Capítulo 3 — Visualización gráfica de patrones climáticos</h3>
+<p>Versión reproducible del capítulo, con un caso guiado que integra series temporales, climatogramas, índice de Lang, balance hídrico y clasificación ecológica.</p>
+<p><strong>Contenido del capítulo:</strong></p>
 <ul>
-<li>📁 <a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap3-clima">Abrir carpeta del capítulo</a></li>
+<li><code>R/</code> scripts completos (caso guiado + funciones auxiliares + guardado + render)</li>
+<li><code>data/raw/</code> → <code>datos.c3.xlsx</code>, <code>bal_hid.R</code></li>
+<li><code>run_cap3.R</code> → ejecución automática</li>
+<li><code>limpiar_outputs.R</code> → reinicio de salidas</li>
+<li><code>reporte_cap3.qmd</code> → validación en HTML</li>
+</ul>
+<p><strong>Ejecución:</strong></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_cap3.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Esto generará:</strong></p>
+<ul>
+<li><p>figuras en <code>outputs/figuras/</code></p></li>
+<li><p>tablas en <code>outputs/tablas/</code></p></li>
+<li><p>reporte HTML en <code>outputs/reportes/</code></p></li>
+<li><p>📁 <a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap3-clima">Abrir carpeta del capítulo</a></p></li>
 </ul>
 <hr>
 </section>
 </section>
-<section id="ejecución-rápida" class="level2">
-<h2 class="anchored" data-anchor-id="ejecución-rápida">▶️ Ejecución rápida</h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"unidad_i/run_unidad1.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="ejecución-rápida-de-toda-la-unidad" class="level2">
+<h2 class="anchored" data-anchor-id="ejecución-rápida-de-toda-la-unidad">▶️ Ejecución rápida de toda la unidad</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_unidad1.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <hr>
 </section>
 <section id="información-de-la-unidad" class="level2">

@@ -1,0 +1,8 @@
+Capítulo 4 — Sin archivos externos requeridos
+
+Este capítulo no utiliza archivos de datos externos. Los datos se generan
+directamente dentro de los scripts mediante simulación o valores definidos
+en el código.
+
+No se requiere ninguna acción en esta carpeta.
+

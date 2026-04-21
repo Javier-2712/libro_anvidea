@@ -1,0 +1,2481 @@
+
+
+
+## Casos guiados en dinámica poblacional estructurada
+
+
+## A.1. Caso guiado: Tablas de vida y demografía a partir de datos observacionales (cementerios)
+
+#### Paso 1) Librerías y lectura de la base de datos
+
+```{r, message=FALSE, warning=FALSE,echo=FALSE}
+# Librerías
+library(kableExtra)
+library(readr)
+library(readxl)
+library(dplyr)
+library(tidyverse)
+library(patchwork)
+library(ggplot2) 
+library(ggforce) 
+library(grid)
+library(broom)
+library(corrplot)    
+```
+
+### 1. Primer Cementerio Censado
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# Base de datos del censo - datos1
+datos1 <- readxl::read_excel("datos.c5.xlsx", sheet = "cement1") %>%
+  transmute(
+    id   = as.integer(`INDIVIDUO`),
+    nac  = as.integer(`NACIMIENTO`),
+    mue  = as.integer(`MUERTE`),
+    edad = as.integer(`EDAD INDIVIDUO`),
+    sexo = as.character(`SEXO`)
+  ) %>%
+  mutate(edad = if_else(is.na(edad) & !is.na(mue) & 
+         !is.na(nac), mue - nac, edad)) %>%
+    filter(!is.na(edad), edad >= 0L)    # Garantizar No = 600
+
+nrow(datos1)  # verificación del número de datos1
+```
+
+------------------------------------------------------------------------
+
+#### Paso 2) Clases de edad y frecuencias $n_x$
+
+```{r, echo=FALSE}
+#| label: tbl-c5-3
+#| tbl-cap: "Cementerio San Miguel. Clases de edad y frecuencias de datos (nx)"
+
+# Ancho o tamaño de los intervalos de clase
+ancho  <- 10
+
+# Cortes o intervalos hasta cubrir la edad máxima observada
+cortes <- seq(0, ceiling((max(datos1$edad) + 1) / ancho) * 
+              ancho, by = ancho)
+
+# Inicio de la tabla de vida con las clases de edad y la frecuencia (nx)
+tbl_ini <- 
+  datos1 %>% 
+  mutate(
+    # índice del intervalo (1,2,3, …)
+    bin = cut(edad, breaks = cortes, right = FALSE, include.lowest = TRUE, labels = FALSE),
+    # límite inferior del intervalo
+    edad_ini = cortes[bin],
+    # ¿es el último intervalo?
+    es_ultimo = edad_ini == max(cortes) - ancho,
+    # etiquetar “a-b” para clases internas y “a+” para la última
+    clase = if_else(es_ultimo,
+                    paste0(edad_ini, "+"),
+                    paste0(edad_ini, "-", edad_ini + ancho - 1))) %>%
+  count(clase, edad_ini, name = "nx") %>%
+  arrange(edad_ini)
+
+# Mostrar la tabla inicial
+tbl_ini %>%
+  select(-edad_ini) %>% 
+  kbl(booktabs  = TRUE, digits = 2,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+------------------------------------------------------------------------
+
+#### Paso 3) Cálculo del resto de estimadores de la tabla de vida
+
+```{r, echo=FALSE}
+#| label: tbl-c5-4
+#| tbl-cap: "Cementerio San Miguel. Clases de edad y frecuencias de datos (nx)"
+
+# Organización de la tabla de vida
+tabla_vida_sm <- 
+  tbl_ini %>%
+  mutate(Nx = N_x, Sx = Sx, lx = lx, Lx = Lx, Tx = Tx, ex = ex,
+         edad_med = edad_ini + ancho/2)
+
+
+# Mostrar la tabla de vida
+tabla_vida_sm %>%
+  select(-edad_ini, -edad_med) %>% 
+  kbl(booktabs  = TRUE, digits = 2,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+------------------------------------------------------------------------
+
+#### Paso 4) Gráficos: supervivencia $l_x$ y de esperanza de vida $e_x$
+
+```{r, echo=FALSE}
+#| label: fig-c5-1
+#| fig-cap: "Curvas de supervivencia y de esperanza de vida"
+#| message: false
+#| warning: false
+#| fig-pos: 'H'
+
+# Figura de esperanza de vida (ex)
+g_lx <- ggplot(tabla_vida_sm, aes(edad_med, lx)) +
+  geom_line() + geom_point() +
+  labs(x = "Edad (años)", y =  expression("Supervivencia"~(l[x])),
+       title = "Supervivencia (l\u2093= Nx/No)") +
+  theme_bw()
+
+# Figura del horario de supervivencia (lx)
+g_ex <- ggplot(tabla_vida_sm, aes(edad_med, ex)) +
+  geom_line() + geom_point() +
+  labs(x = "Edad (años)", y = expression(e[x]~"(años)"),
+       title = "Esperanza_vida (e\u2093= Tx/Nx)") +
+  theme_bw()
+
+# ---- Unión en panel ----
+g_lx + g_ex
+```
+
+------------------------------------------------------------------------
+
+#### Paso 5) Comparativo entre sexos - $e_x$ y $l_x$
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#| label: fig-c5-2
+#| fig-cap: Curvas de supervivencia y de esperanza de vida por sexos.
+#| fig-pos: 'H'
+
+# Insumos requeridos para la figura (Insumos del Paso 1)
+datos1 <- datos1 # Datos del censo al cementerio
+ancho  <- 10     # Amplitud de los irtervalos de edad en la tv
+cortes <- cortes # Intervalos hasta cubrir la edad máxima observada
+
+# etiquetas para los intervalos (última como "a+")
+starts <- head(cortes, -1)
+labs   <- paste0(starts, "-", starts + ancho - 1)
+labs[length(labs)] <- paste0(starts[length(starts)], "+")
+
+tbl_sex <- 
+  datos1 %>%
+  mutate(
+    clase = cut(edad,
+                breaks = cortes,
+                right = FALSE,
+                include.lowest = TRUE,
+                labels = labs),
+    edad_ini = as.integer(sub("-.*", "", as.character(clase)))
+  ) %>%
+  count(sexo, clase, edad_ini, name = "nx") %>%
+  arrange(sexo, edad_ini)
+
+# Tabla de vida por cada sexo
+tv_sex <- 
+  tbl_sex %>%
+  group_by(sexo) %>%
+  arrange(edad_ini, .by_group = TRUE) %>%
+  mutate(
+    N0  = sum(nx),                    # radix por sexo
+    N_x = rev(cumsum(rev(nx))),       # supervivientes al inicio del intervalo
+    Lx  = (N_x + lead(N_x))/2 * ancho,      # años-persona en el intervalo
+    Lx  = if_else(is.na(Lx), (ancho/2) * 
+                    last(N_x), Lx),         # último intervalo abierto
+    Tx  = rev(cumsum(rev(Lx))),
+    ex  = Tx / N_x,
+    lx  = N_x / N0,
+    edad_med = edad_ini + ancho/2
+  ) %>%
+  ungroup()
+
+# --- Figuras ---
+# 1) Esperanza de vida (e_x) por sexo
+g_ex_sex <- 
+  ggplot(tv_sex, aes(x = edad_med, 
+                     y = ex, 
+                     color = sexo)) +
+  geom_line() + 
+  geom_point() +
+  labs(x = "Edad (años)",
+       y = expression(e[x]~"(años)"),
+       color = "Sexo",
+       title = "Esperanza_vida (e\u2093)") +
+  theme_bw()
+
+# 2) Supervivencia (lx) por sexo
+g_lx_sex <- 
+  ggplot(tv_sex, aes(x = edad_med, 
+                     y = lx, 
+                     color = sexo)) +
+  geom_line() + geom_point() +
+  labs(x = "Edad (años)",
+       y = expression(l[x]),
+       color = "Sexo",
+       title = "Supervivencia (l\u2093 = N\u2093 / N\u2092)") +
+  theme_bw()
+
+(g_lx_sex | g_ex_sex) + plot_layout(guides = "collect") &
+  theme(legend.position = "bottom")
+```
+
+
+```{r, echo=FALSE}
+#| label: tbl-c5-5
+#| tbl-cap: "Esperanza de vida al nacer (e\u2092) por sexo"
+
+# Tabla base por sexo
+resumen_e0 <- 
+  tv_sex %>%
+  group_by(sexo) %>%
+  slice_min(edad_ini, 
+            n = 1, 
+            with_ties = FALSE) %>%  # toma el primer intervalo (x = 0)
+  transmute(sexo, N0 = N0, e0 = round(ex, 2)) %>%
+  ungroup()
+
+# Tabla de la esperanza de vida
+resumen_e0 %>%
+  kbl(booktabs  = TRUE, digits = 2,align = "c",
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+
+```
+
+------------------------------------------------------------------------
+
+#### Paso 6) Comparación estadística entre sexos (Bootstrap).
+
+```{r, echo=FALSE}
+# --- Bootstrap estratificado para la diferencia de e0 entre sexos ---
+
+# Asegurar datos
+if (!exists("datos1")) {
+  datos1 <- readxl::read_excel("datos.c5.xlsx", sheet = "cement1") %>%
+    transmute(
+      edad = as.integer(`EDAD INDIVIDUO`),
+      nac  = as.integer(`NACIMIENTO`),
+      mue  = as.integer(`MUERTE`),
+      sexo = as.character(`SEXO`)
+    ) %>%
+    mutate(edad = if_else(is.na(edad) & !is.na(mue) & !is.na(nac),
+                          mue - nac, edad)) %>%
+    filter(!is.na(edad), edad >= 0L)
+}
+if (!exists("ancho")) ancho <- 10
+
+# Función: calcula e0 desde un vector de edades (misma lógica de la tabla de vida)
+e0_from_edades <- function(edades, ancho = 10) {
+  edades <- edades[is.finite(edades) & edades >= 0]
+  if (length(edades) == 0) return(NA_real_)
+
+  cortes <- seq(0, ceiling((max(edades) + 1)/ancho) * ancho, by = ancho)
+  bin <- cut(edades, breaks = cortes, right = FALSE,
+             include.lowest = TRUE, labels = FALSE)
+
+  nx <- tabulate(bin, nbins = length(cortes) - 1)
+  if (sum(nx) == 0) return(NA_real_)
+
+  N_x <- rev(cumsum(rev(nx)))
+  Lx  <- (N_x + dplyr::lead(N_x))/2 * ancho
+  Lx[is.na(Lx)] <- (ancho/2) * tail(N_x, 1)   # último intervalo abierto
+  Tx  <- rev(cumsum(rev(Lx)))
+
+  e0 <- Tx[1] / N_x[1]
+  e0
+}
+
+# Definir los dos sexos más frecuentes (evita niveles vacíos)
+sex_levels <- 
+  datos1 %>%
+  filter(!is.na(sexo)) %>%
+  count(sexo, name = "n") %>%
+  arrange(desc(n)) %>%
+  pull(sexo)
+
+if (length(sex_levels) < 2) {
+  stop("Se requieren al menos dos categorías de sexo con datos para la comparación.")
+}
+sex_levels <- sex_levels[1:2]
+
+# Para mantener la interpretación ecológica, conviene ordenar: A = M, B = F si existen
+if (all(c("M","F") %in% sex_levels)) sex_levels <- c("M","F")
+
+edades_A <- datos1$edad[datos1$sexo == sex_levels[1]]
+edades_B <- datos1$edad[datos1$sexo == sex_levels[2]]
+nA <- length(edades_A); nB <- length(edades_B)
+
+# e0 observado por sexo y diferencia (B - A)
+e0_A <- e0_from_edades(edades_A, ancho = ancho)
+e0_B <- e0_from_edades(edades_B, ancho = ancho)
+delta_obs <- e0_B - e0_A   # Δe0 = e0(B) - e0(A)
+
+# Bootstrap estratificado
+set.seed(123)
+B <- 2000
+
+delta_boot <- replicate(B, {
+  samp_A <- sample(edades_A, size = nA, replace = TRUE)
+  samp_B <- sample(edades_B, size = nB, replace = TRUE)
+  e0A_b  <- e0_from_edades(samp_A, ancho = ancho)
+  e0B_b  <- e0_from_edades(samp_B, ancho = ancho)
+  e0B_b - e0A_b
+})
+
+# IC percentil 95%
+ci <- quantile(delta_boot, probs = c(0.025, 0.975), na.rm = TRUE)
+
+# p-valor bootstrap aproximado (dos colas) para H0: Δ = 0
+pval <- 2 * min(
+  mean(delta_boot <= 0, na.rm = TRUE),
+  mean(delta_boot >= 0, na.rm = TRUE)
+)
+```
+
+```{r}
+#| label: fig-c5-3
+#| fig-cap: Bootstrap estratificado de la diferencia de e_0 entre sexos
+#| fig-pos: 'H'
+
+# (Opcional) Histograma de la distribución bootstrap de la diferencia
+ggplot(data.frame(delta = delta_boot), aes(x = delta)) +
+  geom_histogram(bins = 40) +
+  geom_vline(xintercept = delta_obs, linetype = 2) +
+  geom_vline(xintercept = ci, linetype = 3) +
+  labs(
+    x = paste0("Δ e0 = e0(", sex_levels[2], ") - e0(", sex_levels[1], ")"),
+    y = "Frecuencia",
+    title = ""
+  ) +
+  theme_bw()
+```
+
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#| label: tbl-c5-6
+#| tbl-cap: "Resultados numéricos del Bootstrap"
+
+# Resumen numérico
+res_boot <- tibble::tibble(
+  sexo_A = sex_levels[1],
+  sexo_B = sex_levels[2],
+  e0_A   = round(e0_A,1),
+  e0_B   = round(e0_B,1),
+  diff_B_A = round(delta_obs,1),
+  CI2.5  = round(unname(ci[1]),1),
+  CI97.5 = round(unname(ci[2]),1),
+  valor_p_dos_colas = round(pval,2),
+  B = B
+)
+
+# Mostrar la tabla base requerida
+res_boot %>%
+  kbl(booktabs  = TRUE, digits = 2,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+------------------------------------------------------------------------
+
+### 2. Segundo Cementerio Censado
+
+#### Pasos 1 a 3) Lectura, clases de edad y tabla de vida
+
+```{r, echo=FALSE}
+#| label: tbl-c5-7
+#| tbl-cap: "Cementerio Jardines de Paz. Clases de edad y frecuencias de datos (nx)"
+
+# --- Paso 1) Lectura y depuración ---
+datos2 <- readxl::read_excel("datos.c5.xlsx", sheet = "cement2") %>%
+  transmute(
+    id   = as.integer(`INDIVIDUO`),
+    nac  = as.integer(`NACIMIENTO`),
+    mue  = as.integer(`MUERTE`),
+    edad = as.integer(`EDAD INDIVIDUO`),
+    sexo = as.character(`SEXO`)
+  ) %>%
+  mutate(edad = if_else(is.na(edad) & !is.na(mue) & !is.na(nac),
+                        mue - nac, edad)) %>%
+  filter(!is.na(edad), edad >= 0L)  # muestra válida
+
+nrow(datos2)  # verificación del número de registros
+
+# --- Paso 2) Clases decenales y frecuencias nx ---
+ancho  <- 10
+cortes <- seq(0, ceiling((max(datos2$edad) + 1) / ancho) * ancho, by = ancho)
+
+tbl_ini2 <- 
+  datos2 %>% 
+  mutate(
+    bin = cut(edad, breaks = cortes, right = FALSE, include.lowest = TRUE, labels = FALSE),
+    edad_ini = cortes[bin],
+    es_ultimo = edad_ini == max(cortes) - ancho,
+    clase = if_else(es_ultimo,
+                    paste0(edad_ini, "+"),
+                    paste0(edad_ini, "-", edad_ini + ancho - 1))
+  ) %>%
+  count(clase, edad_ini, name = "nx") %>%
+  arrange(edad_ini)
+
+# --- Paso 3) Estimadores de tabla de vida ---
+N0  <- sum(tbl_ini2$nx)
+N_x <- rev(cumsum(rev(tbl_ini2$nx)))
+Sx  <- (dplyr::lead(N_x) / N_x) %>% tidyr::replace_na(0) %>% round(2)
+lx  <- round(N_x / N0, 2)
+
+Lx  <- (N_x + dplyr::lead(N_x))/2 * ancho
+Lx[is.na(Lx)] <- (ancho/2) * tail(N_x, 1)   # último intervalo abierto
+
+Tx  <- rev(cumsum(rev(Lx)))
+ex  <- round(Tx / N_x, 1)
+
+tabla_vida_jp <- 
+  tbl_ini2 %>%
+  mutate(
+    Nx = N_x, Sx = Sx, lx = lx, Lx = Lx, Tx = Tx, ex = ex,
+    edad_med = edad_ini + ancho/2
+  )
+
+tabla_vida_jp %>%
+  select(-edad_ini, -edad_med) %>% 
+  kbl(booktabs = TRUE, digits = 2, longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+------------------------------------------------------------------------
+
+#### Paso 4) Gráficos: supervivencia $l_x$ y de esperanza de vida $e_x$
+
+```{r, echo=FALSE}
+#| label: fig-c5-4
+#| fig-cap: "Curvas de supervivencia y de esperanza de vida"
+#| fig-pos: 'H'
+
+g_lx <- ggplot(tabla_vida_jp, aes(edad_med, lx)) +
+  geom_line() + geom_point() +
+  labs(x = "Edad (años)", y = expression("Supervivencia"~(l[x])),
+       title = "Supervivencia (l\u2093 = N\u2093 / N\u2092)") +
+  theme_bw()
+
+g_ex <- ggplot(tabla_vida_jp, aes(edad_med, ex)) +
+  geom_line() + geom_point() +
+  labs(x = "Edad (años)", y = expression(e[x]~"(años)"),
+       title = "Esperanza de vida (e\u2093 = T\u2093 / N\u2093)") +
+  theme_bw()
+
+g_lx + g_ex
+```
+
+#### Paso 5) Comparativo entre sexos - $e_x$ y $l_x$
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#| label: fig-c5-5
+#| fig-cap: Curvas de supervivencia y de esperanza de vida por sexos.
+#| fig-pos: 'H'
+
+# Insumos requeridos para la figura (Insumos del Paso 1)
+datos2 <- datos2 # Datos del censo al cementerio
+ancho  <- 10     # Amplitud de los irtervalos de edad en la tv
+cortes <- cortes # Intervalos hasta cubrir la edad máxima observada
+
+# etiquetas para los intervalos (última como "a+")
+starts <- head(cortes, -1)
+labs   <- paste0(starts, "-", starts + ancho - 1)
+labs[length(labs)] <- paste0(starts[length(starts)], "+")
+
+tbl_sex <- 
+  datos2 %>%
+  mutate(
+    clase = cut(edad,
+                breaks = cortes,
+                right = FALSE,
+                include.lowest = TRUE,
+                labels = labs),
+    edad_ini = as.integer(sub("-.*", "", as.character(clase)))
+  ) %>%
+  count(sexo, clase, edad_ini, name = "nx") %>%
+  arrange(sexo, edad_ini)
+
+# Tabla de vida por cada sexo
+tv_sex <- 
+  tbl_sex %>%
+  group_by(sexo) %>%
+  arrange(edad_ini, .by_group = TRUE) %>%
+  mutate(
+    N0  = sum(nx),                    # radix por sexo
+    N_x = rev(cumsum(rev(nx))),       # supervivientes al inicio del intervalo
+    Lx  = (N_x + lead(N_x))/2 * ancho,      # años-persona en el intervalo
+    Lx  = if_else(is.na(Lx), (ancho/2) * 
+                    last(N_x), Lx),         # último intervalo abierto
+    Tx  = rev(cumsum(rev(Lx))),
+    ex  = Tx / N_x,
+    lx  = N_x / N0,
+    edad_med = edad_ini + ancho/2
+  ) %>%
+  ungroup()
+
+# --- Figuras ---
+# 1) Esperanza de vida (e_x) por sexo
+g_ex_sex <- 
+  ggplot(tv_sex, aes(x = edad_med, 
+                     y = ex, 
+                     color = sexo)) +
+  geom_line() + 
+  geom_point() +
+  labs(x = "Edad (años, punto medio del intervalo)",
+       y = expression(e[x]~"(años)"),
+       color = "Sexo",
+       title = "Esperanza_vida (e\u2093)") +
+  theme_bw()
+
+# 2) Supervivencia (lx) por sexo
+g_lx_sex <- 
+  ggplot(tv_sex, aes(x = edad_med, 
+                     y = lx, 
+                     color = sexo)) +
+  geom_line() + geom_point() +
+  labs(x = "Edad (años, punto medio del intervalo)",
+       y = expression(l[x]),
+       color = "Sexo",
+       title = "Supervivencia (l\u2093 = N\u2093 / N\u2092)") +
+  theme_bw()
+
+(g_lx_sex | g_ex_sex) + plot_layout(guides = "collect") &
+  theme(legend.position = "bottom")
+```
+
+```{r, echo=FALSE}
+#| label: tbl-c5-8
+#| tbl-cap: "Esperanza de vida al nacer (e\u2092) por sexo"
+
+# Tabla base por sexo
+resumen_e0 <- 
+  tv_sex %>%
+  group_by(sexo) %>%
+  slice_min(edad_ini, 
+            n = 1, 
+            with_ties = FALSE) %>%  # toma el primer intervalo (x = 0)
+  transmute(sexo, N0 = N0, e0 = round(ex, 2)) %>%
+  ungroup()
+
+# Tabla
+resumen_e0 %>%
+  kbl(booktabs  = TRUE, digits = 2,
+      longtable = TRUE, align = "c") %>% 
+  kable_classic(full_width = FALSE)
+
+```
+
+------------------------------------------------------------------------
+
+#### Paso 6) Comparación estadística entre sexos (Bootstrap).
+
+```{r, echo=FALSE}
+# --- Bootstrap estratificado para Δe0 = e0(F) - e0(M) ---
+
+# Asegurar datos y ancho
+if (!exists("datos2")) {
+  datos2 <- readxl::read_excel("datos.c5.xlsx", sheet = "cement2") %>%
+    transmute(
+      edad = as.integer(`EDAD INDIVIDUO`),
+      nac  = as.integer(`NACIMIENTO`),
+      mue  = as.integer(`MUERTE`),
+      sexo = as.character(`SEXO`)
+    ) %>%
+    mutate(edad = if_else(is.na(edad) & !is.na(mue) & !is.na(nac), mue - nac, edad)) %>%
+    filter(!is.na(edad), edad >= 0L)
+}
+if (!exists("ancho")) ancho <- 10
+
+# Función e0 (idéntica a la del cementerio anterior, con correcciones mínimas)
+e0_from_edades <- function(edades, ancho = 10) {
+  edades <- edades[is.finite(edades) & edades >= 0]
+  if (length(edades) == 0) return(NA_real_)
+  cortes <- seq(0, ceiling((max(edades) + 1)/ancho) * ancho, by = ancho)
+  bin <- cut(edades, breaks = cortes, right = FALSE,
+             include.lowest = TRUE, labels = FALSE)
+  nx  <- tabulate(bin, nbins = length(cortes) - 1)
+  if (sum(nx) == 0) return(NA_real_)
+  N_x <- rev(cumsum(rev(nx)))
+  Lx  <- (N_x + dplyr::lead(N_x))/2 * ancho
+  Lx[is.na(Lx)] <- (ancho/2) * tail(N_x, 1)
+  Tx  <- rev(cumsum(rev(Lx)))
+  Tx[1] / N_x[1]
+}
+
+# Definir niveles y forzar orden: A = M, B = F si existen
+sex_levels <- datos2 %>%
+  filter(!is.na(sexo)) %>%
+  count(sexo, name = "n") %>%
+  arrange(desc(n)) %>%
+  pull(sexo)
+
+if (length(sex_levels) < 2) stop("Se requieren al menos dos sexos con datos.")
+
+sex_levels <- sex_levels[1:2]
+if (all(c("M","F") %in% sex_levels)) sex_levels <- c("M","F")  # A=M, B=F
+
+edades_M <- datos2$edad[datos2$sexo == sex_levels[1]]
+edades_F <- datos2$edad[datos2$sexo == sex_levels[2]]
+
+nM <- length(edades_M); nF <- length(edades_F)
+
+e0_M <- e0_from_edades(edades_M, ancho = ancho)
+e0_F <- e0_from_edades(edades_F, ancho = ancho)
+
+delta_obs <- e0_F - e0_M   # Δe0 = e0(F) - e0(M)
+
+set.seed(123)
+B <- 2000
+delta_boot <- replicate(B, {
+  samp_M <- sample(edades_M, size = nM, replace = TRUE)
+  samp_F <- sample(edades_F, size = nF, replace = TRUE)
+  e0_from_edades(samp_F, ancho = ancho) - e0_from_edades(samp_M, ancho = ancho)
+})
+
+ci <- quantile(delta_boot, probs = c(0.025, 0.975), na.rm = TRUE)
+
+pval <- 2 * min(
+  mean(delta_boot <= 0, na.rm = TRUE),
+  mean(delta_boot >= 0, na.rm = TRUE)
+)
+```
+
+```{r,  echo=FALSE}
+#| label: fig-c5-6
+#| fig-cap: "Bootstrap estratificado de la diferencia de e0 entre sexos (Δe0 = e0(F) − e0(M))"
+#| fig-pos: 'H'
+
+ggplot(data.frame(delta = delta_boot), aes(x = delta)) +
+  geom_histogram(bins = 40) +
+  geom_vline(xintercept = delta_obs, linetype = 2) +
+  geom_vline(xintercept = ci, linetype = 3) +
+  labs(x = "Δ e0 = e0(F) - e0(M)",
+       y = "Frecuencia",
+       title = "Bootstrap estratificado de la diferencia de e0 entre sexos") +
+  theme_bw()
+```
+
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#| label: tbl-c5-9
+#| tbl-cap: "Resultados numéricos del Bootstrap"
+
+res_boot <- tibble::tibble(
+  e0_M   = round(e0_M, 1),
+  e0_F   = round(e0_F, 1),
+  diff_F_M = round(delta_obs, 1),
+  CI2.5  = round(unname(ci[1]), 1),
+  CI97.5 = round(unname(ci[2]), 1),
+  valor_p_bootstrap = round(pval, 3),
+  B = B
+)
+
+res_boot %>%
+  kbl(booktabs = TRUE, digits = 2, longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+------------------------------------------------------------------------
+
+#### Paso 7) Comparación de la esperanza de vida y la supervivencia entre cementerios
+
+```{r, echo=FALSE}
+#| label: fig-c5-7
+#| fig-cap: Curvas de Supervivencia y de Esperanza de Vida entre cementerios
+#| fig-pos: 'H'
+
+# Combinar y etiquetar
+comp <- 
+  dplyr::bind_rows(
+  tabla_vida_sm %>% mutate(cementerio = "San Miguel"),
+  tabla_vida_jp %>% mutate(cementerio = "Jardines de Paz")
+)
+
+# g_lx: Supervivencia proporcional (l_x)
+g_lx <- ggplot(comp, aes(edad_med, lx, color = cementerio)) +
+  geom_line() + 
+  geom_point() +
+  labs(x = "Edad (años)", y = expression("Supervivencia"~(l[x])),
+       title = "Supervivencia") +
+  theme_bw()
+
+# g_ex: Esperanza de vida (e_x)
+g_ex <- ggplot(comp, aes(edad_med, ex, color = cementerio)) +
+  geom_line() + 
+  geom_point() +
+  labs(x = "Edad (años)", y = expression(e[x]~"(años)"),
+       title = "Esperanza_vida") +
+  theme_bw()
+
+(g_lx | g_ex) + 
+  plot_layout(guides = "collect") &
+  theme(legend.position = "bottom")
+```
+
+------------------------------------------------------------------------
+
+#### Paso 8) Tamaño mínimo de muestra y prueba de potencia para la tabla de vida elaborada
+
+------------------------------------------------------------------------
+
+##### a.) Analítica rápida (media edad al morir como proxy de $e_0$)
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#| label: tbl-c5-10
+#| tbl-cap: "Resultados de la prueba analítica rápida"
+
+if (!exists("datos")) {
+  datos <- readxl::read_excel("datos.c5.xlsx", sheet = "cement1") %>%
+    dplyr::transmute(
+      edad = as.integer(`EDAD INDIVIDUO`),
+      nac  = as.integer(`NACIMIENTO`),
+      mue  = as.integer(`MUERTE`)
+    ) %>%
+    dplyr::mutate(edad = dplyr::if_else(is.na(edad) & !is.na(mue) & !is.na(nac),
+                                        mue - nac, edad)) %>%
+    dplyr::filter(!is.na(edad), edad >= 0L)
+}
+
+alpha  <- 0.05   # 95% de confianza
+h_mean <- 1      # margen objetivo (años) para la media
+z      <- qnorm(1 - alpha/2)
+s_edad <- stats::sd(datos$edad, na.rm = TRUE)
+n_obs  <- nrow(datos)
+
+n_req_mean <- ceiling((z * s_edad / h_mean)^2)
+h_obs_mean <- z * s_edad / sqrt(n_obs)
+
+tabla <-
+  dplyr::tibble(
+    Metodo                = "Analítico (edad prom.- proxy de e0)",
+    `n requerido`         = n_req_mean,
+    `n observado`         = n_obs,
+    `h objetivo (años)`   = h_mean,
+    `h  con n_obs`        = round(h_obs_mean, 2)
+  )
+
+# Resultados de la prueba analítica rápida
+tabla %>%
+  kbl(booktabs  = TRUE, digits = 2,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+------------------------------------------------------------------------
+
+##### b.) Bootstrap de $e_0$ con el mismo esquema de tabla de vida
+
+```{r, echo=FALSE}
+#| label: tbl-c5-11
+#| tbl-cap: "Resultados de la prueba Bootstrap"
+#| message: false
+#| warning: false
+
+if (!exists("ancho")) ancho <- 10
+
+# Asegurar objeto 'datos' con columna 'edad'
+if (!exists("datos") || !("edad" %in% names(datos))) {
+  datos <- readxl::read_excel("datos.c5.xlsx", sheet = "cement1") %>%
+    dplyr::transmute(
+      edad = as.integer(`EDAD INDIVIDUO`),
+      nac  = as.integer(`NACIMIENTO`),
+      mue  = as.integer(`MUERTE`)
+    ) %>%
+    dplyr::mutate(
+      edad = dplyr::if_else(is.na(edad) & !is.na(mue) & !is.na(nac),
+                            mue - nac, edad)
+    ) %>%
+    dplyr::filter(!is.na(edad), is.finite(edad), edad >= 0L)
+}
+
+# Función: e0 a partir de edades (mismo esquema de tabla de vida)
+e0_edades <- function(edades, ancho = 10) {
+  edades <- edades[is.finite(edades) & edades >= 0]
+  if (length(edades) == 0) return(NA_real_)
+
+  cortes <- seq(0, ceiling((max(edades) + 1) / ancho) * ancho, by = ancho)
+
+  # bins como índices 1..(k), manteniendo include.lowest correcto
+  bin <- cut(edades, breaks = cortes, right = FALSE,
+             include.lowest = TRUE, labels = FALSE)
+
+  # frecuencias por clase (no pierde clases vacías)
+  nx <- tabulate(bin, nbins = length(cortes) - 1)
+  if (sum(nx) == 0) return(NA_real_)
+
+  N_x <- rev(cumsum(rev(nx)))
+
+  Lx <- (N_x + dplyr::lead(N_x)) / 2 * ancho
+  Lx[is.na(Lx)] <- (ancho / 2) * tail(N_x, 1)  # último intervalo abierto
+
+  Tx <- rev(cumsum(rev(Lx)))
+  Tx[1] / N_x[1]
+}
+
+set.seed(123)
+n_obs  <- nrow(datos)
+grid_n <- seq(min(100, n_obs), n_obs, by = 50)
+B      <- 400
+h_e0   <- 1
+
+res <- lapply(grid_n, function(ni) {
+  e0_vals <- replicate(B, {
+    edades_i <- sample(datos$edad, size = ni, replace = TRUE)
+    e0_edades(edades_i, ancho = ancho)
+  })
+  e0_vals <- e0_vals[is.finite(e0_vals)]
+  q <- quantile(e0_vals, probs = c(0.025, 0.5, 0.975), na.rm = TRUE)
+
+  dplyr::tibble(
+    n           = ni,
+    e0_mediana  = round(unname(q[2]), 2),
+    e0_menor    = round(unname(q[1]), 2),
+    e0_mayor    = round(unname(q[3]), 2),
+    semianchura = round((q[3] - q[1]) / 2, 2)
+  )
+})
+
+res_boot <- dplyr::bind_rows(res)
+
+# Resultados de la prueba Bootstrap
+res_boot %>%
+  kbl(booktabs  = TRUE, digits = 2,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+
+```
+
+
+```{r, echo=FALSE}
+#| label: tbl-c5-12
+#| tbl-cap: "Resultados del objetivo de un margen de un año"
+
+n_recomendado <- 
+  res_boot %>%
+  dplyr::filter(semianchura <= h_e0) %>%
+  dplyr::slice_min(n, n = 1, with_ties = FALSE) %>%
+  dplyr::pull(n)
+
+tabla <-
+dplyr::tibble(
+  `h_e0 objetivo (años)` = h_e0,
+  `n recomendado`        = ifelse(length(n_recomendado)==0, NA_integer_, n_recomendado),
+  `n observado`          = n_obs
+)
+
+# Resultados del objetivo de 1 año
+res_boot %>%
+  kbl(booktabs  = TRUE, digits = 2,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+
+```{r, echo=FALSE}
+#| label: fig-c5-8
+#| fig-cap: Curva de precisión de e0 vs tamaño de muestra (bootstrap)
+#| fig-pos: 'H'
+
+ggplot(res_boot, aes(x = n, y = semianchura)) +
+  geom_line() + 
+  geom_point() +
+  geom_hline(yintercept = h_e0, linetype = 2) +
+  labs(x = "Tamaño de muestra (n tumbas)",
+       y = "Semianchura del IC 95% de e0 (años)",
+       title = "") +
+  theme_bw()
+```
+
+
+------------------------------------------------------------------------
+
+\newpage
+
+## A.2 Caso guiado: Análisis de tablas de vida con datos clásicos (Gotelli)
+
+#### Paso 1) Cargar la base de datos que contiene los tres estimadores iniciales ($x, Nx, mx$)
+
+```{r, echo=FALSE}
+#| label: tbl-c5-13
+#| tbl-cap: "Tabla de vida con los estimadores iniciales"
+
+tabla <- read_excel("datos.c5.xlsx", sheet = "gotelli") 
+
+# Organización de la tabla inicial
+tabla <-
+  tabla %>% 
+  mutate(
+    x  = as.numeric(x),
+    Nx = as.numeric(Nx),
+    mx = as.numeric(mx)
+  ) %>%
+  arrange(x)
+
+# Mostrar la tabla base requerida
+tabla %>%
+  kbl(booktabs  = TRUE, digits = 2,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+------------------------------------------------------------------------
+
+#### Paso 2) Construcción de la tabla de vida hasta la esperanza de vida
+
+```{r, echo=FALSE}
+#| label: tbl-c5-14
+#| tbl-cap: "Tabla de vida de la población hipotética"
+
+tabla_v <- 
+  tabla %>%
+  mutate(
+    Bx      = Nx * mx,
+    N0      = first(Nx), 
+    `mx+1`  = lead(mx, default = 0),   # Requerido para Fx post
+    lx      = Nx / N0,
+    `lx+1`  = lead(lx, default = 0),
+    dx      = lx - `lx+1`,
+    qx      = if_else(lx > 0, dx / lx, NA_real_),
+    px      = 1 - qx,
+    `Nx+1`  = lead(Nx, default = 0),
+    Sx      = `Nx+1` / Nx,
+    Lx      = (Nx + `Nx+1`) / 2,
+    Tx      = rev(cumsum(rev(Lx))),
+    ex      = Tx / Nx,
+    `lx.mx`   = lx * mx,
+    `x.lx.mx` = x  * `lx.mx`
+  )
+
+tabla_v %>%
+  select(x, Nx, mx, Bx, lx, dx, qx, px, Sx, 
+         `lx.mx`, `x.lx.mx`, Lx, Tx, ex) %>%
+  kbl(booktabs  = TRUE, digits = 2,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+------------------------------------------------------------------------
+
+#### Paso 3) Cálculo de estadísticos demográficos basados en la tabla de vida
+
+```{r, echo=FALSE}
+#| label: tbl-c5-15
+#| tbl-cap: "Estadísticos demográficos generales"
+#| message: false
+#| warning: false
+
+#  1. Estadísticos generales 
+Ro <- sum(tabla_v$`lx.mx`,   na.rm = TRUE)        # Tasa reproductiva neta
+Tg <- sum(tabla_v$`x.lx.mx`, na.rm = TRUE) / Ro   # Tiempo generacional
+r_est <- log(Ro) / Tg                             # r estimado
+
+# 2. Función de euler
+euler <- 
+      function(rr) 
+      sum(tabla_v$lx * tabla_v$mx * 
+      exp(-rr * tabla_v$x), na.rm = TRUE) - 1
+
+# 3. Cálculo de r exacto
+r <- uniroot(euler, interval = c(-2, 2))$root
+r <- round(r,3)
+
+# 4. Cálculo de lambda
+lambda <- exp(r)
+
+# 5. Organización de los estadísticos generales
+estad <-
+tibble::tibble(
+  `Tasa reprod. neta (Ro)`      = Ro,
+  `Tiempo gen. (T)`             = Tg,
+  `r_est = ln(R0)/T`            = r_est,
+  `r (Euler)`                   = r,
+  `Lambda = exp(r)`             = lambda
+) 
+
+# 6. Tabulación
+estad %>%
+  mutate(across(everything(), ~ round(., 3))) %>%
+  kbl(booktabs  = TRUE, digits = 2,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+------------------------------------------------------------------------
+
+#### Paso 4) Estimadores de estructura de edad - $F_{(pre)},\ F_{(post)},\ c_{(x)},\  v_{(x)}$.
+
+
+```{r, echo=FALSE}
+#| label: tbl-c5-16
+#| tbl-cap: "Estimadores de estructura de edad"
+
+library(dplyr)
+library(kableExtra)
+
+# Extraer S0 (supervivencia inicial)
+S0 <- tabla_v %>%
+  filter(x == 0) %>%
+  pull(Sx) %>%
+  .[1]
+
+tabla2 <- tabla_v %>%
+  arrange(x) %>%
+  mutate(
+    # ---------------------------------------------------
+    # 1) FECUNDIDADES "LISTAS PARA MATRIZ"
+    # ---------------------------------------------------
+    
+    # F(pre): inicia en m1 * S0
+    Fpre  = ifelse(x == max(x), 0, S0 * lead(mx)),
+    
+    # F(post): alineado como en tu Excel → Sx * m_{x+1}
+    Fpost = ifelse(x == max(x), 0, Sx * lead(mx)),
+    
+    # ---------------------------------------------------
+    # 2) DISTRIBUCIÓN ESTABLE c(x)
+    # ---------------------------------------------------
+    
+    lx_e_rx = lx * exp(-r * x),
+    cx      = lx_e_rx / sum(lx_e_rx, na.rm = TRUE),
+    
+    # ---------------------------------------------------
+    # 3) VALOR REPRODUCTIVO v(x)
+    # ---------------------------------------------------
+    
+    erx_lx        = exp(r * x) / lx,
+    e_ry_ly_my    = exp(-r * x) * lx * mx,
+    Se_ry_ly_my   = rev(cumsum(rev(e_ry_ly_my))),
+    vx            = erx_lx * Se_ry_ly_my,
+    vx_norm       = vx / vx[1]
+  ) %>%
+  select(
+    x, Nx, lx, mx, Sx,
+    Fpre, Fpost,
+    lx_e_rx, cx,
+    vx, vx_norm
+  ) %>%
+  mutate(across(where(is.numeric), ~ round(., 3)))
+
+
+#-------
+#* Estos estimadores también se pueden tabular en select()
+#*  erx_lx, e_ry_ly_my, Se_ry_ly_my 
+#* Y se incluyen en el siguiente kbl() como:  
+# "e^{rx}/lx","e^{-ry}·ly·my)", "Σ(e^{-ry}·ly·my)"  
+# Se excluyen para resumir el tamaño de la tabla
+#-------
+
+
+# Impresión tabla final
+tabla2 %>%
+  kbl(digits = 2,
+      col.names = c(
+        "x","Clase_C","Nx","mx","Sx",
+        "F(pre)","F(post)",
+        "lx·e^{-rx}","c(x)",
+        "v(x)","v(x).norm"
+      ),
+      booktabs  = TRUE) %>% 
+  kable_classic(full_width = FALSE) %>% 
+  kable_styling(
+    full_width = FALSE,
+    font_size  = 10,
+    latex_options = c("repeat_header")  # ok con longtable
+  )
+```
+
+------------------------------------------------------------------------
+
+\newpage
+
+## B. Caso guiado: Proyección de poblaciones estructuradas por edad (Leslie)
+
+------------------------------------------------------------------------
+
+#### Paso 1. Estimadores de estructura de edad: $F_{(pre)},\ F_{(post)},\ S_{(x)},\ c_{(x)},\  v_{(x)}$.
+
+```{r, echo=FALSE}
+#-------
+# Se incluyen en el siguiente kbl() como:  
+# "e^{rx}/lx","e^{-ry}·ly·my)", "Σ(e^{-ry}·ly·my)"  
+# Se excluyen para resumir el tamaño de la tabla
+#-------
+
+# Impresión de la tabla
+tabla2 %>%
+  kbl(digits = 2,
+    col.names = c(
+      "x","Nx","lx","mx","Sx",
+      "F(pre)","F(post)",
+      "lx·e^{-rx}","c(x)",
+      "v(x)","v(x) norm"
+    ),
+      booktabs  = TRUE) %>% 
+  kable_classic(full_width = FALSE) %>% 
+  kable_styling(
+    full_width = FALSE,
+    font_size  = 10,
+    latex_options = c("repeat_header")  
+  )
+```
+
+------------------------------------------------------------------------
+
+#### Paso 2. Matrices de Leslie: $L$ (pre y post reproductivas)
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+# Cargar la base de datos "tabla2"
+library(readr)
+tabla2 <- read_xlsx("datos.c5.xlsx", sheet = "t.vida")
+
+# -----------------------------
+# Vectores necesarios
+# -----------------------------
+edades  <- tabla2$x        # edades: 0,1,2,3,4
+Fpre    <- tabla2$Fpre     # fecundidades pre-reproductivas
+Fpost   <- tabla2$Fpost    # fecundidades post-reproductivas
+Sx      <- tabla2$Sx       # supervivencia de x -> x+1  (S0, S1, ..., S_(k-1); último suele ser 0)
+k       <- length(edades)  # aquí: 5
+
+# Chequeos mínimos
+stopifnot(k >= 2, length(Fpre) >= k, length(Fpost) >= k, length(Sx) >= k-1)
+
+# =============================
+# Matriz de Leslie PRE (4x4)
+#  - Trunca la última edad (no aporta fecundidad/continuación)
+#  - Subdiagonal inicia en S1 (transición 1->2, 2->3, 3->4 dentro del truncamiento)
+# =============================
+k_pre       <- k - 1                 # 4
+edades_pre  <- edades[1:k_pre]       # 0..3
+Fpre_pre    <- Fpre[1:k_pre]         # Fpre para 0..3
+
+# Subdiagonal PRE: S1, S2, S3 (longitud = k_pre-1)
+stopifnot(length(Sx) >= k_pre)       # necesitas al menos S3
+Sx_pre      <- Sx[2:k_pre]
+
+L_pre <- matrix(0, nrow = k_pre, ncol = k_pre)
+L_pre[1, ] <- Fpre_pre
+if (k_pre > 1) {
+  L_pre[cbind(2:k_pre, 1:(k_pre - 1))] <- Sx_pre
+}
+
+dimnames(L_pre) <- list(paste0("Edad_", edades_pre),
+                        paste0("Edad_", edades_pre))
+
+# =============================
+# Matriz de Leslie POST (5x5)
+#  - Completa (todas las edades)
+#  - Subdiagonal inicia en S0 (transición 0->1)
+# =============================
+L_post <- matrix(0, nrow = k, ncol = k)
+L_post[1, ] <- Fpost
+if (k > 1) {
+  # subdiagonal: filas 2:k, columnas 1:(k-1) reciben S0..S_(k-2)
+  L_post[cbind(2:k, 1:(k - 1))] <- Sx[1:(k - 1)]
+}
+
+dimnames(L_post) <- list(paste0("Edad_", edades),
+                         paste0("Edad_", edades))
+
+# -----------------------------
+# Impresión
+# -----------------------------
+kable(L_pre,
+      booktabs = TRUE,
+      digits = 2,
+      align = "c") %>%
+  kable_styling(full_width = FALSE,
+                position = "center",
+                font_size = 9,
+                latex_options = c("hold_position", "scale_down"))
+
+kable(L_post,
+      booktabs = TRUE,
+      digits = 2,
+      align = "c") %>%
+  kable_styling(full_width = FALSE,
+                position = "center",
+                font_size = 9,
+                latex_options = c("hold_position", "scale_down"))
+```
+
+------------------------------------------------------------------------
+
+#### Paso 3. Modelación matricial multi-edad (pre y post reproductiva)
+
+##### a.) Proyección post-reproductiva
+
+------------------------------------------------------------------------
+
+**Paso 1.** Cargar el vector de Edades $(N_t)$ y el número de periodos a
+proyectar en el modelo $(t)$.
+
+```{r, echo=FALSE}
+# Población inicial (hipotética)
+Nt <- tabla_v$Nx
+Nt
+
+# Número de periodos a proyectar en el modelo
+t <- 12
+t
+```
+
+**Paso 2.** Función `modelo_pob` para automatizar
+$(N_{(t+1)} = L \cdot N_{(t)})$
+
+```{r, echo=FALSE}
+# Funcion (modelo_pob) para modelar la población por las diferentes Edades en el tiempo.
+# 1) Elementos de la modelación (Matriz de Leslie - L, Vector de Abundancias - Nt y Periodos a modelar - t)
+library(purrr)  # proporciona set_names()
+
+modelo_pob <- function(L, Nt, t) {
+  k <- length(Nt)
+  out <- matrix(NA_real_, nrow = t + 1, ncol = k)
+  out[1, ] <- Nt
+  for (i in 1:t) out[i + 1, ] <- L %*% out[i, ]
+  as.data.frame(out) %>% 
+    purrr::set_names(paste0("Edad_", seq_len(k)))
+}
+```
+
+**Paso 3.** Simulación de la proyección $(N_{(t+1)} = L\ . N_{(t)})$
+(@tbl-c5-17)
+
+```{r, echo=FALSE}
+#| label: tbl-c5-17
+#| tbl-cap: "Resumen de la simulación de la proyección del vector de edades, para los seis primeros intervalos de tiempo"
+
+# 1) Usar la función creada para el producto L x Nt
+simulacion <- modelo_pob(as.matrix(L_post), Nt, t)
+
+# 2) Crear la columna Tiempo
+simulacion <- simulacion %>%
+  mutate(Tiempo = 0:(nrow(simulacion)-1))
+
+# 3) Reordenar columnas para que Tiempo sea la primera columna
+simulacion <- simulacion %>%
+  select(Tiempo, everything())
+
+# 4) Visualización rápida (redondeo)
+colnames(simulacion) <- c("Tiempo", "Edad_0","Edad_1",
+                          "Edad_2","Edad_3","Edad_4")
+
+# 5) Mostrar un resumen redondeado
+head(round(simulacion)) %>%
+  kbl(booktabs  = TRUE, 
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+
+```
+
+```{r, echo=FALSE}
+#| label: tbl-c5-18
+#| tbl-cap: "Resumen de la simulación post-reproductiva en formato largo"
+
+# 6) Convertir a formato largo
+simulacion_l <- simulacion %>%
+  pivot_longer(cols = -Tiempo, 
+               names_to = "Edad", 
+               values_to = "Abundancia") %>%
+  mutate(Abundancia = round(Abundancia, 0))
+
+# Mostrar un resumen de la simulación en formato largo
+head(simulacion_l) %>%
+  kbl(booktabs  = TRUE, 
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+**Paso 4.** Figura de la proyección multi-Edad
+
+```{r, echo=FALSE}
+#| label: fig-c5-9
+#| fig-cap: Proyección post-reproductiva de la población por las diferentes edades censadas
+#| fig-pos: 'H'
+
+ggplot(simulacion_l, aes(x = Tiempo, y = Abundancia, color = Edad)) +
+  geom_point(size = 3) +
+  geom_line() +
+  labs(x = "Períodos de tiempo (años)",
+       y = "Densidad (Nx)",
+       color = "Edades",
+       title = "Proyección Post-Reproductiva") +
+  scale_x_continuous(breaks = seq(min(simulacion_l$Tiempo),
+                                  max(simulacion_l$Tiempo), by = 2)) +
+  theme_bw() +
+  theme(axis.text = element_text(size = 13),
+        axis.title.x = element_text(size = 13),
+        axis.title.y = element_text(size = 13),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+```
+
+------------------------------------------------------------------------
+
+**Paso 5.** Tasa de crecimiento asintótica ($\lambda$), distribución
+estable por Edades $c_x$ y valor reproductivo normalizado $v_x^{norm}$
+del censo post-reproductivo.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# =========================================
+# Autovalores / Autovectores de L_post
+# =========================================
+A <- as.matrix(L_post)
+
+# 1) Autovalor y autovector derecho (estructura estable)
+eigR <- eigen(A)
+
+posR   <- which.max(Mod(eigR$values))     # índice del autovalor dominante
+lambda <- Re(eigR$values[posR])           # λ (dominante)
+w      <- Re(eigR$vectors[, posR])        # autovector derecho asociado
+cx     <- w / sum(w)                      # distribución estable c_x
+
+# 2) Autovector izquierdo (valor reproductivo)
+eigL <- eigen(t(A))
+
+posL   <- which.max(Mod(eigL$values))     # dominante para la transpuesta
+v      <- Re(eigL$vectors[, posL])        # autovector izquierdo asociado
+v_norm <- v / v[1]                        # normalización: v0 = 1
+
+if (sum(cx) < 0) cx <- -cx
+if (v_norm[1] < 0) v_norm <- -v_norm
+
+# 3) Tasa instantánea
+r <- log(lambda)
+
+# ----------- Salidas ordenadas -----------
+cat("a) Tasa instantánea de aumento (r)\n\n")
+print(round(r, 6))
+
+cat("\n\nb) Tasa finita post-reproductiva (lambda)\n\n")
+print(round(lambda, 6))
+
+cat("\n\nc) Distribución estable de edades (c_x)\n\n")
+print(round(setNames(cx, rownames(A)), 5))
+
+cat("\n\nd) Valor reproductivo normalizado (v_x^norm)\n\n")
+print(round(setNames(v_norm, rownames(A)), 5))
+```
+
+------------------------------------------------------------------------
+
+##### b.) Proyección pre-reproductiva
+
+-   **Paso 1.** Cargar el vector de Edades $(N_t)$
+
+-   **Paso 2.** Función `modelo_pob` para automatizar
+    $(N_{t+1} = L \cdot N_{t})$
+
+**Paso 3.** Simulación de la proyección $(N_{t+1} = L\ . N_{t})$
+
+```{r, echo=FALSE}
+#| label: tbl-c5-19
+#| tbl-cap: "Resumen de la simulación de la proyección del vector de edades, para los seis primeros intervalos de tiempo"
+
+# 1) Usar la función creada para el producto L x Nt
+Nt_pre <- Nt[1:4]   
+t_pre  <- 12
+
+simulacion <- modelo_pob(as.matrix(L_pre), Nt_pre, t_pre)
+
+
+# 2) Crear la columna Tiempo
+simulacion <- 
+  simulacion %>%
+  mutate(Tiempo = 0:(nrow(simulacion)-1))
+
+# 3) Reordenar columnas para que Tiempo sea la primera columna
+simulacion <- 
+  simulacion %>%
+  select(Tiempo, everything())
+
+# 4) Visualización rápida (redondeo)
+colnames(simulacion) <- c("Tiempo", "Edad_0","Edad_1",
+                          "Edad_2", "Edad_3")
+# 5) Mostrar un resumen redondeado
+head(round(simulacion)) %>%
+  kbl(booktabs  = TRUE, 
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+
+```
+
+
+```{r, message=FALSE, echo=FALSE}
+#| label: tbl-c5-20
+#| tbl-cap: "Resumen de la simulación en formato largo"
+
+# 3) Convertir a formato largo
+simulacion_l <- 
+  simulacion %>%
+  pivot_longer(cols = -Tiempo, 
+               names_to = "Edad", 
+               values_to = "Abundancia") %>%
+  mutate(Abundancia = round(Abundancia, 0))
+
+# Mostrar un resumen de la simulación en formato largo
+head(simulacion_l) %>%
+  kbl(booktabs  = TRUE,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+**Paso 4.** Figura de la proyección multi-Edad (@fig-c5-10)
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#| label: fig-c5-10
+#| fig-cap: Proyección pe-reproductiva de la población por las diferentes edades censadas
+#| fig-pos: 'H'
+
+ggplot(simulacion_l, aes(x = Tiempo, y = Abundancia, color = Edad)) +
+  geom_point(size = 3) +
+  geom_line() +
+  labs(x = "Períodos de tiempo (años)",
+       y = "Densidad (Nx)",
+       color = "Edades",
+       title = "Proyección Pre-Reproductiva") +
+  scale_x_continuous(breaks = seq(min(simulacion_l$Tiempo),
+                                  max(simulacion_l$Tiempo), by = 2)) +
+  theme_bw() +
+  theme(axis.text = element_text(size = 13),
+        axis.title.x = element_text(size = 13),
+        axis.title.y = element_text(size = 13),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+```
+
+------------------------------------------------------------------------
+
+**Paso 6.** Tasa de crecimiento asintótica ($\lambda$), distribución
+estable por Edades $c_x$ y valor reproductivo normalizado $v_x^{norm}$
+del censo pre-reproductivo.
+
+```{r, echo=FALSE}
+# =========================================
+# Autovalores / Autovectores de L_pre
+# =========================================
+A <- as.matrix(L_pre)
+
+# 1) Autovalor y autovector derecho (estructura estable)
+eigR <- eigen(A)
+
+posR   <- which.max(Mod(eigR$values))
+lambda <- Re(eigR$values[posR])
+w      <- Re(eigR$vectors[, posR])
+cx     <- w / sum(w)
+
+# 2) Autovector izquierdo (valor reproductivo)
+eigL <- eigen(t(A))
+
+posL   <- which.max(Mod(eigL$values))
+v      <- Re(eigL$vectors[, posL])
+v_norm <- v / v[1]     # v0 = 1
+
+if (sum(cx) < 0) cx <- -cx
+if (v_norm[1] < 0) v_norm <- -v_norm
+
+# 3) Tasa instantánea
+r <- log(lambda)
+
+# ----------- Salidas ordenadas -----------
+cat("a) Tasa instantánea de aumento (r)\n\n")
+print(round(r, 6))
+
+cat("\n\nb) Tasa finita pre-reproductiva (lambda)\n\n")
+print(round(lambda, 6))
+
+cat("\n\nc) Distribución estable de edades (c_x)\n\n")
+print(round(setNames(cx, rownames(A)), 4))
+
+cat("\n\nd) Valor reproductivo normalizado (v_x^norm)\n\n")
+print(round(setNames(v_norm, rownames(A)), 4))
+```
+
+------------------------------------------------------------------------
+
+#### Paso 4. Cálculos especiales. Análisis de Sensibilidad y Elasticidad
+
+###### a.) Análisis de Sensibilidad
+
+**Paso 1**. Cargar la matriz de transición de Leslie ($L_{post}$).
+
+```{r, echo=FALSE}
+L <- as.matrix(L_post)
+round(L,2)
+```
+
+
+**Paso 2**. Cálculo del estimador de sensibilidad de la matriz
+
+```{r, echo=FALSE}
+# ---------------------------------------------------------
+# Matriz de proyección (Leslie post-reproductiva)
+L <- as.matrix(L_post)
+
+# ---------------------------------------------------------
+# 1) Autovalor dominante (λ) y autovector derecho (w)
+# - λ: tasa finita asintótica de crecimiento poblacional.
+# - w: estructura estable de edades (vector propio derecho).
+eigR  <- eigen(L)
+posR  <- which.max(Mod(eigR$values))     # índice del autovalor dominante 
+lambda <- Re(eigR$values[posR])          # λ (parte real)
+w     <- Re(eigR$vectors[, posR])        # w: autovector derecho asociado a λ
+
+# ---------------------------------------------------------
+# 2) Autovector izquierdo (v)
+# - v: valor reproductivo por edad (vector propio izquierdo).
+eigL <- eigen(t(L))
+posL <- which.max(Mod(eigL$values))      # índice dominante en L^T
+v    <- Re(eigL$vectors[, posL])         # v: autovector izquierdo asociado a λ
+
+# ---------------------------------------------------------
+# 3) Ajuste de signo (opcional)
+# Este paso solo evita signos negativos
+# en w y v para facilitar la interpretación ecológica.
+if (sum(w) < 0) w <- -w
+if (sum(v) < 0) v <- -v
+
+# ---------------------------------------------------------
+# 4) Normalización biortogonal: v^T w = 1
+v <- v / as.numeric(t(v) %*% w)
+
+# ---------------------------------------------------------
+# 5) Matriz de sensibilidad S_ij
+S <- outer(v, w)
+round(S, 3)
+```
+
+------------------------------------------------------------------------
+
+###### b.) Análisis de Elasticidad
+
+**Paso 1**. Cargar la matriz de transición de Leslie ($L$).
+
+```{r, message=FALSE, echo=FALSE}
+L <- as.matrix(L_post)
+round(L,2)
+```
+
+**Paso 2**. Cálculo de la matriz de elasticidad $e_{ij}$.
+
+```{r, echo=FALSE}
+E <- (L / lambda) * S
+round(E, 3)
+```
+
+```{r}
+sum(E)
+```
+
+
+------------------------------------------------------------------------
+
+\newpage
+
+## C. Caso guiado: Modelos estructurados por estados de crecimiento (Lefkovitch)
+
+#### Paso 1) Cargar y explorar datos del censo
+
+
+```{r, echo=FALSE}
+#| label: tbl-c5-21
+#| tbl-cap: "Resumen de las seis primeras filas de los datos de campo"
+
+datos <- readxl::read_excel("datos.c5.xlsx", 
+                            sheet = "caltropis") %>% 
+  mutate(
+    across(c(Long.Tot, Ancho, Radio, 
+             Cobertura, Semillas), as.numeric))
+
+# Valor mínimos y máximos de coberturas
+Cmin <- min(datos$Cobertura, na.rm = TRUE)
+Cmax <- max(datos$Cobertura, na.rm = TRUE)
+ancho <- (Cmax - Cmin) / 5
+
+# Cinco intervalos => seis clases de cobertura
+cortes   <- seq(Cmin, Cmax, length.out = 6)  
+etq      <- paste0("C", 1:5)
+interval <- paste0(sprintf("%.2f", cortes[-6]), 
+                   " - ", sprintf("%.2f", cortes[-1]))
+
+# Mostrar la tabla inicial
+head(datos) %>%
+  kbl(booktabs  = TRUE, digits = 2,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+------------------------------------------------------------------------
+
+#### Paso 2) ¿Qué variable de estado explica mejor Bx?
+
+
+```{r, echo=FALSE}
+#| label: fig-c5-11
+#| fig-cap: Relación de variables de estado con la variable reproductiva (semillas).
+#| fig-pos: 'H'
+
+# Matriz de correlación
+M <- cor(datos[,2:6])            # Matriz de Correlación (M)
+
+corrplot(M,  method = "circle",            # Correlaciones con circulos
+         type = "lower", insig="blank",    # Forma del panel
+         order = "AOE", diag = FALSE,      # Ordenar por nivel de correlación
+         addCoef.col ="black",             # Color de los coeficientes
+         number.cex = 0.8,                 # Tamaño del texto
+         col = COL2("RdYlBu", 200))        # Transparencia de los circulos
+```
+
+
+```{r, echo=FALSE}
+#| label: tbl-c5-22
+#| tbl-cap: "Resumen estadístico de las regresiones lineales realizadas"
+
+vars_estado <- c("Long.Tot", "Ancho", "Radio", "Cobertura")
+
+cmp <- lapply(vars_estado, 
+              function(v) {
+  modelo <- lm(reformulate(v, "Semillas"), data = datos)
+  glance(modelo) %>% 
+    mutate(variable = v)  }) %>% 
+  bind_rows() %>% 
+  select(Variable = variable, 
+         R.cuadrado = r.squared, 
+         Valor.p = p.value, 
+         AIC, BIC, gl.residual = df.residual) %>% 
+  arrange(desc(R.cuadrado))
+
+kbl(cmp, 
+    booktabs  = TRUE, digits = 2,
+    longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+```{r}
+# Elección de la mejor variable de estado: cobertura
+mejor_var <- dplyr::first(cmp$Variable)
+message("Mejor variable por R²: ", mejor_var)
+```
+
+##### 2.1) Visualización de la relación Semillas vs Cobertura
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#| label: fig-c5-12
+#| fig-cap: Relación lineal entre la cobertura de individuos censados y la variable reproductiva (semillas).
+#| fig-pos: 'H'
+
+ggplot(datos, aes(x = Cobertura, y = Semillas)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", se = TRUE) +
+  theme_bw() +
+  labs(x = "Cobertura (m²)", 
+       y = "Semillas (Bx)",
+       title = "Relación Número Semillas (Bx) ~ Cobertura (C)") 
+```
+
+------------------------------------------------------------------------
+
+#### Paso 3) Definir cinco clases de cobertura
+
+```{r, echo=FALSE}
+# 1. Valor mínimo de Cobertura en el censo
+Cmin <- min(datos$Cobertura, na.rm = TRUE)
+
+# 2. Valor máximo de Cobertura en el censo
+Cmax <- max(datos$Cobertura, na.rm = TRUE)
+
+# 3. Ancho de clase dividiendo el rango total (Cmax - Cmin) en 5 partes
+ancho <- round(((Cmax - Cmin) / 5),4)
+
+cat("\n- Ancho de clase\n\n")
+cat("", ancho, "m²\n\n")
+
+# 4. Construir los "cortes" o límites de los intervalos (Seis cortes para cinco intervalos definidos)
+cortes <- seq(Cmin, Cmax, length.out = 6)  
+
+# 5. Crear etiquetas (C1, ... , C5) para identificar las 5 clases
+etqs   <- paste0("C", 1:5)
+
+# 6. Clasificar los individuos en las 5 clases de Cobertura
+datos <- 
+  datos %>% 
+  mutate(Clase_C = cut(Cobertura, 
+                       breaks = cortes, 
+                       labels = etqs,
+                       include.lowest = TRUE, 
+                       right = TRUE))
+
+cat("\n- Clases de estado generadas\n\n")
+cat("", paste(levels(datos$Clase_C), collapse = ", "), "\n\n")
+
+```
+
+
+```{r, echo=FALSE}
+#| label: tbl-c5-23
+#| tbl-cap: "Datos crudos discriminados por cobertura"
+
+# Valor mínimos y máximos de coberturas
+Cmin <- min(datos$Cobertura, na.rm = TRUE)
+Cmax <- max(datos$Cobertura, na.rm = TRUE)
+ancho <- (Cmax - Cmin) / 5
+
+# Cinco intervalos => seis clases de cobertura
+cortes   <- seq(Cmin, Cmax, length.out = 6)  
+etq      <- paste0("C", 1:5)
+interval <- paste0(sprintf("%.2f", cortes[-6]), 
+                   " - ", sprintf("%.2f", cortes[-1]))
+
+# Clasificación de cada observación por su nivel de cobertura
+datos <- 
+  datos %>% 
+  mutate(Clase_C = cut(Cobertura, 
+                       breaks = cortes, 
+                       labels = etq,
+                       include.lowest = TRUE, 
+                       right = TRUE))
+
+# Primeras cuatro filas de los datos discriminados por coberturas
+kbl(head(datos,4), 
+    booktabs  = TRUE, digits = 2,
+    longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+##### 3.1) Histograma con cortes de clase\index{Visualización!histogramas}
+
+```{r, echo=FALSE}
+#| label: fig-c5-13
+#| fig-cap: Cobertura con cortes de clase (cinco intervalos).
+#| fig-pos: 'H'
+
+# Distribución de frecuencias de acuerdo a las clases de cobertura
+ggplot(datos, aes(x = Cobertura)) +
+  geom_histogram(bins = 30, alpha = 0.6) +
+  geom_vline(xintercept = cortes, linetype = 2) +
+  labs(x = "Cobertura (m²)", 
+       y = "Frecuencia de indv. (nx)",
+       title = "") +
+  theme_bw()+
+  annotate("text",
+           x = cortes[-6] + diff(cortes)/2, 
+           y = Inf, vjust = 1.5,
+           label = etqs, size = 3)
+```
+
+------------------------------------------------------------------------
+
+#### Paso 4) Elaboración de la tabla de vida
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#| label: tbl-c5-24
+#| tbl-cap: "Tabla de vida con Tot_semillas y Bx (poblacional por clase)"
+
+# Asegurar que Clase_C coincide con los cortes recalculados en ese mismo chunk.
+datos <- 
+  datos %>% 
+  mutate(Clase_C = cut(Cobertura, 
+                       breaks = cortes, 
+                       labels = etqs,
+                       include.lowest = TRUE, 
+                       right = TRUE))
+
+# Definir los cortes de clase nuevamente (para asegurar consistencia)
+Cmin   <- min(datos$Cobertura, na.rm = TRUE)
+Cmax   <- max(datos$Cobertura, na.rm = TRUE)
+ancho  <- (Cmax - Cmin) / 5
+cortes <- seq(Cmin, Cmax, length.out = 6)  # 6 bordes para 5 intervalos
+
+# Crear etiquetas de intervalos con dos decimales
+intervalos <- 
+  paste0(
+  sprintf("%.2f", cortes[-length(cortes)]), " - ",
+  sprintf("%.2f", cortes[-1])
+)
+
+# Supervivencia de las semillas, tomada de la bibliografía (0.123%)
+s0 <- 0.00123  # 0.123%
+
+# 1) Totales de semillas por clase (visión poblacional)
+tabla_v <- 
+  datos %>% 
+  group_by(Clase_C) %>% 
+  summarise(
+    # mapea C1..C5 a su rango
+    Clases  = intervalos[as.integer(first(Clase_C))],  
+    nx      = n(), # Frecuencia de indv. censados por cobertura
+    Tot_semillas = sum(Semillas, na.rm = TRUE), 
+    .groups = "drop"
+  ) %>% 
+  arrange(Clase_C) %>% 
+  mutate(Bx = round(Tot_semillas * s0, 0))  # Bx exitoso
+
+
+# Tabla
+kbl(tabla_v,
+    booktabs  = TRUE, digits = 2,
+    longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+```{r}
+# Chequeo de los valores
+tabla_v$nx; 
+sum(tabla_v$nx)
+```
+
+##### 4.1) Tabla de vida hasta la esperanza de vida ($e_x$)
+
+```{r, echo=FALSE}
+#| label: tbl-c5-25
+#| tbl-cap: "Tabla de vida hasta eₓ"
+
+# Mapear etiquetas C1..C5 a los intervalos de cobertura
+intervalo <- setNames(interval, etq)
+
+# tabla_v1, cuenta con Clase_C, Clases, nx, tot_semillas y Bx
+
+# tabla_v3, calcula el resto de estimadores
+tabla_v1 <- 
+  tabla_v %>%
+  mutate(
+    x       = as.integer(Clase_C),
+    Nx      = rev(cumsum(rev(nx))),    # cohorte ficticia
+    N0      = first(Nx), 
+    `Nx+1`  = lead(Nx, default = 0),
+    mx      = Bx / Nx,
+    `mx+1`  = lead(mx, default = 0),   # Requerido para Fx post
+    Sx      = `Nx+1` / Nx,
+    lx      = Nx / N0,
+    `lx+1`  = lead(lx, default = 0),
+    dx      = lx - `lx+1`,
+    qx      = if_else(lx > 0, dx / lx, NA_real_),
+    px      = 1 - qx,
+    `Nx+1`  = lead(Nx, default = 0),
+    Lx      = (Nx + `Nx+1`) / 2,
+    Tx      = rev(cumsum(rev(Lx))),
+    ex      = Tx / Nx,
+    `lx.mx`   = lx * mx,
+    `x.lx.mx` = x  * `lx.mx`
+
+  )
+
+#---
+tabla_v1 %>%
+  select(x, Clase_C, Clases, nx, Nx, Bx, lx, dx, qx, px, Sx, 
+         `lx.mx`, `x.lx.mx`, Lx, Tx, ex) %>%
+  kbl(booktabs  = TRUE, digits = 2) %>% 
+  kable_classic(full_width = FALSE) %>% 
+  kable_styling(
+    full_width = FALSE,
+    font_size  = 10,
+    latex_options = c("repeat_header")  # ok con longtable
+  )
+```
+
+------------------------------------------------------------------------
+
+##### 4.2) Cálculo de estadísticos demográficos basados en la tabla de vida
+
+```{r, echo=FALSE}
+#| label: tbl-c5-26
+#| tbl-cap: "Estadísticos demográficos generales"
+#| message: false
+#| warning: false
+
+#  1. Estadísticos generales 
+Ro <- sum(tabla_v1$`lx.mx`,   na.rm = TRUE)        # Tasa reproductiva neta
+Tg <- sum(tabla_v1$`x.lx.mx`, na.rm = TRUE) / Ro   # Tiempo generacional
+r_est <- log(Ro) / Tg                             # r estimado
+
+# 2. Función de euler
+euler <- 
+      function(rr) 
+      sum(tabla_v1$lx * tabla_v1$mx * 
+      exp(-rr * tabla_v1$x), na.rm = TRUE) - 1
+
+# 3. Cálculo de r exacto
+r <- uniroot(euler, interval = c(-2, 2))$root
+r <- round(r,3)
+
+# 4. Cálculo de lambda
+lambda <- exp(r)
+
+# 5. Organización de los estadísticos generales
+estad <-
+tibble::tibble(
+  `Tasa rep. neta (Ro)`         = Ro,
+  `Tiempo g.racional (T)`       = Tg,
+  `r_est = ln(R0)/T`            = r_est,
+  `r (Euler)`                   = r,
+  `lambda = exp(r)`             = lambda
+) 
+
+# 6. Tabulación
+estad %>%
+  mutate(across(everything(), ~ round(., 3))) %>%
+  kbl(booktabs  = TRUE, digits = 2,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+------------------------------------------------------------------------
+
+#### Paso 5) Estimadores de estructura de estados - $F_{(pre)},\ F_{(post)},\ c_{(x)},\  v_{(x)}$.
+
+```{r, echo=FALSE}
+#| label: tbl-c5-27
+#| tbl-cap: "Estimadores de estructura de estados"
+#| message: false
+#| warning: false
+
+# Primer valor de S_x, para calcular S_0 (primer intervalo x = 1)
+S0 <- tabla_v1$Sx[1]
+
+# Tabla de vida para estimar Fx pre y post, cx y vx
+tabla2 <- 
+  tabla_v1 %>% 
+  mutate(
+    # 1.) Cálculo de F ´re y post
+    Fpre  = S0 * `mx+1`,  # Fecundidad pre reprod.
+    Fpost = Sx * `mx+1`,  # Fecundidad post reprod.
+    
+    # 2.) Cálculo de distrib. estable c(x)
+    `lx.e_rx` = lx * exp(-r * x), # Estimador de cx
+    cx        = `lx.e_rx` / sum(`lx.e_rx`, 
+                                  na.rm = TRUE),  # cx
+    
+    # 3.) Cálculo del valor reproductivo v(x)
+    erx_lx      = exp(r * x) / lx,
+    `e_ry_ly_my`   = exp(-r * x) * lx * mx,
+    `Se_ry_ly_my`  = rev(cumsum(rev(`e_ry_ly_my`))),
+    vx          = erx_lx * `Se_ry_ly_my`,
+    vx_norm     = vx / vx[1]) %>% 
+  
+    # Organización de la segunda tabla de vida - tabla2
+  select(
+    x, Clase_C, Nx, mx, Sx,  # Estimadores iniciales
+    Fpre, Fpost,             # F pre y post
+    `lx.e_rx`, cx,           # Distrib estable c(x)
+ vx, vx_norm
+  ) %>% 
+  mutate(across(where(is.numeric), ~ round(., 3)))
+
+#-------
+#* Estos estimadores también se pueden tabular en select()
+#*  erx_lx, e_ry_ly_my, Se_ry_ly_my 
+#* Y se incluyen en el siguiente kbl() como:  
+# "e^{rx}/lx","e^{-ry}·ly·my)", "Σ(e^{-ry}·ly·my)"  
+# Se excluyen para resumir el tamaño de la tabla
+#-------
+
+# Impresión de la tabla
+tabla2 %>%
+  kbl(digits = 2,
+      col.names = c(
+        "x","Clase_C","Nx","mx","Sx",
+        "F(pre)","F(post)",
+        "lx·e^{-rx}","c(x)",
+        "v(x)","v(x).norm"
+      ),
+      booktabs  = TRUE) %>% 
+  kable_classic(full_width = FALSE) %>% 
+  kable_styling(
+    full_width = FALSE,
+    font_size  = 10,
+    latex_options = c("repeat_header")  # ok con longtable
+  )
+```
+
+------------------------------------------------------------------------
+
+#### Paso 6) Matrices de Leslie - $L$ (pre y post reproductivas)
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+# =============================
+# Vectores necesarios
+# =============================
+estados <- tabla2$x         # Vector con los estados/clases (x)
+Fpre    <- tabla2$Fpre      # Fecundidades pre-reproductivas
+Fpost   <- tabla2$Fpost     # Fecundidades post-reproductivas
+Sx      <- tabla2$Sx        # Supervivencias de transición (Estado_x -> Estado_(x+1))
+k       <- length(estados)  # Número total de estados
+
+# ==========================================================
+# Matriz de Leslie PRE (k-1 x k-1): elimina el último estado
+#  - Primera fila: Fpre (solo hasta k-1)
+#  - Subdiagonal: inicia en S1 (transición Estado_1 -> Estado_2)
+# ==========================================================
+k_pre <- k - 1  # Tamaño reducido (sin Estado_k)
+
+L_pre <- matrix(0, nrow = k_pre, ncol = k_pre)  # Matriz (k-1)x(k-1) con ceros
+L_pre[1, ] <- Fpre[1:k_pre]                     # Fecundidades pre hasta el estado k-1
+
+if (k_pre > 1) {
+  for (i in 2:k_pre) {
+    L_pre[i, i-1] <- Sx[i]
+    # Subdiagonal:
+    #   i=2 toma Sx[1]  (Estado_1 -> Estado_2)
+    #   i=3 toma Sx[2]  (Estado_2 -> Estado_3)
+    #   ...
+  }
+}
+
+# Nombres (solo estados 1..k-1)
+dimnames(L_pre) <- list(paste0("Estado_", estados[1:k_pre]),
+                        paste0("Estado_", estados[1:k_pre]))
+
+
+# ==========================================================
+# Matriz de Leslie POST (k x k): completa
+#  - Primera fila: Fpost (todos los estados)
+#  - Subdiagonal: inicia en S1 (Estado_1 -> Estado_2)
+# ==========================================================
+L_post <- matrix(0, nrow = k, ncol = k)         # Matriz kxk con ceros
+L_post[1, ] <- Fpost                            # Fecundidades post completas
+
+if (k > 1) {
+  for (i in 2:k) {
+    L_post[i, i-1] <- Sx[i-1]
+    # Subdiagonal:
+    #   i=2 toma Sx[1]  (Estado_1 -> Estado_2)
+    #   i=3 toma Sx[2]  (Estado_2 -> Estado_3)
+    #   ...
+  }
+}
+
+# Nombres (todos los estados)
+dimnames(L_post) <- list(paste0("Estado_", estados),
+                         paste0("Estado_", estados))
+
+
+# -----------------------------
+# Imprimir matrices con kableExtra
+# -----------------------------
+kable(L_pre,
+      booktabs = TRUE,
+      digits = 2,
+      align = "c") %>%
+  kable_styling(full_width = FALSE,
+                position = "center",
+                font_size = 10,
+                latex_options = c("hold_position", "scale_down"))
+
+kable(L_post,
+      booktabs = TRUE,
+      digits = 2,
+      align = "c") %>%
+  kable_styling(full_width = FALSE,
+                position = "center",
+                font_size = 10,
+                latex_options = c("hold_position", "scale_down"))
+```
+
+------------------------------------------------------------------------
+
+#### Paso 7) Modelación matricial multiestado (pre y post reproductiva)
+
+##### 7.1) Proyección post-reproductiva
+
+**Paso 1.** Cargar el vector de Estados $(N_t)$
+
+```{r, echo=FALSE}
+# Población inicial (vector de estados)
+Nt <- tabla_v1$Nx
+Nt
+
+# Número de periodos a proyectar en el modelo
+t <- 12
+t
+```
+
+**Paso 2.** Función `modelo_pob` para automatizar $(N_{(t+1)} = L \cdot N_{(t)})$
+
+```{r, echo=FALSE}
+# Funcion (modelo_pob) para modelar la población por las diferentes Estadoes en el tiempo.
+# 1) Elementos de la modelación (Matriz de Leslie - L, Vector de Abundancias - Nt y Periodos a modelar - t)
+library(purrr)  # proporciona set_names()
+
+modelo_pob <- function(L, Nt, t) {
+  k <- length(Nt)
+  out <- matrix(NA_real_, nrow = t + 1, ncol = k)
+  out[1, ] <- Nt
+  for (i in 1:t) out[i + 1, ] <- L %*% out[i, ]
+  as.data.frame(out) %>% 
+    purrr::set_names(paste0("Estado_", seq_len(k)))
+}
+```
+
+**Paso 3.** Simulación de la proyección $(N_{(t+1)} = L\ . N_{(t)})$
+
+```{r, echo=FALSE}
+#| label: tbl-c5-28
+#| tbl-cap: "Resumen de la simulación realizada"
+#| message: false
+#| warning: false
+
+# 1) Usar la función creada para el producto L x Nt
+simulacion <- modelo_pob(as.matrix(L_post), Nt, t)
+
+# 2) Crear la columna Tiempo
+simulacion <- simulacion %>%
+  mutate(Tiempo = 0:(nrow(simulacion)-1))
+
+# 3) Reordenar columnas para que Tiempo sea la primera columna
+simulacion <- simulacion %>%
+  select(Tiempo, everything())
+
+# 4) Visualización rápida (redondeo)
+colnames(simulacion) <- c("Tiempo", 
+                          paste0("Estado_", 
+                                 seq_len(ncol(simulacion) - 1)))
+
+# 5) Mostrar un resumen redondeado
+head(round(simulacion)) %>%
+  kbl(booktabs  = TRUE, 
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+```{r, echo=FALSE}
+#| label: tbl-c5-29
+#| tbl-cap: "Resumen de la simulación en formato largo"
+#| message: false
+#| warning: false
+
+# 6) Convertir a formato largo
+simulacion_l <- simulacion %>%
+  pivot_longer(cols = -Tiempo, 
+               names_to = "Estado", 
+               values_to = "Abundancia") %>%
+  mutate(Abundancia = round(Abundancia, 0))
+
+# Mostrar un resumen de la simulación en formato largo
+head(simulacion_l) %>%
+  kbl(booktabs  = TRUE, digits = 2,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+**Paso 4.** Figura de la proyección multi-Estado
+
+```{r, echo=FALSE}
+#| label: fig-c5-14
+#| fig-cap: Proyección post-reproductiva de la población de C. procera por estados de cobertura.
+#| fig-pos: 'H'
+
+ggplot(simulacion_l, aes(x = Tiempo, y = Abundancia, color = Estado)) +
+  geom_point(size = 3) +
+  geom_line() +
+  labs(x = "Períodos",
+       y = expression(log[10]~(Densidad~- Nx)),
+       color = "Estados",
+       title = "Proyección Post-Reproductiva") +
+  scale_y_log10() + # Escala logarítmica en el eje Y
+  scale_x_continuous(breaks = seq(min(simulacion_l$Tiempo),
+                                  max(simulacion_l$Tiempo), by = 2)) +
+  theme_bw() +
+  theme(axis.text = element_text(size = 13),
+        axis.title.x = element_text(size = 13),
+        axis.title.y = element_text(size = 13),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+```
+
+------------------------------------------------------------------------
+
+**Paso 4.** Tasa de crecimiento asintótica ($\lambda$) y distribución
+estable por estados $c_x$ del censo post-reproductivo.
+
+```{r, echo=FALSE}
+# =========================================
+# Autovalores / Autovectores de L_post (POST, por estados)
+# =========================================
+A <- as.matrix(L_post)
+
+# 1) Autovalor dominante y autovector derecho (estructura estable)
+eigR <- eigen(A)
+
+posR   <- which.max(Mod(eigR$values))     # índice del autovalor dominante
+lambda <- Re(eigR$values[posR])           # λ (dominante)
+w      <- Re(eigR$vectors[, posR])        # autovector derecho asociado
+cx     <- w / sum(w)                      # distribución estable c_x
+
+# Asegurar signos coherentes (convención)
+if (sum(cx) < 0) cx <- -cx
+
+# 2) Autovector izquierdo (valor reproductivo)
+eigL <- eigen(t(A))
+
+posL   <- which.max(Mod(eigL$values))     # dominante para la transpuesta
+v      <- Re(eigL$vectors[, posL])        # autovector izquierdo asociado
+v_norm <- v / v[1]                        # normalización: v1 = 1 (primer estado como referencia)
+
+if (v_norm[1] < 0) v_norm <- -v_norm
+
+# 3) Tasa instantánea
+r <- log(lambda)
+
+# ----------- Salidas ordenadas -----------
+cat("a) Tasa instantánea de aumento (r)\n\n")
+print(round(r, 6))
+
+cat("\n\nb) Tasa finita post-reproductiva (lambda)\n\n")
+print(round(lambda, 6))
+
+cat("\n\nc) Distribución estable de estados (c_x)\n\n")
+print(round(setNames(cx, rownames(A)), 5))
+
+cat("\n\nd) Valor reproductivo normalizado (v_x^norm)\n\n")
+print(round(setNames(v_norm, rownames(A)), 5))
+```
+
+------------------------------------------------------------------------
+
+##### 7.2) Proyección pre-reproductiva
+
+**Paso 1.** Cargar el vector de Estadoes $(N_t)$
+
+**Paso 2.** Función `modelo_pob` para automatizar
+$(N_{(t+1)} = L \cdot N_{(t)})$
+
+**Paso 3.** Simulación de la proyección $(N_{(t+1)} = L\ . N_{(t)})$
+
+```{r, echo=FALSE}
+#| label: tbl-c5-30
+#| tbl-cap: "Resumen de la simulación en formato ancho"
+#| message: false
+#| warning: false
+
+# 1) Usar la función creada para el producto L x Nt
+Nt_pre <- Nt[1:4]   
+t_pre  <- 12
+
+# 2) Usar la función creada para el producto L x Nt
+simulacion <- modelo_pob(as.matrix(L_pre), Nt_pre, t_pre)
+
+# 2) Crear la columna Tiempo
+simulacion <- 
+  simulacion %>%
+  mutate(Tiempo = 0:(nrow(simulacion)-1))
+
+# 3) Reordenar columnas para que Tiempo sea la primera columna
+simulacion <- 
+  simulacion %>%
+  select(Tiempo, everything())
+
+# 4) Visualización rápida (redondeo)
+colnames(simulacion) <- c("Tiempo", 
+                          paste0("Estado_", 
+                                 seq_len(ncol(simulacion) - 1)))
+# 5) Mostrar un resumen redondeado
+head(round(simulacion)) %>%
+  kbl(booktabs  = TRUE, 
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+```{r, echo=FALSE}
+#| label: tbl-c5-31
+#| tbl-cap: "Resumen de la simulación en formato largo"
+#| message: false
+#| warning: false
+
+library(tidyverse)
+# 3) Convertir a formato largo
+simulacion_l <- simulacion %>%
+  pivot_longer(cols = -Tiempo, 
+               names_to = "Estado", 
+               values_to = "Abundancia") %>%
+  mutate(Abundancia = round(Abundancia, 0))
+
+# Mostrar un resumen de la simulación en formato largo
+head(simulacion_l) %>%
+  kbl(booktabs  = TRUE, 
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+**Paso 4.** Figura de la proyección multi-Estado
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#| label: fig-c5-15
+#| fig-cap: Proyección pre-reproductiva de la población de C. procera por estados de cobertura.
+#| fig-pos: 'H'
+
+ggplot(simulacion_l, aes(x = Tiempo, y = Abundancia, color = Estado)) +
+  geom_point(size = 3) +
+  geom_line() +
+  labs(x = "Períodos",
+       y = expression(log[10]~(Densidad~- Nx)),
+       color = "Estados",
+       title = "Proyección Pre-Reproductiva") +
+  scale_y_log10() + # Escala logarítmica en el eje Y
+  scale_x_continuous(breaks = seq(min(simulacion_l$Tiempo),
+                                  max(simulacion_l$Tiempo), by = 2)) +
+  theme_bw() +
+  theme(axis.text = element_text(size = 13),
+        axis.title.x = element_text(size = 13),
+        axis.title.y = element_text(size = 13),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+```
+
+------------------------------------------------------------------------
+
+**Paso 5.** Tasa de crecimiento asintótica ($\lambda$), distribución
+estable por estados $c_x$ y valor reproductivo normalizado $v_x^{norm}$
+del censo pre-reproductivo.
+
+```{r, echo=FALSE}
+# =========================================
+# Autovalores / Autovectores de L_pre
+# =========================================
+A <- as.matrix(L_pre)
+
+# 1) Autovalor y autovector derecho (estructura estable)
+eigR <- eigen(A)
+
+posR   <- which.max(Mod(eigR$values))   # índice del autovalor dominante
+lambda <- Re(eigR$values[posR])         # λ dominante
+w      <- Re(eigR$vectors[, posR])      # autovector derecho asociado
+cx     <- w / sum(w)                    # distribución estable c_x
+
+# 2) Autovector izquierdo (valor reproductivo)
+eigL <- eigen(t(A))
+
+posL   <- which.max(Mod(eigL$values))   # dominante para la transpuesta
+v      <- Re(eigL$vectors[, posL])      # autovector izquierdo asociado
+v_norm <- v / v[1]                      # normalización: v1 = 1 (Estado_1)
+
+# Asegurar signos positivos (convención)
+if (sum(cx) < 0) cx <- -cx
+if (v_norm[1] < 0) v_norm <- -v_norm
+
+# 3) Tasa instantánea
+r <- log(lambda)
+
+# 4) Tiempo de duplicación
+t_dup <- log(2) / r
+
+# ----------- Salidas ordenadas -----------
+cat("a) Tasa instantánea de aumento (r)\n\n")
+print(round(r, 6))
+
+cat("\n\nb) Tasa finita pre-reproductiva (lambda)\n\n")
+print(round(lambda, 6))
+
+cat("\n\nc) Distribución estable de estados (c_x)\n\n")
+print(round(setNames(cx, rownames(A)), 5))
+
+cat("\n\nd) Valor reproductivo normalizado (v_x^norm)\n\n")
+print(round(setNames(v_norm, rownames(A)), 5))
+
+cat("\n\ne) Tiempo de duplicación (t_dup)\n\n")
+print(round(t_dup, 3))
+```
+
+
+```{r, echo=FALSE}
+# =========================================================
+# Sensibilidad y Elasticidad (L_post) - Modelo por estados
+# =========================================================
+
+# 1) Matriz de proyección (post-reproductiva)
+L <- as.matrix(L_post)
+
+# ---------------------------------------------------------
+# 2) Autovalor dominante (λ) y autovector derecho (w)
+# - λ: tasa finita asintótica de crecimiento
+# - w: estructura estable de estados (vector propio derecho)
+eigR  <- eigen(L)
+posR  <- which.max(Mod(eigR$values))
+lambda <- Re(eigR$values[posR])
+w     <- Re(eigR$vectors[, posR])
+
+# ---------------------------------------------------------
+# 3) Autovector izquierdo (v)
+# - v: valor reproductivo por estado (vector propio izquierdo)
+eigL <- eigen(t(L))
+posL <- which.max(Mod(eigL$values))
+v    <- Re(eigL$vectors[, posL])
+
+# ---------------------------------------------------------
+# 4) Ajuste de signo (convención interpretativa)
+if (sum(w) < 0) w <- -w
+if (sum(v) < 0) v <- -v
+
+# ---------------------------------------------------------
+# 5) Normalización biortogonal: v^T w = 1
+# Esto permite usar directamente: S_ij = v_i w_j
+v <- v / as.numeric(t(v) %*% w)
+
+# ---------------------------------------------------------
+# 6) Matriz de sensibilidad (efecto absoluto)
+S <- outer(v, w)
+
+# ---------------------------------------------------------
+# 7) Matriz de elasticidad (efecto proporcional)
+E <- (L / lambda) * S
+
+# -------------------- Salidas ----------------------------
+cat("a) Lambda dominante (post)\n\n")
+print(round(lambda, 6))
+
+cat("\n\nb) Suma de elasticidades (debe ser 1)\n\n")
+print(round(sum(E), 6))
+
+cat("\n\nc) Matriz de Sensibilidad (S_ij)\n\n")
+print(round(S, 4))
+
+cat("\n\nd) Matriz de Elasticidad (E_ij)\n\n")
+print(round(E, 4))
+```
+
+------------------------------------------------------------------------
+
+##### 8.3) Escenarios de manejo: simulaciones prospectivas
+
+```{r}
+# =========================================================
+# Escenarios de manejo: efecto sobre lambda (post)
+# =========================================================
+L0 <- as.matrix(L_post)
+
+# Función para lambda dominante
+lambda_dom <- function(M){
+  eg <- eigen(M)
+  Re(eg$values[which.max(Mod(eg$values))])
+}
+
+lambda_0 <- lambda_dom(L0)
+
+# ---------------------------------------------------------
+# Escenario 1: Reducción del 30% en la fecundidad dominante
+# (Estado_1 aporta la mayor elasticidad)
+# ---------------------------------------------------------
+L1 <- L0
+L1[1,1] <- 0.70 * L1[1,1]
+
+lambda_1 <- lambda_dom(L1)
+
+# ---------------------------------------------------------
+# Escenario 2: Reducción del 50% en todas las fecundidades
+# (simula remoción recurrente de individuos reproductivos)
+# ---------------------------------------------------------
+L2 <- L0
+L2[1, ] <- 0.50 * L2[1, ]
+
+lambda_2 <- lambda_dom(L2)
+
+# ---------------------------------------------------------
+# Escenario 3: Reducción del 40% en transición temprana
+# ---------------------------------------------------------
+L3 <- L0
+L3[2,1] <- 0.60 * L3[2,1]
+
+lambda_3 <- lambda_dom(L3)
+
+c(lambda_base = lambda_0,
+  lambda_reduc_F1 = lambda_1,
+  lambda_reduc_Ftotal = lambda_2,
+  lambda_reduc_S1 = lambda_3) %>% round(4)
+```
+
+

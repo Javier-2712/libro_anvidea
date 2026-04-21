@@ -1,0 +1,9 @@
+Capítulo 5 — Archivos requeridos en data/raw/
+
+Ubique aquí los archivos de entrada antes de ejecutar los scripts:
+
+1. datos.c5.xlsx
+   (consulte el README del capítulo para el detalle de hojas esperadas)
+
+No cambie el nombre del archivo, a menos que también ajuste las rutas
+dentro de los scripts.

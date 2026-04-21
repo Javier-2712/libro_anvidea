@@ -1,0 +1,566 @@
+
+
+## A. Caso guiado: Diversidad alfa de peces en ríos de México
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: fig-c7-1
+#| fig-cap: Imagen recreada del área de estudio y estimadores de diversidad.
+#| out-width: "1.0\\linewidth"
+#| fig-align: center
+#| fig-pos: 'H'
+knitr::include_graphics("mapa.div.tax.png")
+```
+
+------------------------------------------------------------------------
+
+### Cargar paquetes y lectura de bases de datos
+
+```{r, warning=FALSE, message=FALSE, eval=FALSE}
+library(tidyverse)    # Para diferentes operaciones
+library(readxl)   # Para la lectura de archivos de Excel
+library(corrplot) # Para las figuras de elipses
+library(vegan)    # Estimadores de diversidad
+library(ggrepel)  # Rótulos a los puntos de figuras en ggplot2
+library(kableExtra)   # Edición de las tablas
+library(viridis)
+library(dplyr)
+# Instalar la última versión de github para iNEXT
+# install.packages('devtools')
+library(devtools)
+#install_github('AnneChao/iNEXT.3D')
+library(iNEXT.3D)
+#install_github('AnneChao/iNEXT.4steps')
+library(iNEXT.4steps)
+library(iNEXT)
+```
+
+------------------------------------------------------------------------
+
+#### a. Base de datos de las especies
+
+```{r}
+#| label: tbl-c7-1
+#| tbl-cap: "Resumen de la base de datos biológicos para los seis primeros sitios"
+#| echo: false
+#| message: false
+#| warning: false
+
+library(readxl)   
+library(kableExtra)   
+library(tidyverse)
+
+biol <- read_xlsx("datos.c7.xlsx", sheet = "tax")
+
+biol %>% 
+  head() %>% 
+  dplyr::select(1:6) %>% 
+  kbl(
+    booktabs  = TRUE,
+    longtable = TRUE      # ← esto evita que la tabla flote
+  ) %>% 
+  kable_classic(full_width = FALSE)
+
+```
+
+#### b. Tabla con nombres completos y abreviados en formato largo
+
+```{r}
+#| label: tbl-c7-2
+#| tbl-cap: "Resumen de la base con nombres abreviados de las especies"
+#| echo: false
+#| message: false
+#| warning: false
+
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(kableExtra)
+
+# 1) Leer la tabla original
+
+tabla <- read_xlsx("datos.c7.xlsx", "tax")
+
+# 2) Calcular abundancia TOTAL por especie y tabla final
+
+tabla_resumen <-
+tabla %>%
+dplyr::select(-Sites, -Sites1) %>%         # Quitar columnas de sitio
+summarise(across(everything(), sum, na.rm = TRUE)) %>%
+pivot_longer(
+cols      = everything(),
+names_to  = "Especies",
+values_to = "Abundancia"
+) %>%
+arrange(desc(Abundancia)) %>%              # ← Ordenar de mayor a menor
+mutate(
+Abrev = abbreviate(Especies, minlength = 4),
+ID    = dplyr::row_number()
+) %>%
+dplyr::select(ID, Especies, Abrev, Abundancia)  # Orden final de columnas
+
+# 3) Imprimir tabla (10 primeras filas)
+
+tabla_resumen %>%
+head(10) %>%
+kbl(
+booktabs  = TRUE,
+longtable = TRUE
+) %>%
+kable_classic(full_width = FALSE)
+
+
+```
+
+
+### 1 Estimadores clásicos de diversidad alfa por cada zona altitudinal
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#| label: tbl-c7-3
+#| tbl-cap: "Resumen de la base de datos con totales de abundancia para cada sitio evaluado"
+
+# Cargar paquetes
+library(readxl)
+library(dplyr)
+
+# Nombres abreviados de los taxones
+biol1 <- 
+  biol %>%
+  dplyr::select(-1) %>%      # Elimina la primera columna (Sites)
+  rename_with(~ abbreviate(.x, minlength = 4), -1)
+
+
+# Agrupar por Sitio y sumar la abundancia de cada taxón por sitio
+biol2 <- 
+  biol1 %>%
+  group_by(Sites1) %>%
+  summarise(across(everything(), sum, na.rm = TRUE)) 
+
+biol2 %>%
+  dplyr::select(1:12) %>% 
+  kbl(booktabs = T,longtable = T) %>%
+  kable_classic(full_width = F)
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+library(vegan)
+
+# Datos sin la columna de sitios (Sites1)
+biol2_alfa <- biol2[,-1]
+
+# Estimadores de diversidad alfa (segun Borcard et al. 2018)
+N0 <- rowSums(biol2_alfa > 0)   # Riqueza de especies
+N0 <- specnumber(biol2_alfa)    # Riqueza de especies (alterno)
+H <- diversity(biol2_alfa)  # Entropía de Shannon (base e)
+Hb2 <- diversity(biol2_alfa, base = 2)  # Entropía de Shannon (base 2)
+N1 <- exp(H)       # Diversidd de Shannon (base e)
+N1b2 <- 2^Hb2      # Diversidad de Shannon (base 2)
+N2 <- diversity(biol2_alfa, "inv")  # Diversidad de Simpson (dominancia) 
+J <- H / log(N0)   # Equidad de Pielou (evenness)
+E10 <- N1 / N0     # Equidad de Shannon (Razón de Hill)
+E20 <- N2 / N0     # Equidad de Simpson (Razón de Hill)
+```
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#| label: tbl-c7-4
+#| tbl-cap: "Base de datos con diferentes estimadores de diversidad para cada zona  evaluada"
+
+# Base de datos con los valores de los esimadores de diversidad alfa
+d.alfa <- data.frame(zona= biol2[,1], q_0= N0, 
+                     q_1= round(N1,1), q_2= round(N2,1), 
+                     Equidad_J= round(J,2))
+
+
+# Edición de la tabla para su impresión
+d.alfa %>%
+  kbl(booktabs = T,longtable = T) %>%
+  kable_classic(full_width = F)
+```
+
+
+### 2 Diversidad alfa con curvas de distribución rango-abundancia RAD
+
+```{r}
+#| label: tbl-c7-5
+#| tbl-cap: "Resumen de la base de datos con diferentes estadísticos requeridos para las curvas RAD"
+#| echo: false
+#| message: false
+#| warning: false
+
+# Este paso se realizó en el procedimiento anterior (biol2)
+biol2 <-     # Tabla en formato ancho
+  biol1 %>%  # Tabla general con todos los factores
+  group_by(Sites1) %>%       # Agrupar por estaciones
+  summarise(across(everything(), 
+            sum, na.rm = TRUE))  # Totales de abundancia
+
+# Reestructurar los datos en formato largo por zona (biol_rad)
+biol_rad <- 
+  biol2 %>%
+  pivot_longer(
+    cols = -c(Sites1),   
+    names_to = "Especies",      
+    values_to = "Abundancia"        
+  ) %>% 
+  dplyr::select(Sites1 = Sites1, everything())
+
+
+# Convertir 'Sites1' y 'Especies' en factores
+biol_rad$Sites1 <- as.factor(biol_rad$Sites1)
+biol_rad$Especies <- as.factor(biol_rad$Especies)
+
+
+# Insertar rango basado en abundancia descendente
+biol_rad <- 
+  biol_rad %>%
+  group_by(Sites1) %>%
+  mutate(Rango = rank(-Abundancia, ties.method = "min")) %>%
+  ungroup()
+
+# Calcular abundancia relativa
+biol_rad <- 
+  biol_rad %>%
+  group_by(Sites1) %>%
+  mutate(Ab_rel = round(Abundancia / sum(Abundancia), 3)) %>%
+  ungroup()
+
+# Seleccionar los 20 taxones más abundantes
+top20_taxas <- 
+  biol_rad %>%
+  group_by(Especies) %>%
+  summarise(Total_Ab_rel = sum(Ab_rel), .groups = "drop") %>%
+  top_n(20, Total_Ab_rel) %>%
+  pull(Especies)
+
+# Filtrar datos para los 20 taxones seleccionados
+# Son 60 datos: 20 por cada Zona
+biol_rad <- 
+  biol_rad %>%
+  filter(Especies %in% top20_taxas)
+
+# Seleccionar los 20 Especies más abundantes
+# Se omite este paso por haber solo 12 Especies
+
+# Impresión de la tabla con los seis (6) primeros datos (filas)
+head(biol_rad) %>%
+  kbl(booktabs = T,longtable = T) %>%
+  kable_classic(full_width = F)
+
+```
+
+```{r, warning=FALSE, message=FALSE, fig.height=6}
+#| label: fig-c7-2
+#| fig-cap: "Patrón de distribución-rango-abundancia - RAD - para los quince Especies de macropeces continentales más abundantes"
+#| fig-pos: 'H'
+
+library(ggrepel)  # insertar rótulos a los puntos
+
+
+# Figura
+ggplot(biol_rad, 
+       aes(x = Rango, y = Ab_rel, 
+           color = Especies, label = Especies)) +
+  geom_point(size = 3) +
+  geom_text_repel(aes(label = Especies), 
+                  hjust = 1, vjust = 1.5, size = 3,
+                  box.padding = 0.4, point.padding = 0.2, 
+                  # Color de las líneas de conexión
+                  segment.color = "black",  
+                  # Líneas punteadas
+                  segment.linetype = "dashed",   
+                  show.legend = FALSE) +
+  geom_line(color = "blue") +
+  scale_x_continuous(breaks = seq(0, max(biol_rad$Rango), 
+                     by = 10),  # Personalizar eje x
+                     # Iniciar en 0 y extender
+                     expand = expansion(add = c(0, 0.5))) + 
+  scale_y_log10() +
+  labs(
+    x = "Rangos de Especies",
+    y = expression(log[10]~(Abundancia~Relativa)),
+    color = "Especies") +
+  facet_wrap(~Sites1, nrow = 1) +
+  theme_bw() + 
+  theme(panel.grid=element_blank(),
+        legend.pozonan = "none",  # Oculta la leyenda
+        strip.text = 
+          element_text(face = "bold")  # Nombres de panel en negrilla
+)
+
+
+```
+
+
+```{r, message=FALSE, warning=FALSE, fig.height=5, echo=FALSE}
+#| label: fig-c7-3
+#| fig-cap: "Patrón de distribución-rango-abundancia - RAD - para los quince Especies de macropeces continentales más abundantes"
+#| fig-pos: 'H'
+
+# Generar el gráfico
+ggplot(biol_rad, 
+       aes(x = Rango, y = Ab_rel, color = Especies, label = Especies)) +
+  geom_point(size = 4, shape = 21, fill = "white", color = "black", stroke = 1.5) +
+  geom_text_repel(
+    aes(label = Especies), hjust = 1, vjust = 1.5, size = 3.5,
+    box.padding = 0.4, point.padding = 0.2,
+    segment.color = "gray70", segment.linetype = "dashed", 
+    show.legend = FALSE
+  ) +
+  geom_line(color = "blue") +
+  # Eje X ascendente
+  scale_x_continuous(breaks = seq(0, max(biol_rad$Rango), by = 10)) + 
+  scale_y_log10() + # Escala logarítmica en el eje Y
+  scale_color_manual(values =        # Colores personalizados, 20: # especies
+                       colorRampPalette(c("darkred", "firebrick", 
+                                          "tomato", "orange"))(20)) +
+  labs(
+    x = "Rangos de Especies",
+    y = expression(log[10]~(Abundancia~Relativa))) +
+  facet_wrap(~Sites1, nrow = 1) +
+  theme_bw(base_size = 14) +
+  theme(
+    panel.grid = element_blank(),
+    panel.background = element_rect(fill = "gray98", color = NA),
+    plot.background = element_rect(fill = "white"),
+    strip.background = element_rect(fill = "gray80", color = "gray50"),
+    strip.text = element_text(face = "bold", size = 12, color = "black"),
+    axis.text = element_text(color = "gray30"),
+    axis.title = element_text(face = "bold"),
+    legend.pozonan = "none"
+  ) 
+```
+
+
+
+#### a. Ajuste de las curvas RAD
+
+
+```{r}
+#| label: tbl-c7-5a
+#| tbl-cap: "Resumen de la matriz de abundancia por sitio para análisis RAD"
+#| echo: false
+#| message: false
+#| warning: false
+
+
+# Este paso se realizó en el procedimiento anterior (biol2)
+biol2 <-     # Tabla en formato ancho
+  biol1 %>%  # Tabla general con todos los factores
+  group_by(Sites1) %>%       # Agrupar por estaciones
+  summarise(across(everything(), 
+            sum, na.rm = TRUE))  # Totales de abundancia
+
+
+# Reestructurar los datos en formato largo por zona (biol2)
+biol2 <- 
+  biol2 %>%
+  pivot_longer(
+    cols = -c(Sites1),   
+    names_to = "Especies",      
+    values_to = "Abundancia"        
+  ) %>% 
+  dplyr::select(Sites1 = Sites1, everything())
+
+
+# Organizar datos en formato largo
+biol2 <- 
+  biol2 %>%
+  group_by(Sites1, Especies) %>%
+  summarise(Abundance = sum(Abundancia, na.rm = TRUE), .groups = "drop") %>%
+  pivot_wider(names_from = Sites1, 
+              values_from = Abundance, 
+              values_fill = 0)
+
+# Ver primeros datos
+biol2 %>%
+head(8) %>%
+kbl(
+booktabs  = TRUE,
+longtable = TRUE
+) %>%
+kable_classic(full_width = FALSE)
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+library(vegan)
+
+# Ajustar modelos radfit para cada sitio
+biol2a <- as.data.frame(biol2)
+rownames(biol2a) <- biol2a$Especies
+biol2 <- biol2a[, -1]
+
+mod.mountains <- radfit(biol2a[,"M"])
+mod.plains <- radfit(biol2a[,"P"])
+mod.mouth <- radfit(biol2a[,"RM"])
+
+```
+
+
+```{r}
+#| label: tbl-c7-6
+#| tbl-cap: "Modelo con mejor ajuste por sitio (menor AIC)"
+#| message: false
+#| warning: false
+#| echo: false
+
+
+# Extraer modelos con menor AIC por sitio
+extract_model <- function(mod) {
+  sapply(mod$models, AIC)
+}
+
+tibble(
+  Sitio = c("M", "P", "RM" ),
+  Modelo_Menor_AIC = c(
+    names(which.min(extract_model(mod.mountains))),
+    names(which.min(extract_model(mod.plains))),
+    names(which.min(extract_model(mod.mouth)))
+  )
+) %>%
+kbl(
+booktabs  = TRUE,
+longtable = TRUE
+) %>%
+kable_classic(full_width = FALSE)
+```
+
+
+#### b. Figuras de los modelos RAD por sitio
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#| label: fig-c7-4
+#| fig-cap: "Ajuste del patron de diversidad de cada sitio evaluado, para los cinco modelos empíricos evaluados"
+
+
+par(mfrow=c(1,3))
+plot(mod.mountains, main="RAD - M", ylab= "log10(Ab. relativa)", xlab="Rangos")
+plot(mod.plains, main="RAD - P", ylab= "log10(Ab. relativa)", xlab="Rangos")
+plot(mod.mouth, main="RAD - RM", ylab= "log10(Ab. relativa)", xlab="Rangos")
+```
+
+```{r, message=FALSE, warning=FALSE}
+#| label: fig-c7-5
+#| fig-cap: "Ajuste del patron de diversidad de cada sitio evaluado, de acuerdo al medelo con menor AIC"
+
+# Modelos con mejor ajuste
+par(mfrow=c(1,3))
+plot(mod.mountains$models$Preemption, 
+     main="M - Preemption", 
+     ylab= "log10(Ab. Relativa)", xlab="Rangos")
+plot(mod.plains$models$Null, 
+     main="P - Null", 
+     ylab= "log10(Ab. Relativa)", xlab="Rangos")
+plot(mod.mouth$models$Mandelbrot, 
+     main="RM - Mandelbrot", 
+     ylab= "log10(Ab. Relativa)", xlab="Rangos")
+```
+
+------------------------------------------------------------------------
+
+#### c. Diagnóstico de supuestos
+
+##### *c.1 Normalidad multivariada.*
+
+```{r}
+#| message: false
+#| warning: false
+#| echo: false
+
+# Especies de la zona M
+Estacion_M <- 
+  biol1 %>%
+  filter(Sites1 == "M") 
+
+# Especies de la zona P
+Estacion_P <- 
+  biol1 %>%
+  filter(Sites1 == "P") 
+
+# Especies de la zona RM
+Estacion_RM <- 
+  biol1 %>%
+  filter(Sites1 == "RM")
+```
+
+```{r}
+#| message: false
+#| warning: false
+#| echo: false
+
+library(MVN)
+#
+# mardia(Estacion_M)
+# mardia(Estacion_P) # Matriz singular
+# mardia(Estacion_RM)
+```
+
+##### *c.2 Homogeneidad de covarianzas.*
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+library(vegan)
+
+# Eliminar posibles NA o datos faltantes en la tabla
+biol1 <- 
+  biol1 %>% 
+  na.omit()
+
+# Reemplazar los NA por 0
+biol1 <- biol1 %>%
+  mutate(across(-1, ~replace_na(., 0)))
+
+# Distancias de Bray-Curtis o Euclidianas si se requiere
+# na.rm = TRUE para excluir pares con NA al calcular cada distancia
+distancias <- vegdist(biol1[,-c(1)], method = "bray", na.rm = TRUE)
+
+# Verificar dispersión por grupo (zona)
+grupo <- biol1$Sites1
+disper <- betadisper(distancias, group = grupo)
+```
+
+```{r}
+#| message: false
+#| warning: false
+
+# Evaluación estadística
+anova(disper)
+permutest(disper)
+```
+
+##### *c.3 Independencia de los datos.*
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+# Librería necesaria
+library(car)
+library(dplyr)
+
+# Crear una variable de suma total de abundancia por fila
+biol1b <-
+  biol1 %>% 
+mutate(
+    Total = rowSums(across(Pclm:Symc, ~ replace_na(as.numeric(.), 0)))
+  )
+
+# Modelo lineal con esa suma
+modelo <- lm(biol1b$Total ~ Sites1, data = biol1b)
+
+# Test de independencia de residuos
+durbinWatsonTest(modelo)
+
+```
+
+
+
+
+

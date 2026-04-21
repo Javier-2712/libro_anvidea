@@ -1,0 +1,2379 @@
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: fig-c4-1
+#| fig-cap: "Modelo de masas en la dinámica de poblaciones"
+#| fig-pos: 'H'
+#| out-width: "0.9\\linewidth"
+#| fig-align: center
+knitr::include_graphics("portada.expo.log.png")
+```
+
+
+::: {.callout-tip}
+## Lo que desarrolla este capítulo
+
+Este capítulo introduce a la comprensión de cómo cambia el tamaño de una población en el tiempo. Se busca **interpretar ecológicamente los procesos demográficos que explican el crecimiento o la regulación de las poblaciones**. El flujo de trabajo del capítulo sigue una secuencia conceptual progresiva:\
+
+**(1) Comprender el balance demográfico de las poblaciones**, donde el tamaño poblacional (**N**) resulta del equilibrio entre **nacimientos y muertes**.
+
+**(2) Analizar el crecimiento bajo condiciones ideales** mediante el **modelo exponencial**, que representa el potencial biótico cuando la tasa de crecimiento per cápita permanece constante y no existen limitaciones ambientales.
+
+**(3) Incorporar la regulación del recurso** a través del **modelo logístico**, que introduce la **capacidad de carga (K)** como límite ecológico al crecimiento poblacional.
+
+**(4) Interpretar la dinámica del crecimiento poblacional**, examinando tanto la **trayectoria temporal de N(t)** como la **velocidad de cambio dN/dt**, identificando el punto de máxima tasa de crecimiento en **N = K/2**.
+
+**(5) Explorar el efecto de los parámetros demográficos**, especialmente la tasa intrínseca de crecimiento (**r**), la tasa finita (**λ**) y la capacidad de carga (**K**), evaluando cómo modifican la forma y estabilidad de las trayectorias poblacionales.
+:::
+
+
+
+\newpage
+
+
+## Introducción
+
+La **ecología de poblaciones** estudia cómo varía en el tiempo el tamaño
+y la estructura de las poblaciones biológicas, así como los procesos
+demográficos que explican dichos cambios [@begon2020ecology; @krebs2009ecology]. 
+Desde una perspectiva cuantitativa, una población puede
+entenderse como un **sistema abierto** donde los individuos ingresan
+(nacimientos e inmigraciones) y salen (muertes y emigraciones), lo que
+puede expresarse formalmente como un **balance de masas demográfico**
+[@alma991025188879706011].
+
+La **dinámica de poblaciones** corresponde a un cuerpo teórico y a un
+conjunto de metodologías, que estudian los aspectos demográficos y
+cuantitativos de los individuos en sus poblaciones [@alma991025188879706011].
+Tiene como objetivo el estudio de las poblaciones en cuanto a su
+dimensión o densidad, su estructura, su evolución y sus características
+generales, consideradas desde un punto de vista cuantitativo. Desde el
+punto de vista práctico, se puede considerar a esta dinámica ecológica
+como un **modelo de balance de masas** (@fig-c4-1):
+
+El almacenamiento de masa es representado por la **densidad N**, la cual
+es el resultado de ingresos de individuos (**Inmigraciones y
+Nacimientos**) y de pérdidas (**Emigraciones y Muertes**). Este balance
+puede fluctuar en espacio y en tiempo.
+
+Los modelos poblacionales no buscan reproducir toda la complejidad
+ecológica, sino aislar mecanismos fundamentales que permitan comprender
+patrones generales bajo supuestos explícitos [@may1976simple]. En este
+capítulo se desarrollan dos modelos determinísticos fundamentales en
+ecología teórica:
+
+-   El **modelo exponencial**\index{Modelo!exponencial}, que describe el crecimiento bajo
+    condiciones ideales y ausencia de limitación ambiental.
+
+-   El **modelo logístico**\index{Modelo!logístico}, que introduce regulación densodependiente
+    mediante el concepto de **capacidad de carga (**K)\index{Capacidad de carga}, incorporando
+    realismo ecológico [@verhulst1838notice; @pearl1920rate].
+
+**El modelo exponencial** constituye el punto de partida conceptual,
+pues describe situaciones en las cuales la tasa de crecimiento per
+cápita permanece constante [@alma991025188879706011]. Aunque raramente se cumplen
+sus supuestos en la naturaleza, resulta adecuado para describir fases
+iniciales de colonización o expansión poblacional tras perturbaciones
+[@begon2020ecology].
+
+Por su parte, **el modelo logístico**\index{Modelo!logístico} representa una mejora conceptual
+importante al incorporar el efecto de la densidad poblacional sobre la
+tasa de crecimiento. Cuando los recursos comienzan a limitarse, procesos
+como competencia intraespecífica, depredación o enfermedades reducen
+progresivamente la tasa per cápita, generando estabilización alrededor
+de la capacidad de carga del ambiente [@krebs2009ecology].
+
+Estos modelos no solo constituyen herramientas teóricas, sino que
+permiten responder preguntas aplicadas en manejo de fauna, conservación
+y dinámica de recursos naturales [@hilborn1992role], tales como:
+
+-   ¿Cuál es la velocidad máxima de crecimiento posible?
+
+-   ¿Cuánto tiempo tarda una población en alcanzar cierto tamaño?
+
+-   ¿En qué condiciones se estabiliza?
+
+-   ¿Cómo afectan los cambios en r o K la in dinámica poblacional?
+
+En consecuencia, el análisis matemático se complementa aquí con
+interpretación ecológica y representación gráfica reproducible,
+favoreciendo la integración entre teoría y aplicación.
+
+------------------------------------------------------------------------
+
+\newpage
+
+## Contextualización teórica
+
+### 1. Modelos Exponenciales
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| out-width: "0.7\\linewidth"
+#| fig-align: center
+#| fig-pos: 'H'
+knitr::include_graphics("mod.exponencial.png")
+```
+
+
+El modelo exponencial\index{Modelo!exponencial} en **tiempo continuo**\index{Modelo!exponencial continuo} describe el cambio en el
+tamaño de la población en función del tiempo como un proceso suave, en
+el cual las tasas de natalidad y mortalidad se aplican constantemente en
+cada instante. Este enfoque es especialmente útil para poblaciones
+microbianas (bacterias, protozoarios, algas) que se reproducen de forma
+continua, así como para estimar procesos demográficos en poblaciones
+humanas donde los nacimientos y muertes ocurren a lo largo del año de
+manera no estacional.
+
+En ecología de poblaciones silvestres, los modelos continuos resultan
+apropiados para organismos con reproducción asincrónica, como muchos
+invertebrados acuáticos, plantas perennes y poblaciones de peces en
+ambientes marinos donde no hay una temporada de reproducción marcada. En
+el caso de humanos, el modelo continuo sirve como una aproximación a la
+dinámica poblacional cuando se modelan tasas promedio de natalidad y
+mortalidad en lapsos prolongados de tiempo.
+
+El modelo exponencial\index{Modelo!exponencial} en **tiempo contínuo** describe el crecimiento
+cuando la tasa de crecimiento per cápita o instantáneo de incremento es
+constante:\
+$$
+\frac{dN}{dt} = rN
+$$
+Cuya solución es:\
+$$
+N_{t}=N_0.e^{r.t}
+$$ 
+En escala logarítmica:\
+$$
+ln(N_t) = ln(N_0)+rt
+$$
+donde:\
+- ($dN/dt$) es la tasa o velocidad de aumento de la población en el
+tiempo.\
+- ($N_0$) es el tamaño inicial de la población evaluada.\
+- ($t$) es el tiempo en el que se evalúa el proceso.\
+- ($r$) es la tasa intrínseca o de crecimiento instantáneo.\
+- ($r>0$) la población aumenta.\
+- ($r<0$) la población disminuye el se reduce.\
+- ($r=0$) la población se mantiene estable.\
+
+El modelo exponencial en **tiempo discreto**\index{Modelo!exponencial discreto} (@fig-c4-2) formaliza el
+potencial biótico de una población y permite estimar el
+crecimiento bajo condiciones densidad-independientes, particularmente
+útil en fases tempranas de expansión [@alma991025188879706011]. En su **versión de
+tiempo discreto**:\
+$$
+N_{t} = N_0 \cdot \lambda^t
+$$ 
+Con ($\lambda>1$) crecimiento, ($\lambda=1$) estable, ($\lambda<1$)
+decrecimiento. Relación con continuo: ($\lambda = e^r$). Esta última
+relación ha sido ampliamente desarrollada en textos clásicos de
+demografía ecológica [@caswell2001matrix].
+
+```{r, message= FALSE, warning=FALSE, echo=FALSE}
+#| label: fig-c4-2
+#| fig-cap: Comparación del crecimiento exponencial en tiempo continuo (izq.) y discreto (der.). Se usa r = 0.2 y lambda = e^r para mantener equivalencia matemática.
+#| fig-pos: 'H'
+
+library(tidyverse)
+library(patchwork)
+
+# Parámetros comunes
+N0 <- 10
+r  <- 0.2
+lambda <- exp(r)
+
+# ---- Modelo continuo ----
+t_cont <- seq(0, 20, by = 0.1)
+tabla_cont <- tibble(
+  t = t_cont,
+  N = N0 * exp(r * t)
+)
+
+m_cont <- 
+  ggplot(tabla_cont, aes(t, N)) +
+  geom_line(linewidth = 1.1) +
+  labs(
+    title = "Modelo continuo",
+    x = "Tiempo (t)",
+    y = "Tamaño poblacional (N)"
+  ) +
+  theme_bw()
+
+# ---- Modelo discreto ----
+t_disc <- 0:20
+tabla_disc <- tibble(
+  t = t_disc,
+  N = N0 * lambda^t
+)
+
+m_disc <- 
+  ggplot(tabla_disc, aes(t, N)) +
+  geom_step(linewidth = 0.8, direction = "hv") +
+  geom_point(size = 2) +
+  labs(
+    title = "Modelo discreto",
+    x = "Tiempo (t, generaciones)",
+    y = "Tamaño poblacional (N)"
+  ) +
+  theme_bw()
+
+# ---- Unión en panel ----
+m_cont + m_disc
+
+```
+
+::: callout-tip
+## **Cuándo NO usar el modelo exponencial:**
+
+Si hay densodependencia, límites, estocasticidad, estructura por edades.
+:::
+
+------------------------------------------------------------------------
+
+\newpage
+
+### 2. Modelos Logísticos
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=3}
+#| out-width: "0.8\\linewidth"
+#| fig-align: center
+#| fig-pos: 'H'
+knitr::include_graphics("mod.logístico.png")
+```
+
+El modelo logístico\index{Modelo!logístico} fue propuesto originalmente por @verhulst1838notice y
+posteriormente aplicado empíricamente por @pearl1920rate en
+estudios demográficos humanos.
+
+En diferentes ambientes, el crecimiento poblacional\index{Crecimiento!poblacional} no puede sostenerse
+indefinidamente: los **recursos son finitos** y emergen mecanismos
+**densodependientes** (competencia, depredación, enfermedades, espacio).
+El **modelo logístico** incorpora esta realidad mediante una **capacidad
+de carga** $K$, que representa el tamaño máximo sostenible dadas las
+condiciones ambientales. Su forma canónica o diferencial en tiempo
+continuo es:
+
+$$
+\frac{dN}{dt} = rN \left(1 - \frac{N}{K}\right), \qquad 
+N_{t} = \frac{K}{1 + \left(\frac{K-N_0}{N_0}\right)e^{-rt}}
+$$ donde:\
+- ($dN/dt$) es la tasa o velocidad de aumento de la población en el
+tiempo.\
+- ($N_0$) es el tamaño inicial de la población evaluada.\
+- ($t$) es el tiempo en el que se evalúa el proceso.\
+- ($r$) es la tasa intrínseca o de crecimiento instantáneo.\
+- ($k$) es la capacidad de carga o límite de densidad de la población.\
+
+Este modelo incorpora densodependencia negativa, representando una
+desaceleración progresiva del crecimiento conforme la población se
+aproxima a 𝐾[@krebs2009ecology] (@fig-logistica y @fig-r-k-compar).
+Matemáticamente, genera una trayectoria sigmoidea con punto de inflexión
+en 𝑁=𝐾/2, donde la tasa absoluta de crecimiento alcanza su máximo (May,
+1976). En términos ecológicos, el modelo logístico representa una
+primera aproximación al equilibrio poblacional regulado por limitación
+de recursos, y ha sido ampliamente utilizado como marco conceptual en
+manejo de recursos renovables [@hilborn1992role].
+
+::: callout-tip
+## Advertencia metodológica: interpretar K\*\*
+
+La capacidad de carga no es un parámetro fijo del ecosistema, sino una
+propiedad emergente que depende de condiciones ambientales, clima,
+disponibilidad de recursos e interacciones bióticas. Cambios en el
+sistema alteran K\index{Capacidad de carga}.
+:::
+
+**Velocidad de cambio $dN/dt$ y su forma parabólica**
+
+$$
+\frac{dN}{dt} = rN \left(1 - \frac{N}{K}\right) 
+\quad \Rightarrow \quad 
+\text{parábola en } N \text{ con máximo en } N = K/2
+$$
+
+```{r, echo=FALSE}
+#| label: fig-logistica
+#| fig-cap: "Crecimiento logístico con K=1000, r=0.2; el punto de inflexión ocurre en N=K/2."
+#| fig-pos: 'H'
+
+# ---- Modelo logístico ----
+
+# Parámetros del modelo
+K <- 1000; 
+r <- 0.2; 
+N0 <- 50
+t <- seq(0, 60, by = 0.1)
+N <- K/(1 + ((K-N0)/N0)*exp(-r*t))
+tabla <- data.frame(t, N)
+
+# Figura
+m_log <- 
+ggplot(tabla, aes(t, N)) +
+  geom_line(linewidth=1.1) +
+  geom_hline(yintercept = K/2, linetype=2) +
+  annotate("text", x=max(t)*0.75, y=K/2, 
+           label="K/2 (inflexión)", vjust=-0.7) +
+  geom_hline(yintercept = K, linetype=3) +
+  labs(x="Tiempo (t)", y="Tamaño poblacional (N)", 
+       title="Curva logística") +
+  theme_bw()
+
+
+# ---- Velocidad de cambio ----
+
+# Parámetros del modelo
+K <- 1000; 
+r <- 0.2
+Ngrid <- seq(0, K, by=5)
+dNdt <- r*Ngrid*(1 - Ngrid/K)
+
+v_cambio <- 
+ggplot(data.frame(N=Ngrid, dNdt), aes(N, dNdt))+
+  geom_line(linewidth=1.1) +
+  geom_vline(xintercept = K/2, linetype=2) +
+  annotate("text", x=K*0.58, y=max(dNdt), 
+  label="máx = rK/4", hjust=0) +
+  labs(x="N", y="dN/dt", title="Máxima velocidad en N=K/2") +
+  theme_bw()
+
+# ---- Unión en panel ----
+m_log + v_cambio
+```
+
+**Efecto de $r$ y $K$ (comparaciones)**
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#| label: fig-r-k-compar
+#| fig-cap: "Comparación de trayectorias al variar r (izq) y K (der)."
+#| fig-pos: 'H'
+
+curve_log <- function(K, r, N0, t) K/(1 + ((K-N0)/N0)*exp(-r*t))
+t <- seq(0, 60, by=0.2); N0 <- 50
+
+dr <- tibble(r=c(0.05, 0.15, 0.30))
+df_r <- purrr::map_dfr(dr$r, \(rr){
+  tibble(t=t, N=curve_log(800, rr, N0, t), r=factor(rr))
+})
+p_r <- ggplot(df_r, aes(t, N, linetype=r)) +
+  geom_line(linewidth=1.1)+theme_bw() +
+  labs(x="Tiempo (t)", y="Tamaño poblacional (N)",
+            title="Variando r", linetype="r")
+
+dK <- tibble(K=c(600, 800, 1200))
+df_K <- purrr::map_dfr(dK$K, \(KK){
+  tibble(t=t, N=curve_log(KK, 0.15, N0, t), K=factor(KK))
+})
+p_K <- ggplot(df_K, aes(t, N, linetype=K)) +
+  geom_line(linewidth=1.1)+theme_bw() +
+  labs(x="Tiempo (t)", y="Tamaño poblacional (N)",
+       title="Variando K", linetype="K")
+
+p_r + p_K
+```
+
+::: callout-tip
+## **Advertencia conceptual: r y $\lambda$ no son lo mismo**
+
+El parámetro r describe una tasa instantánea continua, mientras que $\lambda$
+representa una tasa finita por intervalo discreto. Aunque están
+matemáticamente relacionados por $\lambda$ = e\^r, no pueden intercambiarse sin
+conversión previa. Confundirlos conduce a proyecciones incorrectas.
+:::
+
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#| label: tbl-c4-1
+#| tbl-cap: "Comparación didáctica entre el modelo exponencial y el modelo logístico en ecología de poblaciones."
+
+library(kableExtra)
+library(tibble)
+
+comparacion_modelos <- 
+  tribble(
+    ~Aspecto, ~`Modelo exponencial`, ~`Modelo logístico`,
+    
+    "Supuesto central",
+    "Recursos no limitantes; tasa per cápita constante",
+    "Recursos finitos; regulación densodependiente",
+    
+    "Densodependencia",
+    "No (densidad-independiente)",
+    "Sí (densodependencia negativa)",
+    
+    "Ecuación (tiempo continuo)",
+    "$\\dfrac{dN}{dt} = rN$",
+    "$\\dfrac{dN}{dt} = rN\\left(1 - \\dfrac{N}{K}\\right)$",
+    
+    "Solución",
+    "$N(t)=N_0\\,e^{rt}$",
+    "$N(t)=\\dfrac{K}{1+\\left(\\dfrac{K-N_0}{N_0}\\right)e^{-rt}}$",
+    
+    "Trayectoria típica",
+    "Curva en J (crecimiento) o decaimiento exponencial",
+    "Curva sigmoidea (S) con estabilización",
+    
+    "Equilibrios",
+    "No presenta equilibrio estable si $r\\neq 0$",
+    "$N=0$ (inestable si $r>0$) y $N=K$ (estable si $r>0$)",
+    
+    "Máxima tasa absoluta",
+    "Aumenta a medida que $N$ aumenta (sin límite)",
+    "Ocurre en $N=K/2$; máximo $= rK/4$",
+    
+    "Cuándo es útil",
+    "Fases iniciales: brotes, colonización, recuperación temprana",
+    "Poblaciones reguladas por límites: manejo, conservación, recursos",
+    
+    "Riesgo de uso incorrecto",
+    "Extrapolar a largo plazo como si fuera ilimitado",
+    "Interpretar $K$ como fijo o suponer que se alcanza exactamente"
+  )
+
+comparacion_modelos %>%
+  kbl(
+    booktabs = TRUE,
+    escape   = FALSE,
+    align    = c("l","l","l")
+  ) %>%
+  kable_styling(
+    latex_options = c("hold_position", "striped"),
+    font_size = 8,
+    full_width = FALSE
+  ) %>%
+  row_spec(0, bold = TRUE)
+
+```
+
+
+
+------------------------------------------------------------------------
+
+\newpage
+
+## Objetivo general
+
+Modelar, visualizar e interpretar la dinámica de poblaciones mediante
+los modelos exponencial (continuo y discreto) y logístico, integrando
+formulación matemática, análisis de parámetros y contextualización
+ecológica.
+
+### Objetivos específicos
+
+-   Analizar el crecimiento poblacional bajo supuestos de
+    densidad-independencia (modelo exponencial) y densodependencia
+    (modelo logístico).
+
+-   Resolver problemas directos e inversos relacionados con proyecciones
+    demográficas.
+
+-   Comparar el comportamiento poblacional en tiempo continuo y
+    discreto.
+
+-   Evaluar el efecto de los parámetros $r$, $\lambda$, $N$ y $N_0$​
+    sobre la trayectoria y estabilidad poblacional.
+
+-   Interpretar biológicamente el punto de inflexión $K/2$ y la
+    velocidad máxima de crecimiento $rK/4$.
+
+-   Relacionar los modelos determinísticos con escenarios ecológicos
+    reales y con procesos de regulación poblacional.
+
+------------------------------------------------------------------------
+
+## Competencias
+
+### a. Competencias conceptuales
+
+-   Diferenciar crecimiento **densidad-independiente** (exponencial) y
+    **densodependiente** (logístico).
+
+-   Comprender la interpretación ecológica de los parámetros $r$,
+    $\lambda$, $N$ y $N_0$​.
+
+-   Entender la relación matemática entre los modelos continuo y
+    discreto ($\lambda = e^r$).
+
+-   Reconocer las condiciones bajo las cuales el modelo exponencial
+    constituye una aproximación válida.
+
+-   Interpretar el significado ecológico del punto de inflexión en
+    $N = K/2$.
+
+-   Analizar la estabilidad de los equilibrios $N=0$ y $N=K$ en el
+    modelo logístico.
+
+### b. Competencias procedimentales
+
+-   Calcular trayectorias poblacionales utilizando ecuaciones
+    exponenciales y logísticas.
+
+-   Resolver problemas inversos (tiempo de duplicación, tiempo para
+    alcanzar una fracción de $K$, estimación de $r$).
+
+-   Implementar simulaciones y visualizaciones reproducibles en R.
+
+-   Comparar escenarios variando parámetros demográficos.
+
+-   Analizar gráficamente $N(t)$ y la tasa de cambio $dN/dt$.
+
+-   Interpretar resultados en términos ecológicos y demográficos.
+
+### c. Competencias actitudinales
+
+-   Valorar los modelos matemáticos como herramientas de comprensión
+    ecológica y no como representaciones absolutas de la realidad.
+
+-   Analizar críticamente los supuestos y limitaciones de cada modelo
+    antes de aplicarlo.
+
+-   Integrar evidencia cuantitativa con interpretación biológica sólida.
+
+-   Reconocer la importancia del análisis matemático en la toma de
+    decisiones en conservación, manejo de recursos y planificación
+    ambiental.
+
+-   Desarrollar rigor conceptual y precisión en el manejo de parámetros
+    y unidades.
+
+------------------------------------------------------------------------
+
+\newpage
+
+## A. Ejemplos con modelos exponenciales
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=3}
+#| out-width: "0.7\\linewidth"
+#| fig-align: center
+#| fig-pos: 'H'
+knitr::include_graphics("mod.discre-contin.png")
+```
+
+### 1. Tiempo continuo
+
+#### Preparación (paquetes)
+
+```{r, message=FALSE, warning=FALSE}
+#| label: setup-c4
+library(tidyverse)
+library(kableExtra)
+```
+
+#### Ejemplo 1 — Curvas con r positivo
+
+Supongamos una población de fitoplancton que inicia con 10 células/mL y
+crece exponencialmente con $r = 0.4\;ind/ind·hora$.\
+Proyecte el patrón de crecimiento de esta población en veinte periodos
+de tiempo.
+
+**Respuesta.** El tiempo de duplicación\*\* es:
+
+$$
+T_d = \frac{\ln 2}{r} = \frac{0.6931}{0.4} \approx 1.73\;horas.
+$$ **Nota:** El tiempo de duplicación solo aplica para $r>0$.
+
+Con:\
+$t = 20\;horas$:
+
+$$
+N(t) = 10\, e^{0.4\cdot 20} = 10\, e^{8} \approx 2.98\times10^{4}\;individuos.
+$$
+
+**Análisis del resultado.** En condiciones óptimas (luz y nutrientes),
+el fitoplancton puede aumentar varios órdenes de magnitud en horas. El
+carácter exponencial implica que **pequeñas diferencias** en $r$
+producen **grandes separaciones** en abundancia con el tiempo.
+
+**Visualización del ejercicio.**\
+Proyección exponencial de la muestra de la población en tiempo continuo\index{Modelo!exponencial continuo}
+(@fig-c4-3).
+
+```{r}
+#| label: fig-c4-3
+#| fig-cap: Crecimiento exponencial en tiempo continuo para la muestra de la población de fitoplancton.
+#| fig-pos: 'H'
+
+# Parámetros del ejercicio
+N0 <- 10
+r  <- 0.4
+t  <- seq(0, 20, by = 0.5)
+tabla <- tibble(t, N = N0 * exp(r*t))
+
+# Figura de la proyección exponencial
+ggplot(tabla, aes(t, N)) +
+  geom_line(linewidth = 1.1) +
+  labs(title = "Crecimiento exponencial continuo",
+       subtitle = "N(t) = N0. e^(r.t)  con r = 0.4",
+       x = "Tiempo (t)", y = "Tamaño poblacional (N)") +
+  theme_bw()
+```
+
+------------------
+
+#### Ejemplo 2 — r negativo (decrecimiento)
+
+**Enunciado ecológico.** Una población de 120 peces en un estanque
+contaminado decrece con una tasa instantánea $r = -0.2\;ind/ind·día$.\
+(1) Calcule el tiempo que tarda en disminuir la muestra evaluada a la
+mitad de los peces ($t_{(1/2)}$). (2) Proyecte el patrón de disminución
+de esta población en treinta periodos de tiempo.
+
+**Respuesta.**\
+(1) El **tiempo de semirreducción** es:
+
+$$
+T_{1/2} = \frac{\ln(1/2)}{r} = \frac{-0.6931}{-0.2} \approx 3.47\;días.
+$$
+
+(2) En $t = 30\;días$:
+
+$$
+N(t) = 120\, e^{-0.2\cdot 30} = 120\, e^{-6} \approx 0.30\;individuos.
+$$
+
+**Análisis del resultado.**\
+Con valores de $r<0$ se evidencian patrones de mortalidad neta, que
+pueden incluir pérdidas por emigración de los peces o por estrés de los
+individuos. La población colapsará disminuyendo hasta la extinción si
+las condiciones ambientales no cambian (@fig-c4-4).
+
+**Visualización del ejercicio.**
+
+```{r, echo=FALSE}
+#| label: fig-c4-4
+#| fig-cap: Patrón de reducción de la población de peces.
+#| fig-pos: 'H'
+
+# Parámetros del modelo
+N0 <- 120
+r  <- -0.2
+t  <- seq(0, 30, by = 1)
+tabla <- tibble(t, N = N0 * exp(r*t))
+
+# Figura de la proyección
+ggplot(tabla, aes(t, N)) +
+  geom_line(linewidth = 1.1) +
+  labs(title = "Decrecimiento (continuo)",
+       subtitle = "r = -0.2",
+       x = "Tiempo", y = "Tamaño poblacional") +
+  theme_bw()
+```
+
+---------------
+
+#### Ejemplo 3 — Comparación de múltiples r
+
+Tres poblaciones de insectos parten con una abundancia $N_0 = 50$
+individuos y tasas de crecimiento instantáneo
+$r = 0.1, 0.3, 0.5\;ind/ind·generación$. Calcular el crecimiento en 20
+generaciones a partir de los parámetros definidos.
+
+**Respuesta.**\
+Para $t = 20\;$ generaciones:
+
+$$
+\begin{aligned}
+r=0.1:&\quad N(20)=50\, e^{2} \;\approx\; 3.70\times10^{2}\\
+r=0.3:&\quad N(20)=50\, e^{6} \;\approx\; 2.02\times10^{4}\\
+r=0.5:&\quad N(20)=50\, e^{10}\;\approx\; 1.10\times10^{6}
+\end{aligned}
+$$
+
+**Análisis del resultado.**\
+Los resultados muestran que a pesar que hayan incrementos leves o
+modestos en $r$, se generan **aumentos exponenciales** importantes. Esto
+explica la rápida dominancia de especies con leve ventaja reproductiva
+en ambientes que le sean favorables (@fig-c4-5).
+
+**Visualización del ejercicio.**
+
+```{r, echo=FALSE}
+#| label: fig-c4-5
+#| fig-cap: Patrón de crecimiento en poblaciones de insectos.
+#| fig-pos: 'H'
+
+# Parámetros del modelo
+N0 <- 50
+t  <- seq(0, 20, by = 0.25)
+r  <- c(0.1, 0.3, 0.5)
+tabla <- purrr::map_dfr(r, function(r)
+         tibble(t, r = r, N = N0 * exp(r*t)))
+
+# Figura de las proyecciones
+ggplot(tabla, aes(t, N, group = factor(r), 
+                   linetype = factor(r))) +
+  geom_line(linewidth = 1.05) +
+  labs(title = "Patrón de aumento de la población",
+       linetype = "Valores de r", x = "Tiempo (t)", 
+       y = "Tamaño poblacional (N)") +
+  theme_bw()
+```
+
+---------------------------
+
+#### Ejemplo 4 — Tiempo de duplicación y de “mitad”
+
+Se comparan poblaciones con las siguientes tasas de crecimiento
+instantáneo, en las que :\
+$r$ = -0.5, -0.25, -0.1, 0.1, 0.25, 0.5;ind/ind·tiempo.
+
+A partir de estas tasas de crecimiento instantáneo ($r$), se pueden
+calcular dos métricas temporales fundamentales en dinámica poblacional:
+
+-   *Tiempo de duplicación* ($T_d$): cuánto tarda la población en
+    duplicar su tamaño si $r>0$.
+
+-   *Tiempo de semirreducción* ($T_{1/2}$): cuánto tarda la población en
+    reducirse a la mitad de su tamaño si $r<0$.
+
+En otras palabras, se busca relacionar la magnitud de $r$ (positiva o
+negativa) con la rapidez (tiempo) en los cambios de las poblacionales en
+comparación.
+
+**Nota:** El tiempo de duplicación solo aplica para $r>0$. En
+semireducción si es posible que $r<0$.
+
+**Respuesta.**\
+Para $r>0$:
+
+$$
+T_d = \frac{\ln 2}{r} \quad \text{(duplicación)}.
+$$
+
+Para $r<0$:
+
+$$
+T_{1/2} = \frac{\ln(1/2)}{r} \quad \text{(semirreducción)}.
+$$
+
+Para el caso del ejemplo:\
+$r=0.25 \Rightarrow T_d \approx 2.77\;unidades\ de\ tiempo$.
+
+**Análisis del resultado.** Existe **simetría temporal**: la rapidez de
+duplicación en $r>0$ es análoga a la rapidez de semirreducción en $r<0$.
+Métrica clave para comunicar veloces cambios demográficos (brotes vs.
+control).
+
+La @tbl-c4-1a muestra, para cada valor de $r$:\
+
+-   La columna Td si \$r\>0\` (tiempo que tarda en duplicar).\
+-   La columna Tsr si \$r\<0\` (tiempo que tarda en reducirse a la
+    mitad).\
+
+```{r, echo=FALSE}
+#| label: tbl-c4-1a
+#| tbl-cap: "Visualización de Td con r>0 y T(1/2) con r<0 en función del crecimiento instantáneo -> r"
+#| message: false
+
+
+# Valores de r
+r_val <- c(-0.50, -0.25, -0.10, 0.10, 0.25, 0.50)
+
+# Tabla inicial
+tab <- 
+  tibble(
+  r  = r_val,
+  Td = if_else(r> 0, log(2)/r, NA_real_),  # tiempo de duplicación
+  Tsr = if_else(r< 0, log(0.5)/r, NA_real_) # medio tiempo (semirreducción)
+)
+
+# Tabla en formato largo
+tab_largo <- 
+  tab %>%
+  pivot_longer(cols = c(Td, Tsr), 
+               names_to = "Metrica", 
+               values_to = "Tiempo") %>%
+  filter(!is.na(Tiempo))
+
+tab_largo %>% 
+  head() %>% 
+  kbl(booktabs  = TRUE, digits = 2,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+**Visualización del ejercicio.**\
+
+El gráfico revela la simetría espejo entre duplicar y reducir los
+valores de $r$ a la mitad. En este sentido se obtiene lo siguiente:
+
+Para $r>0$, las curvas muestran que a medida que $r$ es mayor, el tiempo
+de duplicación disminuye y la pendientes de la curva aumenta (las
+poblaciones crecen más rápido).
+
+**Nota:** El tiempo de duplicación solo aplica para $r>0$. En
+semireducción si es posible que $r<0$.
+
+Para $r<0$, las curvas muestran que a medida que $r$ es más negativo, el
+tiempo de semirreducción disminuye (decrecen más rápido) (@fig-c4-6).
+
+```{r, echo=FALSE}
+#| label: fig-c4-6
+#| fig-cap: "Visualización de Td con r>0 y T(1/2) con r<0 en función del crecimiento instantáneo -> r."
+#| warning: false
+#| fig-pos: 'H'
+
+# Figura de la proyección
+ggplot(tab_largo, aes(x = r, y = Tiempo, 
+                     shape = Metrica, 
+                     linetype = Metrica)) +
+  geom_point(size = 2.6) +
+  geom_line() +
+  labs(x = "r (tasa crec. instantáneo)", 
+       y = "Tiempo",
+       title = "Escenarios de crecimiento exponencial continuo")+
+  theme_bw()
+
+```
+
+-------------------------
+
+#### Ejemplo 5 — dN/dt = rN (velocidad instantánea)
+
+Una población de 30 invertebrados inicia con $r = 0.2\;ind/ind·día$.\
+(1) Calcular la tasa o velocidad de aumento de la población.\
+(2) Determinar la densidad en 25 días y la velocidad de incremento.\
+
+**Respuesta.**\
+En $t=0$:\
+$$
+\frac{dN}{dt} = rN = 0.2\times 30 = 6\;individuos/día.
+$$ En $t=25$:\
+$$
+N_{(t)} = 30\, e^{r\cdot t}\Rightarrow \ N_{(25)} = 30\, e^{0.2\cdot 25} = 30\, e^{5} \approx 4.45\times10^{3}\ invertebrados.
+$$
+
+Por tanto:
+
+$$
+\frac{dN}{dt} \approx 0.2\times 4.45\times10^{3} = 8.91\times10^{2}\;individuos/día.
+$$
+
+**Análisis del resultado.**\
+La **velocidad de cambio** crece proporcionalmente con $N$ (@fig-c4-7).
+En ausencia de límites densodependientes, poblaciones prósperas pueden
+**saturar rápidamente** el hábitat.
+
+**Visualización del ejercicio.**\
+
+```{r, echo=FALSE}
+#| label: fig-c4-7
+#| fig-cap: Patrón de crecimiento exponencial para la población de invertebrados.
+#| fig-pos: 'H'
+
+# Parámetros del modelo
+N0 <- 30; 
+r <- 0.2; 
+t <- seq(0, 25, by = 0.5)
+N  <- N0 * exp(r*t)
+dNdt <- r * N
+tabla <- tibble(t, N, dNdt)
+
+# Figura de la proyección
+ggplot(tabla, aes(t, dNdt)) +
+  geom_line(linewidth = 1.1) +
+  labs(title = "Velocidad de cambio o de aumento (dN/dt = r.N)",x="Tiempo (t)", y="Velocidad de aumento (dN/dt)") +
+  theme_bw()
+```
+
+-----------------------
+
+#### Ejemplo 6 — Estimar r con dos observaciones
+
+Se requiere estimar la tasa de crecimiento instantáneo $r$ con
+$r = \dfrac{\ln(N_t/N_0)}{t}$ en cuatro escenarios de campo.\
+$N_{0}$= 40, 80, 50 y 30 individuos.\
+$N_{t}$= 120, 20, 50 y 200 individuos\
+$t$= 10, 8, 12 y 15 unidades de tiempo\
+
+**Respuesta.**
+
+-   $(N_0,N_t,t)=(40,120,10) \Rightarrow r=\ln(3)/10 \approx 0.1099\;$
+    ind/ind·tiempo. 
+-   $(80,20,8) \Rightarrow r=\ln(0.25)/8 \approx -0.1733\;$
+    ind/ind·tiempo. 
+-   $(50,50,12) \Rightarrow r=0\;$ ind/ind·tiempo. 
+-   $(30,200,15) \Rightarrow r=\ln(200/30)/15 \approx 0.1265\;$
+    ind/ind·tiempo.\
+
+**Análisis del resultado.**\
+Con **cuatro censos** puede caracterizarse la tendencia
+(aumento/descenso/estable). Útil como aproximación cuando no hay series
+largas (@tbl-c4-2 y @fig-c4-8).
+
+**Visualización del ejercicio.**
+
+```{r, echo=FALSE}
+#| label: tbl-c4-2
+#| tbl-cap: "Estimación de r a partir de valores (No, Nt, t)."
+#| message: false
+
+
+# Escenarios hipotéticos
+tabla <- 
+  tribble(
+  ~N0, ~Nt, ~t,
+   40, 120, 10,   # crecimiento
+   80,  20,  8,   # decrecimiento
+   50,  50, 12,   # estable
+   30, 200, 15    # crecimiento rápido
+)
+
+# Cálculo de r
+resultados <- 
+  tabla %>%
+  mutate(r = log(Nt/N0)/t)
+
+resultados %>% 
+  head() %>% 
+  kbl(booktabs  = TRUE, digits = 2,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+
+```
+
+```{r, echo=FALSE}
+#| label: fig-c4-8
+#| fig-cap: "Trayectorias poblacionales estimadas a partir de r calculado con cuatro escenarios."
+#| warning: false
+#| fig-pos: 'H'
+
+# Tabla con 10 valores de t por c/escenario
+tabla1 <- 
+  resultados %>%
+  rowwise() %>%
+  mutate(
+      curva = list(tibble(
+      tiempo = 0:t,
+      N = N0 * exp(r * (0:t))
+    ))
+  ) %>%
+  unnest(curva)
+
+# Figura con las proyecciones
+ggplot(tabla1, aes(x = tiempo, y = N, color = factor(Nt), group = interaction(N0, Nt, t))) +
+  geom_line(linewidth = 1.1) +
+  geom_point(data = resultados, aes(x = t, y = Nt), 
+             size = 3, shape = 21, fill = "white") +
+  labs(x = "Tiempo (t)", y = "Tamaño poblacional (N)",
+       title = "Estimación de r con las observaciones",
+       color = "Nt observado") +
+  theme_bw()
+
+```
+
+--------------------
+
+#### Ejemplo 7 — Estimar r en una población bacteriana
+
+**Pregunta 1.** Si una población bacteriana pasa de 100 a 800 individuos
+en 10 horas, ¿cuál es el valor de r?
+
+$$
+r = \frac{\ln(N_t/N_0)}{t} = \frac{\ln(800/100)}{10} = \frac{\ln(8)}{10} \approx 0.2089\ bacterias/bacterias.hora
+$$
+
+**Respuesta:**\
+La tasa intrínseca de crecimiento es
+$r \approx 0.21\ bacterias/bacterias.hora \approx$ aumento del 21%.
+
+**Análisis:** El resultado encontrado es típico de poblaciones
+bacterianas en un aumento elevado, debido a que por cada hora aumenta la
+población en un 20%, por ello es que en en solo 10 horas aumenta 8 veces
+su densidad (100 hasta 800 bacterias) (@fig-c4-9).
+
+**Visualización del ejercicio.**
+
+```{r, echo=FALSE}
+#| label: fig-c4-9
+#| fig-cap: "Crecimiento continuo estimado en bacterias (visualización)."
+#| message: false
+#| warning: false
+#| fig-pos: 'H'
+
+# Parámetros del modelo
+N0 <- 100
+Nt <- 800
+t_max <- 10
+r <- log(Nt/N0) / t_max
+t <- seq(0, t_max, by = 0.1)
+tabla <- tibble(t = t, N = N0 * exp(r * t))
+
+# Figura de la proyección
+ggplot(tabla, aes(t, N)) +
+  geom_line(linewidth = 1.1) +
+  geom_point(data = tibble(t = t_max, N = Nt), 
+             size = 3, shape = 21, fill = "white") +
+  labs(title = "Crecimiento exponencial continuo",
+       subtitle = paste0("N0=", N0, ", Nt=", Nt, ", t=", t_max, ", r≈", round(r,3), 
+                         " ind/ind·hora"),
+       x = "Tiempo (horas)", y = "Número de individuos") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+\newpage
+
+### 2. Tiempo discreto
+
+Este modelo exponencial\index{Modelo!exponencial} se utiliza cuando el crecimiento o reducción de
+la densidad poblacional ocurre en intervalos claramente definidos de
+tiempo, por ejemplo, generaciones no solapadas (ej. especies con ciclo
+de vida anual). En este enfoque, el tamaño de la población en la
+generación siguiente depende únicamente del tamaño de la generación
+previa multiplicado por la tasa finita de crecimiento ($\lambda$).\index{Modelo!exponencial discreto}
+
+
+$$
+N_{(t)} = N_0 \cdot \lambda^t
+$$
+
+Con ($\lambda>1$) crecimiento, ($\lambda=1$) estable, ($\lambda<1$)
+decrecimiento. Relación con continuo: ($\lambda = e^r$).
+
+#### Ejemplo 1 — $\lambda$ \> 1 (crecimiento)
+
+Una población de 50 plantas anuales aumenta con $\lambda = 1.2$.
+Calcular su densidad en 15 periodos de tiempo.
+
+**Respuesta.** Cada generación es 20% mayor que la anterior.\
+En $t=15$:\
+$$
+N_{(15)} = 50 \cdot 1.2^{15} \approx 818\ plantas
+$$
+
+**Análisis del resultado.**\
+El crecimiento discreto\index{Modelo!exponencial discreto} refleja ciclos estacionales. Poblaciones anuales
+con buena supervivencia muestran incrementos regulares (@fig-c4-10).
+
+**Visualización del ejercicio.**
+
+```{r, echo=FALSE}
+#| label: fig-c4-10
+#| fig-cap: Proyección de crecimiento exponencial discreto
+#| fig-pos: 'H'
+
+# Parámetros del modelo
+N0 <- 50; 
+lambda <- 1.2; 
+t <- 0:15
+tabla <- tibble(t, N = N0 * lambda^t)
+
+# Figura de la proyección
+ggplot(tabla, aes(t, N)) +
+  geom_step(linewidth = 1, direction = "hv") +
+  geom_point(size = 2) +
+  labs(title = "Crecimiento discreto (lambda = 1.2)",
+       x="Generaciones (t)", y="Densidad poblacional (N)") +
+  theme_bw()
+```
+
+-------------
+
+#### Ejemplo 2 — $\lambda$ = 1 (estable)
+
+Una población de 100 aves migratorias se mantiene estable con
+$\lambda = 1$. Calcular cualquier valor de t entre 0 y 10 periodos de
+tiempo y analizar el resultado.
+
+**Respuesta.**\
+Ecuación de crecimiento discreto:\
+$$
+N_{(t)} = N_0 \cdot \lambda^t
+$$\
+$$
+N(t) = 100 \cdot 1^t = 100
+$$ para cualquier $t$.
+
+**Análisis del resultado.**\
+Poblaciones con $\lambda=1$ representan equilibrio: el reemplazo exacto
+de individuos.
+
+**Tabulación del ejercicio.**\
+
+```{r, echo=FALSE}
+#| label: discreto-lambda-igual1
+
+# Parámtros del modelo
+N0 <- 100; 
+lambda <- 1; 
+t <- 0:10
+
+tibble(t, N = N0 * lambda^t) %>% 
+  kbl(booktabs  = TRUE, 
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+
+```
+
+-------------------------
+
+#### Ejemplo 3 — $\lambda$ \< 1 (decrecimiento)
+
+Una población de 80 insectos decrece con $\lambda = 0.7$. Calcular su
+densidad en 12 periodos de tiempo o generaciones.
+
+**Respuesta.**\
+Cada generación disminuye en 30% en $t=12$:\
+$$
+N_{(12)} = 80 \cdot 0.7^{12} \approx 3.6\ insectos
+$$
+
+**Análisis del resultado.**\
+Representa poblaciones en declive por falta de recursos, depredación o
+ambientes desfavorables (@fig-c4-11).
+
+**Visualización del ejercicio.**\
+
+```{r, echo=FALSE}
+#| label: fig-c4-11
+#| fig-cap: Patrón de disminución o decrecimiento de las aves migratorias.
+#| fig-pos: 'H'
+
+# Parámtros del modelo
+N0 <- 80; 
+lambda <- 0.7; 
+t <- 0:12
+tabla <- tibble(t, N = N0 * lambda^t)
+
+# Figura de la proyección
+ggplot(tabla, aes(t, N)) +
+  geom_step(linewidth = 1, direction = "hv") +
+  geom_point(size = 2) +
+  labs(title = "Decrecimiento discreto (lambda = 0.7)",
+       x="Generaciones (t)", 
+       y="Densidad poblacional (N)") +
+  theme_bw()
+```
+
+--------------------
+
+#### Ejemplo 4 — Crecimiento continuo vs. discreto
+
+Una población de 30 individuos con $r=0.2$ debe producir la misma
+trayectoria que $\lambda = e^r$. Realizar el cálculo de lambda y
+analizar el resultado.
+
+**Respuesta.**\
+$\lambda = e^{0.2} \approx 1.221$. Ambas formulaciones generan curvas
+equivalentes.
+
+**Visualización del ejercicio.**
+
+```{r, echo=FALSE}
+#| label: comparativa-continuo-discreto
+
+# Parámetros del modelo
+N0 <- 30; 
+r <- 0.2; 
+t <- seq(0, 10, by = 1)
+lambda <- exp(r)
+
+# Modelo continuo (cont) vs. discreto (disc)
+datos_cont <- tibble(t, Modelo = "Continuo", N = N0 * exp(r*t))
+datos_disc <- tibble(t, Modelo = "Discreto", N = N0 * lambda^t)
+datos_comp  <- bind_rows(datos_cont, datos_disc)
+
+# Figura de la proyección
+ggplot(datos_comp, aes(t, N, shape = Modelo, 
+                       linetype = Modelo)) +
+  geom_step(linewidth = 0.8, direction = "hv") +
+  geom_point(size = 2) +
+  labs(title="Comparación de las trayectorias", 
+       x="Tiempo (t)", 
+       y="Densidad de la población (N)") +
+  theme_bw()
+```
+
+---------------------
+
+#### Ejemplo 5 — Estimar $\lambda$ a partir de escenarios
+
+Estimar $\lambda$ a partir de $N_0$, $N_t$ y $t$ en distintos escenarios
+de aumento y reducción de la densidad.
+
+**Respuesta.**\
+$$
+\lambda = \left(\frac{N_t}{N_0}\right)^{1/t}
+$$
+
+**Análisis del resultado.**\
+Si $\lambda>1$ la población crece; si $\lambda=1$ permanece estable; si
+$\lambda<1$ decrece (@tbl-c4-3 y @fig-c4-12).
+
+
+```{r, echo=FALSE}
+#| label: tbl-c4-3
+#| tbl-cap: "Estimación de lambda a partir de (N0, Nt, t) en un conjunto de escenarios."
+#| message: false
+
+# Escenarios hipotéticos (puedes reemplazarlos por los de tus talleres)
+escenarios <- 
+  tribble(
+  ~No, ~Nt, ~t,
+   60, 240,  6,   # crecimiento
+  100, 100, 10,   # estable
+   80,  20,  8,   # decrecimiento
+   30, 300, 10    # crecimiento fuerte
+)
+
+# Tabulación de los escenarios
+tab_lambda <- 
+  escenarios %>%
+  mutate(Lambda = (Nt/No)^(1/t)) %>%
+  mutate(Interpretacion = case_when(
+    lambda > 1  ~ "Crecimiento (λ>1)",
+    lambda == 1 ~ "Estable (λ=1)",
+    lambda < 1  ~ "Decrecimiento (λ<1)"
+  ))
+
+tab_lambda %>% 
+  head() %>% 
+  kbl(booktabs  = TRUE, digits = 2,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+
+```
+
+```{r, echo=FALSE}
+#| label: fig-c4-12
+#| fig-cap: "Trayectorias discretas estimadas con lambda calculado a partir de dos observaciones."
+#| warning: false
+#| fig-pos: 'H'
+
+# Generar trayectorias discretas con lambda estimado
+trayec_lambda <- 
+  tab_lambda %>%
+  rowwise() %>%
+  mutate(curva = list(tibble(
+    tiempo = 0:t,
+    N = N0 * Lambda^(0:t)
+  ))) %>%
+  unnest(curva)
+
+# Figura
+ggplot(trayec_lambda, aes(x = tiempo, y = N, 
+       group = interaction(N0, Nt, t), 
+       shape = Interpretacion, 
+       linetype = Interpretacion)) +
+  geom_step(linewidth = 1, direction = "hv") +
+  geom_point(size = 2) +
+  labs(x = "Tiempo (t)", y = "Tamaño poblacional (N)",
+       title = "Estimación de λ y trayectorias discreta N(t) = N0 · λ^t",
+       shape = "Interpretación", 
+       linetype = "Interpretación") +
+  theme_bw()
+
+```
+
+-   Si $\lambda$$>1$ la población crece.\
+-   Si $\lambda$$=1$ la población permanece estable.\
+-   Si $\lambda$$<1$ la población decrece.\
+
+Para un mismo valor de $t$, cuanto mayor sea la razón mayor será el
+valor de $$\lambda$$.\
+$$Nt/N_{0}$$
+
+El punto en ($t$, $N_{t}$) corresponde a la observación real usada para
+calcular $$\lambda$$.\
+
+#### Ejemplo 6 — Reconstruir r a partir de $\lambda$
+
+La relación $\lambda = e^r$ permite calcular $r$.
+
+**Respuesta.**\
+$$
+r = \ln(\lambda)
+$$
+
+**Análisis del resultado.**\
+$r$ y $\lambda$ son dos formas equivalentes de describir el crecimiento
+poblacional. La conversión es exacta (@tbl-c4-4 y @fig-c4-13).
+
+**Visualización del ejercicio.**\
+
+```{r, echo=FALSE}
+#| label: tbl-c4-4
+#| tbl-cap: "Conversión de λ a r y métricas derivadas."
+#| message: false
+
+# Valores de λ de ejemplo (ajústalos a tus ejercicios)
+lambda_val <- c(0.6, 0.8, 1.0, 1.2, 1.5)
+
+tab_r <- tibble(
+  lambda = lambda_val,
+  r = log(lambda_val)) %>%
+  mutate(
+    clasificacion = case_when(
+      lambda > 1  ~ "Crecimiento",
+      lambda == 1 ~ "Estable",
+      TRUE        ~ "Decrecimiento"
+    ),
+    # Tiempo de duplicación solo tiene sentido si r > 0
+    T_dup = if_else(r > 0, log(2)/r, as.numeric(NA)),
+    # “Medio tiempo” (semirreducción) si r < 0
+    T_half = if_else(r < 0, log(0.5)/r, as.numeric(NA))
+  )
+
+tab_r %>% 
+  head() %>% 
+  kbl(booktabs  = TRUE, digits = 2,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+
+```
+
+```{r, echo=FALSE}
+#| label: fig-c4-13
+#| fig-cap: "Comparación de trayectorias: continuo (r=ln (lambda)) vs. discreto (lambda) para varios lambda."
+#| warning: false
+#| fig-pos: 'H'
+
+# Parámetros base
+N0 <- 40
+t_max <- 12
+tiempos_cont <- seq(0, t_max, by = 0.25)
+tiempos_disc <- 0:t_max
+
+# Construir data para ambos modelos por cada λ
+curvas <- map_dfr(lambda_val, function(lmb) {
+  r_val <- log(lmb)
+  datos_cont <- tibble(
+    Modelo = "Continuo",
+    lambda = lmb,
+    r = r_val,
+    t = tiempos_cont,
+    N = N0 * exp(r_val * tiempos_cont))
+  datos_disc <- tibble(
+    Modelo = "Discreto",
+    lambda = lmb,
+    r = r_val,
+    t = tiempos_disc,
+    N = N0 * (lmb^tiempos_disc)
+  )
+  bind_rows(datos_cont, datos_disc)
+})
+
+# Figura d ela proyección
+ggplot(curvas, aes(x = t, y = N)) +
+  geom_step(linewidth = 1, direction = "hv") +
+  geom_point(data = filter(curvas, Modelo == "Discreto"),
+             size = 1.5) +
+  facet_wrap(~ lambda, scales = "free_y") +
+  labs(x = "Tiempo (t)", y = "Tamaño de la población (N)",
+       title = "Trayectorias equivalentes: modelo continuo vs. discreto",
+       subtitle = "Relación: lambda = e^r  ⇔  r = ln(lambda)") +
+  theme_bw()
+```
+
+-   La relación entre modelos es exacta:\
+    $\lambda$ = $e^r$ ⟺ $r=ln⁡($\lambda$)$
+
+-   Para un mismo valor de $\lambda$, la curva continua\
+    $N_{(t)} = N_0\, e^{rt}$
+
+    y la curva discreta\
+    $N_{(t)} = N_0.$\lambda$^t$
+
+    son coherentes y producen trayectorias equivalentes.
+
+-   Si $r>0$, el **tiempo de duplicación** es: $T_d = ln⁡(2)/r$
+
+-   Si $r<0$, o el **tiempo de semirreducción** es:\
+    $T_{(1/2)}=\frac{ln{(1/2)}}r$
+
+**Nota:** El tiempo de duplicación solo aplica para $r>0$. En
+semireducción si es posible que $r<0$.
+
+#### Ejemplo 7 — Cálculo de $\lambda$
+
+Una población de insectos inicia con 50 individuos y al cabo de 4
+generaciones alcanza 200. ¿Cuál es el valor de $\lambda$?
+
+$$
+\lambda = \left(\frac{N_t}{N_0}\right)^{1/t} = \left(\frac{200}{50}\right)^{1/4} = (4)^{0.25} \approx 1.414\ insectos
+$$
+
+**Respuesta:**\
+La tasa finita de crecimiento es $\lambda \approx 1.41$. Esto implica
+que la población aumenta en promedio un 41% por generación, consistente
+con organismos con ciclos de vida cortos.
+
+
+------------------------------------------------------------------------
+
+\newpage
+
+### Cuestionario
+
+#### 1. Preguntas teóricas
+
+1.  Determine las diferencias entre las tasas **r** y **$\lambda$** y su
+    relación matemática.\
+2.  Interpretar la pendiente en escala log de $N_{(t)}$ bajo el patrón
+    de crecimiento exponencial.\
+3.  ¿Qué implica **r \< 0** o **$\lambda$ \< 1**? Dé un caso ecológico.\
+4.  Explique cómo estimar **r** con dos mediciones ($N_0$, $N_t$).\
+5.  ¿Cuándo usaría un modelo continuo vs. discreto?\
+6.  ¿Por qué la fase inicial de una invasión bacteriana puede
+    aproximarse por un modelo exponencial?\
+7.  ¿Qué precauciones tomaría al extrapolar trayectorias exponenciales?\
+8.  Justifique el uso de **escala log** en evaluación del crecimiento
+    exponencial.\
+9.  Mencione los procesos que violan los supuestos del modelo
+    exponencial.\
+10. Implemente un mini-experimento numérico cambiando r o $\lambda$ y describa
+    su efecto visual.
+
+------------------------------------------------------------------------
+
+#### 2. Preguntas de cálculo y gráficas
+
+
+1.  Una población biológica crece de forma continua a una tasa anual del
+    6%. Si la población actual es de 5000:\
+
+-   
+
+    (1) ¿Cuál será en 7 años?\
+
+-   
+
+    (2) Graficar la proyección de esta población en 10 periodos de
+        tiempo.\
+
+2.  Una población de aves crece a un ritmo anual del 5%. Si la población
+    actual es de 2000 individuos, 
+
+-   
+
+    (1) ¿cuántos años se tardará para que vuelvan a doblar su densidad?
+        Redondea tu respuesta a la centésima más cercana.\
+
+-   
+
+    (2) Graficar la proyección poblacional en 20 periodos de tiempo o 20
+        años.
+
+3.  Una población de hormigas presenta una tasa de disminución anual del
+    7,2%.
+
+-   
+
+    (1) ¿Cuántos años le tomará a esta población de 227 gramos para
+        llegar a 93 gramos de biomasa?
+
+-   
+
+    (2) Graficar la proyección de esta población en 20 periodos de
+        tiempo.\
+
+4.  Una población de peces aumenta a una tasa anual de 7%. Si la
+    población actual es de 8.000 individuos:\
+
+-   
+
+    (1) ¿Cuántos años le tomará a esta población para llegar a 18.000
+        individuos?\
+
+-   
+
+    (2) Graficar la proyección de esta población en 20 periodos de
+        tiempo.\
+
+------------------------------------------------------------------------
+
+#### 3. Preguntas de cálculo
+
+5.  Una población biológica crece de forma contínua a una tasa anual del
+    6%. Si la población actual es de 5000, ¿cuál será en 7 años?
+
+6.  Una colonia de bacterias crece a una tasa anual del 8%. Si
+    inicialmente hay 1,500 bacterias, ¿cuántas bacterias habrá al cabo
+    de 10 años?
+
+7.  Un virus se propaga en una comunidad duplicándose cada 1.5 días. Si
+    inicialmente hay 500 virus, ¿cuál es la población después de 10
+    días?
+
+8.  Una población de peces crece a una tasa del 5% anual. Si en 12 años
+    la población alcanza los 6,000 individuos, ¿cuál era la población
+    inicial?
+
+9.  En un experimento, se observa que una población de microbios se
+    triplica en 10 horas. Si la población inicial es de 200 microbios,\
+
+a)  determinar la tasa ($r$);\
+b)  calcular la población después de 15 horas.
+
+<!-- -->
+
+10. Una población de aves crece a un ritmo anual del 5%. Si la población
+    actual es de 2000, ¿cuántos años se tardará para que la población se
+    duplique? (Redondea tu respuesta a la centésima más cercana.)
+
+11. Una población de insectos se duplica cada 8 años. Si actualmente hay
+    5,000 insectos, ¿cuál será la población en 24 años?
+
+12. Una población de hormigas presenta una tasa de disminución anual del
+    7,2%. ¿Cuántos años le tomará a esta población, cuya biomasa es de
+    227 gramos, reducirse a 93 gramos
+
+13. Una población de conejos decrece a una tasa anual del 4%. Si
+    actualmente hay 1,200 conejos, ¿cuántos años se necesitarán para que
+    la población se reduzca a 800?
+
+14. Supongamos que la población de peces marinos crece a una tasa anual
+    del 7%. Si la población actual es de 8000 individuos, ¿cuántos años
+    se tardará para que la población alcance los 18000 individuos?
+
+15. Una población de algas en un lago crece a una tasa anual del 9%. Si
+    actualmente hay 10,000 unidades, ¿en cuántos años se alcanzarán
+    50,000 unidades?
+
+16. Se estima que una población de ardillas aumentará de 1,800 a 2,500
+    en 10 años. Determina la tasa de crecimiento instantáneo $r$.
+
+17. Una población silvestre crece a una tasa anual del 7%. Si la
+    población alcanza los 2000 individuos en 7 años, ¿cuál era el tamaño
+    de la población inicial?
+
+18. Una población de curíes de interés para consumo crece a una tasa
+    anual del 3%. Si la población actual es de 3000 individuos, ¿cuántos
+    años se tardará para que la población doble su densidad?
+
+19. En un cultivo de hongos, la población aumenta de 300 a 1200 en 6
+    días.\
+
+a)  Determinar la tasa ($r$).\
+b)  Calcula el tiempo de duplicación de la población.
+
+    **Nota:** El tiempo de duplicación solo aplica para $r>0$. En
+semireducción si es posible que $r<0$.
+
+<!-- -->
+
+20. Una población de virus en un cultivo crece exponencialmente. Si la
+    población aumenta de $10^3$ a $10^9$ en 24 horas, ¿cuál es la tasa
+    de crecimiento instantáneo $r$ y cuál es el tiempo de duplicación?
+
+21. Una población endémica de mariposas declina su densidad anual en un
+    12,5%. A partir de una muestra de 127 gramos de biomasa, ¿cuál será
+    su biomasa a los 6 años?
+
+22. Según el artículo "U.S. reaching the 300 million person milestone",
+    la población de EE.UU. alcanzó los 200 millones en 1967. Asumiendo
+    que en 2007 la población es de 303 millones,\
+
+a)  Calcular la tasa de incremento instantáneo anual.\
+b)  Si esta tendencia continúa por los 20 años siguientes, ¿cuál será el
+    tamaño de la población en 2027?
+
+<!-- -->
+
+23. Una población de elefantes crece a una tasa anual del 2%.
+    Actualmente hay 800 elefantes, ¿en cuántos años se triplicará la
+    población?
+
+24. Según las proyecciones de las Naciones Unidas, para el año 2050 se
+    estima que la población mundial estará en un rango:\
+-   Menor estimador: 7.3 billones de personas.\
+-   Mayor estimador: 10.7 billones de personas.
+
+<!-- -->
+
+    Si se asume que la población mundial inicia con 8.1 billones en 2023,
+¿cuál es la tasa de incremento anual en cada estimador? (El tiempo
+transcurrido es de 27 años, de 2023 a 2050).
+<https://countrymeters.info/es/World>
+
+25. Con una tasa de crecimiento poblacional de ( r = 2.8% ) anual,\
+
+a)  ¿cuánto tiempo tomaría que un par de individuos produzca la
+    población mundial actual (cerca de 10 billones de personas)? 
+b)  Además, ¿en qué tiempo se duplicaría esta población? Discuta el
+    resultado.
+
+<!-- -->
+
+26. Se esperaba que la población humana mundial doblara en tamaño en
+    aproximadamente 50 años.\
+
+a)  Calcular la tasa de crecimiento ($r$) asumiendo este tiempo de
+    duplicación.\
+b)  Si la población en 1993 era de 5400 millones, ¿cuál es el tamaño
+    proyectado para el año 2030?
+
+<!-- -->
+
+27. Usted estudia una población de escarabajos con un tamaño inicial
+    de 3000. Durante un mes se registraron 400 nacimientos y 150
+    muertes.\
+
+a)  Estimar la tasa de crecimiento ($r$).\
+b)  Proyectar el tamaño poblacional en 6 meses.
+
+<!-- -->
+
+28. Usted estudia una población de orquídeas en peligro, para las cuales
+    la tasa de nacimientos es ($b = 0.0021$) nacimientos/individuo.año y
+    la tasa de muertes es ($d = 0.0020$) muertes/individuo.año. La
+    población actual es de 40 plantas. Se proyecta que un nuevo centro
+    comercial reducirá esta población a 20 plantas. Explique el efecto
+    del desarrollo propuesto sobre la probabilidad de extinción de esta
+    población.
+
+29. Si una población de *E. coli* crece de 1000 células a ( 2
+    \times 10\^9 ) células en 6 horas,\
+
+a)  ¿cuál es su tasa intrínseca de incremento?\
+b)  ¿Está la población duplicándose en el tiempo esperado?
+
+<!-- -->
+
+30. Una especie invasora de plantas disminuye su población a una tasa
+    del 3% anual debido a medidas de control. Si inicialmente hay 5,000
+    plantas:\
+
+a)  ¿Cuál será el número aproximado de plantas después de 20 años?\
+b)  ¿Cuánto tiempo se necesitará para reducir la población a la mitad?
+
+<!-- -->
+
+31. Una colonia de bacterias se duplica cada 4 horas.\
+
+a)  Determinar la tasa de crecimiento instantáneo ($r$).\
+b)  Calcular el tiempo necesario para que la población se incremente a
+    10 veces la cantidad inicial.
+
+<!-- -->
+
+32. Una población de conejos aumenta de 250 a 800 individuos en 12 meses
+    siguiendo un modelo exponencial.\
+
+a)  Calcular la tasa de crecimiento ($r$).\
+b)  Estimar la población al cabo de 24 meses.
+
+<!-- -->
+
+33. Un cultivo de células aumenta de 10,000 a 25,000 en 48 horas
+    siguiendo un modelo exponencial.\
+
+a)  Calcular la tasa de crecimiento ($r$).\
+b)  Estimar la población a las 72 horas.
+
+<!-- -->
+
+34. Una colonia de algas en un estanque aumenta en un 200% en 30 días
+    (es decir, la población se convierte en 3 veces la inicial).\
+
+a)  Determinar la tasa ($r$);\
+b)  ¿En cuántos días se habrá cuadruplicado la población respecto a la
+    inicial?
+
+<!-- -->
+
+35. Una población de bacterias crece un 25% cada 2 horas de forma
+    compuesta.\
+
+a)  Calcular la tasa de crecimiento instantáneo ($r$).\
+b)  Estimar la población después de 10 horas si la población inicial es
+    de 800 bacterias.
+
+------------------------------------------------------------------------
+
+\newpage
+
+## B. Ejemplos con modelos logísticos
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=3}
+#| out-width: "0.9\\linewidth"
+#| fig-align: center
+#| fig-pos: 'H'
+knitr::include_graphics("mod.logístico1.png")
+```
+
+
+------------------------------------------------------------------------
+
+#### Ejemplo 1 — Tasa inicial $dN/dt$
+
+$N_0 = 500,\; K = 10000,\; r = 0.05$ (bacterias/hora).
+
+**Cálculo:**
+
+$$
+\left.\frac{dN}{dt}\right|_{t=0} = rN_0 \left(1 - \frac{N_0}{K}\right)
+= 0.05 \times 500 \times \left(1 - \frac{500}{10000}\right) = 23.75
+$$
+
+```{r}
+#| label: ej1
+r <- 0.05; 
+N0 <- 500; 
+K <- 10000
+dNdt_0 <- r*N0*(1 - N0/K); 
+dNdt_0
+```
+**Resultado esperado:** $\approx\ 23.75$\ $bacterias.hora^{-1}$.
+
+
+** $N_0=200, K=5000, r=0.04\\ dN/dt=7.84\ bacterias.hora^{-1}$ al inicio.
+
+```{r}
+#| label: ej5
+r <- 0.04; N0 <- 200; K <- 5000; r*N0*(1 - N0/K)
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 2 — Tamaño tras 6 meses
+
+Plantas: $N_0 = 100,\; K = 400,\; r = 0.02 \;\text{día}^{-1}$; $t = 180$
+días.
+
+**Cálculo:**
+
+$$
+N(t) = \frac{K}{1 + \left(\frac{K-N_0}{N_0}\right).e^{-rt}}
+$$
+
+```{r}
+#| label: ej2
+N0 <- 100; K <- 400; r <- 0.02; t <- 180
+N_t <- K/(1 + ((K-N0)/N0)*exp(-r*t)); N_t
+```
+
+**Resultado esperado:** $\approx\ 370$ plantas.
+
+------------------------------------------------------------------------
+
+#### Ejemplo 3 — Tiempo hasta 80% de K 
+Ratones: $N_0 = 50,\; K = 500,\; r = 0.1 \;\text{semana}^{-1}$.\
+Quieres $N = 0.8K = 400$.
+
+**Cálculo:**
+
+$$
+t = \frac{1}{r}\ln\left(\frac{K-N_0}{N_0} \cdot \frac{N}{K-N}\right)
+$$
+
+```{r, echo=FALSE}
+#| label: ej3
+N0 <- 50; K <- 500; r <- 0.1; Nstar <- 0.8*K
+t_req <- (1/r)*log(((K-N0)/N0)*(Nstar/(K-Nstar))); t_req
+```
+
+**Resultado esperado**: $\approx 35.83$ semanas.
+
+------------------------------------------------------------------------
+
+#### Ejemplo 4 — $b'(N)$ cuadrática y $d'(N)$ lineal
+
+**Funciones:**\
+$b'(N) = 0.12 + 0.01N - 0.0001N^2$\
+$d'(N) = 0.18 + 0.008N$
+
+-   Máximo de $b'(N)$: $db'/dN=0.01-0.0002N=0 \Rightarrow N=50$.\
+    $b'(50)=0.37$ (máximo).
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#| label: ej4-tabla
+#| tbl-cap: "Valores de b' y d' en función de N (cada 5 unidades)"
+
+b_p <- function(N) 0.12 + 0.01*N - 0.0001*N^2
+d_p <- function(N) 0.18 + 0.008*N
+N_vals <- seq(0, 50, by=5)
+
+tab <- tibble(N=N_vals, 
+              `b'`=round(b_p(N_vals),4), 
+              `d'`=round(d_p(N_vals),4))
+  kbl(tab, booktabs  = TRUE, digits = 2,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+```{r, echo=FALSE}
+#| label: fig-c4-14
+#| fig-cap: "b'(N) (cuadrática) y d'(N) (lineal). El máximo de b' ocurre en N=50."
+#| fig-pos: 'H'
+
+# Parámetros del modelo
+tabla <- tibble(N=seq(0,60,by=1)) %>% 
+  mutate(b = b_p(N), d = d_p(N)) %>% 
+  pivot_longer(cols=c(b,d), names_to="tasa", values_to="valor")
+  
+# Figura de la proyección  
+ggplot(tabla, aes(N, valor, linetype=tasa)) +
+  geom_line(linewidth=1.1) +
+  geom_vline(xintercept = 50, linetype=2) +
+  labs(y="tasa específica", 
+       title="Tasas densodependientes") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 5 — Población tras 12 meses
+
+Peces: $N_0=150,\ K=3000,\ r=0.03$ mes$^{-1}$; $t=12$ meses.
+
+```{r, echo=FALSE}
+#| label: ej6
+N0 <- 150; K <- 3000; r <- 0.03; t <- 12
+K/(1 + ((K-N0)/N0)*exp(-r*t))
+```
+**Resultado esperado:** $\approx\ 210$ individuos.
+
+------------------------------------------------------------------------
+
+#### Ejemplo 6 — Tiempo hasta 75% de K
+
+Conejos: $N_0=50,\ K=800,\ r=0.08$ mes$^{-1}$; $N=0.75K=600$.
+
+```{r, echo=FALSE}
+#| label: ej7
+N0 <- 50; 
+K <- 800; 
+r <- 0.08; 
+Nstar <- 0.75*K
+(1/r)*log(((K-N0)/N0)*(Nstar/(K-Nstar)))
+```
+**Resultado esperado:** $\approx\ 47.58$ unidades de tiempo.
+
+------------------------------------------------------------------------
+
+#### Ejemplo 7 — K reducida por degradación
+
+Aves: $K=1200 \Rightarrow K' = 840$ (reducción 30%), $N_0=200, r=0.06$
+año$^{-1}$.\
+
+**Tiempo hasta** $K'$: formalmente $N(t)\to K'$ asintóticamente; **no
+existe un tiempo finito** para “alcanzar exactamente” $K'$ (se aproxima
+cada vez más). En la práctica, se usa un umbral cercano, p.ej. **99%
+de** $K'$.
+
+```{r, echo=FALSE}
+#| label: ej8
+N0 <- 200; 
+Kp <- 840; 
+r <- 0.06;
+f <- 0.99; 
+Nstar <- f*Kp
+t_99 <- (1/r)*log(((Kp-N0)/N0)*(Nstar/(Kp-Nstar))); t_99
+```
+**Resultado esperado:** $\approx\ 96$ unidades de tiempo.
+
+------------------------------------------------------------------------
+
+#### Ejemplo 8 — Tamaño tras 24 h
+
+Bacterias: $r=0.07$ h$^{-1}$, $K=50000$, $N_0=1000$, $t=24$ h.
+
+```{r, echo=FALSE}
+#| label: ej9
+r <- 0.07; K <- 50000; N0 <- 1000; t <- 24
+K/(1 + ((K-N0)/N0)*exp(-r*t))
+```
+
+**Resultado esperado:** $\approx\ 4935$ bacterias.
+
+------------------------------------------------------------------------
+
+#### Ejemplo 9 — Equilibrio con $b'(N)$ y $d'(N)$
+
+$b' = 0.10 + 0.015N - 0.00015N^2$\
+$d' = 0.12 + 0.006N$\
+**Puntos de equilibrio:** resolver $b'(N)=d'(N)$.
+
+```{r, echo=FALSE}
+#| label: ej10
+b2 <- function(N) 0.10 + 0.015*N - 0.00015*N^2
+d2 <- function(N) 0.12 + 0.006*N
+f_eq <- function(N) b2(N) - d2(N)
+
+uniroot_all <- function(f, interval, n=2000){
+  xs <- seq(interval[1], interval[2], length.out = n)
+  ys <- f(xs)
+  sign_change <- which(diff(sign(ys)) != 0)
+  roots <- purrr::map_dbl(sign_change, ~uniroot(f, c(xs[.x], xs[.x+1]))$root)
+  unique(round(roots, 6))
+}
+roots <- uniroot_all(f_eq, c(0, 1000))
+roots
+```
+
+```{r, echo=FALSE}
+#| label: fig-c4-15
+#| fig-cap: "Intersección b'(N)=d'(N) define estados de equilibrio."
+#| fig-pos: 'H'
+
+# Tabla
+df <- tibble(N=seq(0, 300, by=1),
+             b=b2(N), d=d2(N))
+
+# Figura
+ggplot(df, aes(N)) + 
+  geom_line(aes(y=b, linetype="b'(N)"), linewidth=1.1) +
+  geom_line(aes(y=d, linetype="d'(N)"), linewidth=1.1) +
+  geom_vline(xintercept = roots, linetype=2) +
+  labs(y="Tasa específica (b' y d')", 
+       x="Tamaño de la población (N)",
+       linetype="", 
+       title="Equilibrios por intersección de tasas") +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+#### Ejemplo 10 — Tiempo para duplicar $N_0$
+
+Zorros: $r=0.05$ año$^{-1}$, $K=1000$, $N_0=200$. Hallar $t$ tal que
+$N(t)=2N_0=400$.
+
+```{r, echo=FALSE}
+#| label: ej11
+r <- 0.05; K <- 1000; N0 <- 200; Nstar <- 2*N0
+(1/r)*log(((K-N0)/N0)*(Nstar/(K-Nstar)))
+```
+
+**Resultado esperado:** $\approx 19.6$ años.
+
+------------------------------------------------------------------------
+
+#### Ejemplo 11 — Tasa $dN/dt$ en $t=10$ d
+
+Algas: $r=0.09$ día$^{-1}$, $K=10000$, $N_0=500$.\
+1) Calcular $N(10)$ y 2) Evaluar $dN/dt$ en ese $N(10)$.
+
+```{r, echo=FALSE}
+#| label: ej12
+r <- 0.09; 
+K <- 10000; 
+N0 <- 500; 
+t <- 10
+N10 <- K/(1 + ((K-N0)/N0)*exp(-r*t))
+dNdt_10 <- r*N10*(1 - N10/K)
+N10; dNdt_10
+```
+**Resultado esperado:** $\approx 1146$ algas con un aumento $\approx 91.3$ algas/tiempo.
+
+------------------------------------------------------------------------
+
+\newpage
+
+### Cuestionario
+
+#### 1. Preguntas teóricas
+
+1.  Explique la diferencia conceptual entre crecimiento exponencial y
+    crecimiento logístico en poblaciones.
+
+2.  ¿Qué representa la capacidad de carga (K) y por qué no debe
+    interpretarse como un valor fijo inmutable en ecología?\
+
+3.  Interprete el significado ecológico del punto de inflexión en la
+    curva logística.
+
+4.  Demuestre por qué la velocidad máxima de crecimiento ocurre en
+    $N=K/2$.
+
+5.  ¿Cuál es la forma de la función $dN/dt$ en relación con $N$ y qué
+    nos indica su carácter parabólico?
+
+6.  Explique cómo se calcula el tiempo necesario para que una población
+    alcance un porcentaje específico de $K$ (ej. 80%).
+
+7.  ¿Por qué el modelo logístico describe mejor poblaciones en ambientes
+    con recursos limitados que el modelo exponencial?
+
+8.  Mencione un ejemplo ecológico donde el modelo logístico es más
+    realista que el exponencial, y justifique su elección.
+
+9.  ¿Por qué el tamaño poblacional no llega a K en tiempo finito sino
+    que se aproxima asintóticamente?
+
+10. Realice un mini-experimento numérico: simule con R el crecimiento
+    logístico de una población con $N_0=50$, $K=1000$ y $r=0.2$, y
+    modifique el valor de $r$ para observar los cambios en la curva.
+
+------------------------------------------------------------------------
+
+#### 2. Preguntas de cálculo y gráficas
+
+1.  Una población de bacterias sigue un modelo logístico con $N_0=500$,
+    $K=10000$ y $r=0.05$ h⁻¹.\
+
+<!-- -->
+
+(1) Calcule el tamaño poblacional en $t=50$ horas.\
+(2) Grafique la proyección logística de la población en los primeros 100
+    periodos de tiempo\
+
+<!-- -->
+
+2.  Una población de plantas crece según la ecuación logística con
+    $N_0=100$, $K=400$, $r=0.02$ día⁻¹.\
+
+<!-- -->
+
+(1) ¿Cuántas plantas habrá después de 6 meses?\
+(2) Grafique la proyección de $N(t)$ durante 180 días.\
+
+<!-- -->
+
+3.  Una población de ratones inicia con $N_0=50$, capacidad de carga
+    $K=500$ y $r=0.1$ semana⁻¹.\
+
+<!-- -->
+
+(1) ¿Cuántas semanas necesita la población para llegar al 80% de $K$?\
+(2) Grafique $N(t)$ y marque en la curva el valor $N=0.8K$.\
+
+<!-- -->
+
+4.  Una población de conejos crece de manera logística con $N_0=50$,
+    $K=800$ y $r=0.08$ mes⁻¹.\
+
+<!-- -->
+
+(1) ¿En cuántos meses alcanzará el 75% de $K$?\
+(2) Grafique la proyección logística durante 100 meses.\
+
+------------------------------------------------------------------------
+
+#### 3. Preguntas de cálculo (logístico)
+
+5.  Una población de hongos inicia con $N_0=200$, $K=5000$ y $r=0.04$
+    día⁻¹. ¿Cuál es la tasa inicial de crecimiento $dN/dt$?
+
+6.  Una colonia bacteriana tiene $N_0=1000$, $K=50000$, $r=0.07$ h⁻¹.
+    Calcule $N(24)$.
+
+7.  Una población de peces inicia con $N_0=150$, $K=3000$, $r=0.03$
+    mes⁻¹. Determine el tamaño poblacional después de 1 año.
+
+8.  En un ecosistema, $K=1200$ aves se reduce un 30% por pérdida de
+    hábitat. Si $N_0=200$, $r=0.06$ año⁻¹:\
+
+(1) Determine la nueva capacidad de carga $K’$.\
+(2) Calcule el tiempo para alcanzar el 99% de $K’$.
+
+<!-- -->
+
+9.  Una población de zorros sigue $N_0=200$, $K=1000$, $r=0.05$ año⁻¹.
+    ¿Cuánto tiempo tardará en duplicar su tamaño inicial?
+
+10. Una población de algas inicia con $N_0=500$, $K=10000$, $r=0.09$
+    día⁻¹. Calcule $N(10)$ y la tasa $dN/dt$ en ese tiempo.
+
+11. Una población de aves comienza con $N_0=50$, $K=2000$, $r=0.04$
+    año⁻¹. Determine el tiempo requerido para alcanzar el 90% de la
+    capacidad de carga.
+
+12. Una población de invertebrados tiene $K=500$, $r=0.15$ mes⁻¹ y
+    $N_0=10$.\
+
+(a) Calcule $N(12)$.\
+(b) Determine el tiempo en que alcanza $N=250$.\
+
+<!-- -->
+
+13. Una población de microbios en laboratorio inicia con $N_0=300$,
+    capacidad de carga $K=1200$ y $r=0.25$ día⁻¹.\
+
+(1) Determine la tasa de crecimiento máxima posible.\
+(2) Grafique la función $dN/dt$ en función de $N$ y localice el máximo.\
+
+<!-- -->
+
+14. Una población silvestre crece con $N_0=30$, $K=600$, $r=0.12$ mes⁻¹.
+    ¿Qué tamaño poblacional tendrá en 20 meses?
+
+15. Una colonia de ranas se modela logísticamente con $N_0=80$,
+    $K=2000$, $r=0.1$ mes⁻¹. Determine el tiempo necesario para alcanzar
+    $N=1000$.
+
+16. Una población de virus en un cultivo sigue un modelo logístico. En
+    24 h pasa de $N_0=10^3$ a $N_{24}=10^9$ y la capacidad de carga
+    estimada es $K=2\\times10^9$.\
+
+a)  Estime $r$.\
+b)  Calcule el tiempo de duplicación instantáneo en $t=0$ usando
+    $T_d \\approx \\dfrac{\\ln 2}{r(1-N_0/K)}$. Discuta la diferencia
+    con el exponencial.\
+
+<!-- -->
+
+17. Una población endémica de mariposas decrece logísticamente por
+    pérdida de hábitat: $K=150$ g de biomasa estable. Si $N_0=127$ g y
+    $r=-0.125\\,año^{-1}$, proyecte la biomasa a 6 años.
+
+18. La población de EE.UU. alcanzó $200$ millones en 1967 y $303$
+    millones en 2007. Suponga $K=450$ millones.\
+
+a)  Estime $r$ con la solución logística.\
+b)  Proyecte $N(2027)$. Compare con el exponencial y discuta la
+    diferencia cerca de $K$.\
+
+<!-- -->
+
+19. Elefantes: $N_0=800$, $r=0.02\\,año^{-1}$, $K=5000$.\
+
+a)  ¿En cuántos años alcanzan el triple de $N_0$ (2400)?\
+b)  ¿Qué ocurriría si el “triple” excediera $K$?\
+
+<!-- -->
+
+20. Mundo 2023: $N_0=8.1$ billones. Escenarios 2050:\
+
+-   Bajo: $7.3$ (con $K=7.5$)\
+-   Alto: $10.7$ (con $K=11.5$)\
+    Para $t=27$ años: estime $r$ en cada escenario y compare con la tasa
+    exponencial.\
+
+21. Con $r=0.028\\,año^{-1}$ y $N_0=2$, $K=12\\times10^9$:\
+
+a)  ¿En cuánto tiempo se alcanza el 99% de $10\\times10^9$?\
+b)  ¿Cuál es el tiempo de duplicación en $t=0$ y cómo cambia cerca de
+    $N=K/2$?\
+
+<!-- -->
+
+22. Se esperaba que la población humana doblara en \~50 años. Suponga
+    $K=15$ billones y $N_{1993}=5.4$ billones.\
+
+a)  Encuentre $r$ tal que $N(1993+50)\\approx 2N_{1993}$.\
+b)  Proyecte $N(2030)$ y compare con el exponencial.\
+
+<!-- -->
+
+27. Escarabajos: $N_0=3000$. En 1 mes hubo 400 nacimientos y 150 muertes
+    (saldo +250). Suponga $K=6000$.\
+
+a)  Estime $r$ a partir de $dN/dt\\approx rN_0(1-N_0/K)\\approx B-D$.\
+b)  Proyecte $N$ a 6 meses con la solución logística.\
+
+<!-- -->
+
+23. Orquídeas: $b'=0.0021$, $d'=0.0020$, $N_0=40$. Un centro comercial
+    reduce $K$ de 400 a 120.\
+    Explique cómo la reducción de $K$ afecta la probabilidad de
+    extinción bajo logística.\
+
+24. *E. coli*: $N_0=10^3$ a $N_6=2\\times10^9$ en 6 h, con
+    $K=3\\times10^9$.\
+
+a)  Estime $r$.\
+b)  Compare el número de duplicaciones esperadas en 6 h bajo logística
+    vs. exponencial.\
+
+<!-- -->
+
+25. Invasora vegetal bajo control: decrece 3% anual; $N_0=5000$,
+    $K=6000$.\
+
+a)  Proyecte $N(20)$.\
+b)  ¿Cuánto tiempo para llegar a la mitad de $N_0$?\
+
+<!-- -->
+
+26. Una colonia bacteriana se duplica cada 4 h cuando $N\\ll K$. Si
+    $K=10^9$, $N_0=10^5$:\
+
+a)  Estime $r$ local con $T_d=\\ln2/[r(1-N_0/K)]$.\
+b)  ¿Cuánto tiempo para llegar a $10N_0$?\
+
+<!-- -->
+
+27. Conejos: de 250 a 800 en 12 meses, con $K=3000$.\
+
+a)  Estime $r$.\
+b)  Proyecte $N(24)$ y compare con el exponencial.\
+
+<!-- -->
+
+28. Cultivo celular: 10 000 → 25 000 en 48 h; $K=60 000$.\
+
+a)  Estime $r$.\
+b)  Estime $N(72)$. ¿Ya se nota desaceleración?\
+
+<!-- -->
+
+29. Algas: en 30 días la población se triplica ($N_{30}=3N_0$),
+    $K=12N_0$.\
+
+a)  Estime $r$.\
+b)  ¿En cuántos días se cuadruplica ($4N_0$)?
+
+<!-- -->
+
+30. Bacterias: crecen 25% cada 2 h cuando $N\\ll K$. Si $N_0=800$,
+    $K=2\\times10^6$:\
+
+a)  Estime $r$.\
+b)  Proyecte $N(10\\,h)$ con logística y compare con el exponencial.\
+
+------------------------------------------------------------------------
+
+\newpage
+
+### Errores comunes e interpretación
+
+#### 1) Interpretar el crecimiento exponencial como “ilimitado” en la naturaleza
+
+Un error común es asumir que una población puede crecer indefinidamente
+bajo un patrón exponencial. En realidad, el crecimiento exponencial
+suele describir **fases tempranas** (colonización, recuperación inicial,
+brotes), mientras que en el mediano plazo emergen límites por recursos,
+densidad, depredación o enfermedades. Por ello, el exponencial debe
+entenderse como un **modelo ideal** o de “ventana temporal” corta.
+
+#### 2) Confundir r y $\lambda$ (continuo vs. discreto)
+
+Otra confusión frecuente es intercambiar $r$ (tasa instantánea continua)
+y $\lambda$ (tasa finita por intervalo). Son equivalentes solo si se
+convierte correctamente:\
+$$
+\lambda = e^{r} \qquad \Longleftrightarrow \qquad r = \ln(\lambda)
+$$
+No convertirlos produce proyecciones erróneas, especialmente cuando se
+mezclan porcentajes anuales con intervalos discretos o con
+“generaciones”.
+
+#### 3) Usar escalas gráficas que distorsionan la comparación
+
+Comparar escenarios en distintas escalas (o sin justificar
+transformaciones) puede exagerar o esconder diferencias reales. En
+crecimiento exponencial, la **escala logarítmica** es particularmente
+útil porque linealiza el patrón y hace comparable la pendiente asociada
+a $r$ (o $ln(\lambda)$) (@fig-c4-17).
+
+```{r, echo=FALSE, fig.height=4}
+#| label: fig-c4-17
+#| fig-cap: "La escala log linealiza el crecimiento exponencial; útil para comparar pendientes (r o log(lambda))."
+#| fig-pos: 'H'
+
+N0 <- 15; 
+r <- 0.25; 
+t <- seq(0, 20, by=0.5)
+datos_log <- tibble(t, N = N0*exp(r*t))
+
+# Figura
+ggplot(datos_log, aes(t, N)) +
+  geom_line() +
+  scale_y_log10() +
+  labs(title = "Escala logarítmica", 
+       x="Tiempo (t)", y="Densidad [N (log10)]") +
+  theme_bw()
+```
+
+#### 4) Suponer que se “alcanza” exactamente $K$ en tiempo finito
+
+En el modelo logístico\index{Modelo!logístico}, $N(t)$ se aproxima a $K$
+**asintóticamente**, por lo que no existe un tiempo finito para “llegar
+exactamente” a $K$. En aplicaciones reales se emplean **umbrales prácticos** (p.ej., 95%–99% de $K$).
+
+```{r, echo=FALSE}
+#| label: fig-c4-16
+#| fig-cap: "Tiempo para distintos umbrales de K (95%, 99%) con N0=50, K=1000, r=0.2."
+#| fig-pos: 'H'
+
+N0 <- 50; 
+K <- 1000; 
+r <- 0.2
+f <- c(0.95, 0.99)
+t_f <- (1/r)*log(((K-N0)/N0)*(f/(1-f)))
+tibble(Umbral=f, Tiempo=t_f) %>% 
+  kbl(booktabs  = TRUE, digits = 2,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+#### 5) Confundir “máximo crecimiento” con $N$ alto
+
+En logística, el máximo crecimiento absoluto ocurre en:
+
+$$
+N=\frac{K}{2}, \qquad \left(\frac{dN}{dt}\right)_{\max} = \frac{rK}{4}
+$$
+
+Por ello, cuando $N \approx K$, el crecimiento **no es máximo**:
+tiende a cero. Ecológicamente, esto significa que cerca de $K$ dominan
+procesos reguladores (competencia, limitación, etc.).
+
+#### 6) Inconsistencia de unidades ($r$, $t$ y datos)
+
+Un error clásico es mezclar $r$ en “$año^{−1}$” con $t$ en días/meses
+o con datos en intervalos distintos. La consistencia de unidades es
+obligatoria: **si cambia la unidad de tiempo,** $r$ debe cambiar
+también.
+
+------------------------------------------------------------------------
+
+### Aplicaciones ecológicas y ambientales
+
+Los modelos exponencial y logístico se usan como herramientas de
+interpretación y predicción, con alcances distintos:
+
+-   **Restauración ecológica y manejo**: permiten proyectar recuperación
+    de poblaciones tras mejorar hábitat (aumento de $K$) o reducir
+    mortalidad (aumento de $r$).
+
+-   **Invasiones biológicas**: el crecimiento suele ser exponencial al
+    inicio, pero se desacelera hacia un patrón logístico al aparecer
+    límites (recursos/espacio/competencia).
+
+-   **Pesquerías y recursos renovables**: el rendimiento máximo
+    sostenible se relaciona con la región alrededor de $K/2$, donde
+    la tasa absoluta de crecimiento es máxima.
+
+-   **Epidemiología simple**: fenómenos análogos de saturación ocurren
+    cuando hay susceptibles finitos (dinámicas tipo logísticas como
+    aproximación).
+
+-   **Conservación**: modelar trayectorias con umbrales (p.ej., 90%–95%
+    de $K$) ayuda a definir metas realistas y evaluables en planes de
+    manejo.
+
+------------------------------------------------------------------------
+
+### Transición hacia capítulos posteriores
+
+#### Transición al Capítulo 5 (tablas de vida y modelos matriciales).
+
+En este capítulo se introdujeron los parámetros $r$ (tiempo continuo) y **lambda** (tiempo discreto) como descriptores globales del cambio poblacional. En el Capítulo 5 se amplía esta idea incorporando **estructura** (por edad o por estados), donde la dinámica deja de depender solo de N(t) y pasa a depender de **vectores poblacionales** y **matrices de transición**. Allí, **lambda** emerge naturalmente como el **autovalor dominante** de la matriz (tasa finita asintótica), y se conecta con el enfoque continuo mediante **r = ln(lambda)**. De esta forma, los modelos exponencial/logístico funcionan como el “caso base” que facilita interpretar los resultados de modelos matriciales más realistas.
+
+#### Transición al Capítulo 6 (patrones de distribución de poblaciones).
+Finalmente, los parámetros de crecimiento y regulación (r, K, lambda) no solo determinan cuánto cambia una población, sino que también influyen en **cómo se distribuye en el espacio:** dispersión, agregación, metapoblaciones y disponibilidad espacial de recursos afectan tanto la trayectoria N(t) como el valor efectivo de K y la supervivencia/reclutamiento. El Capítulo 6 conectará la dinámica temporal con patrones espaciales, mostrando que la población no solo “crece”, sino que **se organiza** en el territorio bajo restricciones ambientales y ecológicas.
+
+
+-------------------------------------
+
+\newpage
+
+## Conclusiones
+
+El modelo exponencial\index{Modelo!exponencial} constituye un **punto de partida** fundamental:
+describe crecimiento o decrecimiento bajo tasa per cápita constante y es
+especialmente útil en fases tempranas o en ventanas temporales cortas.
+Sin embargo, su principal limitación ecológica es la ausencia de
+regulación por densidad y recursos.
+
+El modelo logístico\index{Modelo!logístico} introduce realismo al incorporar densodependencia
+mediante $K$, permitiendo explicar **desaceleración**,
+**estabilización** y el punto de máxima velocidad en $N=K/2$.
+Didácticamente, el capítulo muestra que el valor de estos modelos no
+está en “predecir con exactitud”, sino en **conectar parámetros (**$r$,
+$\lambda$, $K$, $N_0$) con procesos ecológicos, evaluar escenarios y
+orientar decisiones aplicadas (manejo, conservación y restauración) con
+metas operativas (umbrales cercanos a $K$) en horizontes temporales realistas.
+
+
+------------------------------------------------------------------------
+
+\newpage
+
+
+

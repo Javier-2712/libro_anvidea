@@ -1,0 +1,257 @@
+
+## Caso guiado: Distribución y densidad con parches de *Calotropis procera*
+
+
+### Preparación de los datos
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#| label: setup2
+#| include: false
+
+suppressPackageStartupMessages({
+  library(readxl); 
+  library(dplyr); 
+  library(tidyr)
+  library(ggplot2); 
+  library(kableExtra); 
+  library(stringr)
+})
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-c6-2
+#| tbl-cap: "Estimadores descriptivos de la muestra evaluada"
+
+#| label: carga-datos
+# Cargar la base de datos
+datos <- read_xlsx("datos.c6.xlsx", sheet = "poisson")
+
+# Se usa la columna de conteos por cuadrícula
+# (en el archivo proporcionado se llama 'Individuos')
+conteos <- 
+  datos %>% 
+  dplyr::rename(x = Individuos) %>% 
+  dplyr::mutate(x = as.integer(x)) %>% 
+  dplyr::pull(x)
+
+# Estimadores descriptivos
+n  <- length(conteos)
+N  <- sum(conteos)
+mu <- mean(conteos)         # µ estimado
+s2 <- stats::var(conteos)   # varianza muestral
+
+# Elaboración de la tabla resumen
+resumen <- tibble::tibble(
+  `n (cuadrículas)` = n,
+  `N (individuos)`  = N,
+  `µ (media)`       = mu,
+  `s^2 (varianza)`   = s2
+)
+resumen %>% 
+  kbl(booktabs  = TRUE,
+      digits = c(0,0,2,2),
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+ 
+```
+
+
+
+### *B. Estimación ecológica de la densidad de la población*
+
+
+#### 1.) Método de Holtage (con puntos de intersección al azar)
+
+##### Paso 1. Cargar las librerías requeridas
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: setup_c6
+#
+suppressPackageStartupMessages({
+  library(readxl)
+  library(dplyr)
+  library(tidyr)
+  library(stringr)
+  library(kableExtra)
+  library(ggplot2)
+})
+
+```
+
+##### Paso 2. Lectura de la base de datos para calcular IH
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-c6-8
+#| tbl-cap: "Vista previa — Densidad por puntos aleatorios de intersección"
+
+datos1 <- read_xlsx("datos.c6.xlsx", sheet = "densidad1")
+
+head(datos1, 4) %>% 
+  kbl(booktabs  = TRUE, digits = 3,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+##### Paso 3. Cálculo de IH en metros cuadrados (m2) y en hectáreas (ha)
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-c6-9
+#| tbl-cap: "Holtage — Densidad estimada por distancias (IH)"
+
+# Cálculo de Holtage (IH) a partir de chi^2 en metros cuadrados
+res_ih <- 
+  datos1 %>%
+  rename_with(tolower) %>%
+  transmute(x2_m = as.numeric(x2_m)) %>%
+  filter(!is.na(x2_m), x2_m > 0) %>%
+  summarise(
+    n_puntos   = n(),
+    sum_x2_m2  = sum(x2_m),
+    D_Ht_m2    = n_puntos / (pi * sum_x2_m2),
+    D_Ht_ha    = D_Ht_m2 * 10000
+  )
+
+#
+res_ih %>%
+  kbl(booktabs  = TRUE,
+      digits = c(0, 3, 6, 0),
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+##### Paso 4. Visualización de las frecuencias observadas
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: fig-c6-5
+#| fig-cap: "Distribución de distancias usadas en IH (Holtage)"
+#| fig-pos: 'H'
+
+# Chequeo visual simple (opcional y didáctico)
+ggplot(datos1, aes(x = sqrt(x2_m))) +
+  geom_histogram(bins = 20, fill = "skyblue", color = "white") +
+  geom_vline(aes(xintercept = mean(sqrt(x2_m), na.rm = TRUE)), 
+             linetype = 2, color = "red") +
+  labs(x = "Distancia al 1er individuo, xᵢ (m)",
+       y = "Frecuencia",
+       title = "") +
+  theme_bw()
+
+```
+
+------------------------------------------------------------------------
+
+#### 2.) Índices de King y de Hayne (con transecto diagonal)
+
+##### Paso 1. Leer las dos bases de datos
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-c6-10
+#| tbl-cap: "Vista previa — Densidad por puntos en transecto diagonal"
+
+# 1) Leer y previsualizar
+datos2 <- read_xlsx("datos.c6.xlsx", sheet = "densidad2")
+
+head(datos2, 4) %>%
+  kbl(booktabs  = TRUE, digits = 3,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+
+```
+
+##### Paso 2. Cálculos de los índices King y Hayne.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-c6-11
+#| tbl-cap: "Índices de King y Hayne — Densidad estimada por puntos aleatorios en la parcela evaluada"
+
+# 2) Cálculo mínimo (King y Hayne)
+d2 <- 
+  datos2 %>% 
+  dplyr::rename_with(tolower)
+
+L <- 28.284271  # Hipotenusa (L) tomada de tu hoja de resultados
+
+d <- d2 %>% 
+  transmute(
+    di    = as.numeric(di_m),
+    invdi = as.numeric(`1/di`)
+  ) %>% 
+  filter(is.finite(di), di > 0, is.finite(invdi))   # excluir d_i <= 0
+
+n       <- nrow(d)
+sum_di  <- sum(d$di)
+sum_inv <- sum(d$invdi)
+
+res <- tibble::tibble(
+  `L (m)`              = L,
+  `n (puntos)`         = n,
+  `∑ d_i (m)`          = sum_di,
+  `∑ (1/d_i) (m⁻¹)`    = sum_inv,
+  `King D (ind·m⁻^2)`   = (n^2) / (2 * L * sum_di),
+  `King D (ind·ha⁻¹)`  = ((n^2) / (2 * L * sum_di)) * 10000,
+  `Hayne D (ind·m⁻^2)`  =  sum_inv / (2 * L),
+  `Hayne D (ind·ha⁻¹)` = (sum_inv / (2 * L)) * 10000
+)
+
+res %>%
+  kbl(booktabs  = TRUE,
+      digits = c(2,0,3,3,3,0,2,0)) %>% 
+  kable_classic(full_width = FALSE) %>% 
+  kable_styling(
+    full_width = FALSE,
+    font_size  = 10,
+    latex_options = c("repeat_header")  # ok con longtable
+  )
+```
+
+------------------------------------------------------------------------
+
+##### Paso 3. Visualización de las frecuencias observadas
+
+```{r, message=FALSE, warning=FALSE}
+#| label: fig-c6-6
+#| fig-cap: "Distribución de dᵢ (m) — método King"
+#| fig-pos: 'H'
+
+# Partimos de la misma lectura que ya tienes:
+# datos2 <- read_xlsx("datos.c6.xlsx", sheet = "densidad2")
+
+# Preparar datos (usa tus nombres reales: di_m y `1/di`)
+d <- datos2 %>% 
+  dplyr::rename_with(tolower) %>% 
+  dplyr::transmute(
+    di    = as.numeric(di_m),
+    invdi = as.numeric(`1/di`)
+  ) %>% 
+  dplyr::filter(is.finite(di), di > 0, is.finite(invdi))
+
+# --- Gráfico 1: KING (distribución de d_i)
+ggplot(d, aes(x = di)) +
+  geom_histogram(bins = 20, fill = "skyblue", color = "white") +
+  geom_vline(aes(xintercept = mean(di, na.rm = TRUE)),
+             linetype = 2, color = "red") +
+  labs(x = "Distancia perpendicular, dᵢ (m)",
+       y = "Frecuencia",
+       title = "") +
+  theme_bw()
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: fig-c6-7
+#| fig-cap: "Distribución de 1/dᵢ (m^-1) - método Hayn"
+#| fig-pos: 'H'
+
+# --- Gráfico 2: HAYNE (distribución de 1/d_i)
+ggplot(d, aes(x = invdi)) +
+  geom_histogram(bins = 20, fill = "skyblue", color = "white") +
+  geom_vline(xintercept = mean(d$invdi, na.rm = TRUE),
+             linetype = 2, color = "red") +
+  labs(
+    x = "Distancia perpendicular, 1/dᵢ (m^-1)",
+    y = "Frecuencia",
+    title = "e"
+  ) +
+  theme_bw()  # <- sin base_family
+```
+
+

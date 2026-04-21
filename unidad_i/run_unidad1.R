@@ -1,92 +1,96 @@
 # =========================================================
 # ANVIDEA - Unidad I
 # Archivo: run_unidad1.R
-# Propósito: ejecutar de forma secuencial los capítulos 1, 2 y 3
+# Propósito: ejecutar secuencialmente los capítulos 1, 2 y 3
+#            desde la raíz de la Unidad I
+# Uso: source("run_unidad1.R")  desde la carpeta unidad_i/
 # =========================================================
 
 cat("========================================\n")
 cat("ANVIDEA - Unidad I\n")
 cat("Análisis de datos ecológicos\n")
 cat("========================================\n")
+cat("Este script ejecutará automáticamente los capítulos 1, 2 y 3.\n")
+cat("Las salidas se guardarán en las carpetas outputs/ de cada capítulo.\n\n")
 
 # ---------------------------------------------------------
-# Verificar estructura general
+# Verificar que se ejecuta desde la raíz de la unidad
 # ---------------------------------------------------------
 
-rutas_requeridas <- c(
-  "cap1-datos/R/00_setup.R",
-  "cap1-datos/R/03_funciones_auxiliares.R",
-  "cap1-datos/R/01_casoA_mesozooplancton.R",
-  "cap1-datos/R/02_casoB_macroinvertebrados.R",
-  "cap2-visualizacion-exploratoria/R/00_setup.R",
-  "cap2-visualizacion-exploratoria/R/03_funciones_auxiliares.R",
-  "cap2-visualizacion-exploratoria/R/01_casoA_plancton_exploracion.R",
-  "cap2-visualizacion-exploratoria/R/02_casoB_macroinvertebrados_exploracion.R",
-  "cap3-clima/R/00_setup.R",
-  "cap3-clima/R/03_funciones_auxiliares.R",
-  "cap3-clima/R/01_casoA_series_climaticas.R",
-  "cap3-clima/R/02_casoB_climatogramas_balance_hidrico.R"
-)
-
-faltantes <- rutas_requeridas[!file.exists(rutas_requeridas)]
-
-if (length(faltantes) > 0) {
+if (!dir.exists("cap1-datos") ||
+    !dir.exists("cap2-visualizacion-exploratoria") ||
+    !dir.exists("cap3-clima")) {
   stop(
-    "No se encontraron los siguientes archivos requeridos:\n",
-    paste(faltantes, collapse = "\n")
+    "Ejecute run_unidad1.R desde la carpeta unidad_i/.\n",
+    "Debe contener las subcarpetas cap1-datos/, cap2-visualizacion-exploratoria/ y cap3-clima/."
   )
 }
 
-# ---------------------------------------------------------
-# Capítulo 1 - Manipulación de datos
-# ---------------------------------------------------------
-
-cat("\n----------------------------------------\n")
-cat("Ejecutando Capítulo 1 - Manipulación de datos\n")
-cat("----------------------------------------\n")
-
-source("cap1-datos/R/00_setup.R")
-source("cap1-datos/R/03_funciones_auxiliares.R")
-source("cap1-datos/R/01_casoA_mesozooplancton.R")
-source("cap1-datos/R/02_casoB_macroinvertebrados.R")
-
-cat("Capítulo 1 completado.\n")
+unidad_dir <- getwd()
 
 # ---------------------------------------------------------
-# Capítulo 2 - Visualización exploratoria
+# Función auxiliar: cambiar al capítulo y ejecutar run_capX.R
 # ---------------------------------------------------------
 
-cat("\n----------------------------------------\n")
-cat("Ejecutando Capítulo 2 - Visualización exploratoria\n")
-cat("----------------------------------------\n")
+ejecutar_capitulo <- function(capitulo_rel, titulo) {
+  capitulo_dir <- file.path(unidad_dir, capitulo_rel)
 
-source("cap2-visualizacion-exploratoria/R/00_setup.R")
-source("cap2-visualizacion-exploratoria/R/03_funciones_auxiliares.R")
-source("cap2-visualizacion-exploratoria/R/01_casoA_plancton_exploracion.R")
-source("cap2-visualizacion-exploratoria/R/02_casoB_macroinvertebrados_exploracion.R")
+  if (!dir.exists(capitulo_dir)) {
+    stop("No se encontró la carpeta del capítulo: ", capitulo_dir)
+  }
 
-cat("Capítulo 2 completado.\n")
+  run_script <- file.path(capitulo_dir, paste0("run_", basename(capitulo_rel), ".R"))
+
+  # Intentar detectar el run_*.R si el nombre no coincide exactamente
+  if (!file.exists(run_script)) {
+    candidates <- list.files(capitulo_dir, pattern = "^run_cap.*\\.R$", full.names = TRUE)
+    if (length(candidates) == 0) {
+      stop("No se encontró run_cap*.R en: ", capitulo_dir)
+    }
+    run_script <- candidates[1]
+  }
+
+  old_wd <- getwd()
+  setwd(capitulo_dir)
+  on.exit(setwd(old_wd), add = TRUE)
+
+  cat("\n----------------------------------------\n")
+  cat("Ejecutando ", titulo, "\n", sep = "")
+  cat("----------------------------------------\n")
+
+  source(basename(run_script), local = FALSE, echo = FALSE)
+
+  cat(titulo, " completado.\n", sep = "")
+}
 
 # ---------------------------------------------------------
-# Capítulo 3 - Análisis climático
+# Capítulo 1 — Fundamentos de manipulación de datos
 # ---------------------------------------------------------
 
-cat("\n----------------------------------------\n")
-cat("Ejecutando Capítulo 3 - Análisis climático\n")
-cat("----------------------------------------\n")
-
-source("cap3-clima/R/00_setup.R")
-source("cap3-clima/R/03_funciones_auxiliares.R")
-source("cap3-clima/R/01_casoA_series_climaticas.R")
-source("cap3-clima/R/02_casoB_climatogramas_balance_hidrico.R")
-
-cat("Capítulo 3 completado.\n")
+tryCatch(
+  ejecutar_capitulo("cap1-datos", "Capítulo 1 - Manipulación de datos"),
+  error = function(e) stop("Error en Capítulo 1: ", e$message)
+)
 
 # ---------------------------------------------------------
-# Fin de la Unidad I
+# Capítulo 2 — Visualización exploratoria
 # ---------------------------------------------------------
+
+tryCatch(
+  ejecutar_capitulo("cap2-visualizacion-exploratoria", "Capítulo 2 - Visualización exploratoria"),
+  error = function(e) stop("Error en Capítulo 2: ", e$message)
+)
+
+# ---------------------------------------------------------
+# Capítulo 3 — Análisis climático
+# ---------------------------------------------------------
+
+tryCatch(
+  ejecutar_capitulo("cap3-clima", "Capítulo 3 - Análisis climático"),
+  error = function(e) stop("Error en Capítulo 3: ", e$message)
+)
 
 cat("\n========================================\n")
-cat("Unidad I ejecutada correctamente\n")
-cat("Revise las salidas en las carpetas outputs/ de cada capítulo.\n")
+cat("Unidad I ejecutada correctamente.\n")
+cat("Revise las salidas en outputs/ de cada capítulo.\n")
 cat("========================================\n")

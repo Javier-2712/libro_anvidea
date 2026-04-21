@@ -1,0 +1,2359 @@
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| out-width: "0.9\\linewidth"
+#| fig-align: center
+#| fig-pos: 'H'
+knitr::include_graphics("portada.distrib.png")
+```
+
+::: {.callout-tip}
+## Lo que desarrolla este capítulo
+
+Se examina **cómo la distribución espacial y la densidad permiten interpretar la organización de las poblaciones en el espacio**. A diferencia del capítulo anterior, aquí el énfasis no está en la estructura temporal, sino en **la disposición de los individuos en el ambiente y su estimación cuantitativa**. El capítulo avanza en cinco pasos:
+
+**(1) Distinguir densidad absoluta y densidad relativa**, reconociendo su utilidad en estudios poblacionales y comparativos.
+
+**(2) Identificar patrones espaciales** aleatorios, agrupados y uniformes, vinculándolos con procesos ecológicos como heterogeneidad ambiental, competencia o dispersión limitada.
+
+**(3) Evaluar hipótesis de distribución espacial** mediante los modelos de **Poisson** y **Binomial Negativa**, apoyados en pruebas de bondad de ajuste.
+
+**(4) Calcular índices de dispersión** como $ID$, $IC$, $IH$, $m^*$, $I_c^{Lloyd}$ e $I_M$, para fortalecer la interpretación del patrón espacial.
+
+**(5) Estimar densidad poblacional** con métodos basados en distancias, como **Holgate, King y Hayne**, comparando sus resultados en términos ecológicos.
+
+Así, el capítulo conecta la **ecología espacial descriptiva** con el **análisis cuantitativo reproducible** para interpretar patrones de distribución y estimar densidades poblacionales.
+:::
+
+
+\newpage
+
+## Introducción
+
+El análisis de poblaciones naturales descansa sobre dos interrogantes
+fundamentales: **¿cuántos individuos existen?** y **¿cómo están
+dispuestos en el espacio?** Estas preguntas, planteadas de manera
+sistemática en la ecología cuantitativa por [Charles J.
+Krebs]{.underline} (1998) [@krebs1989ecological], constituyen el eje sobre el cual se
+estructura el estudio de la dinámica poblacional, la regulación
+densodependiente y las interacciones intra e interespecíficas.
+
+La estimación del número de individuos puede abordarse desde la
+**densidad absoluta**, entendida como el número de organismos por unidad
+de área o volumen, o desde la **densidad relativa**, que expresa la
+abundancia de una población en relación con otra o con alguna medida
+estandarizada del muestreo. La densidad absoluta resulta esencial cuando
+se requiere estimar parámetros demográficos, tasas vitales o balances
+energéticos; en contraste, la densidad relativa se emplea con frecuencia
+en estudios comparativos de comunidades o gradientes ambientales debido
+a su eficiencia operativa.
+
+Sin embargo, conocer la densidad no es suficiente. Dos poblaciones con
+igual número de individuos pueden presentar configuraciones espaciales
+radicalmente distintas. Una puede distribuirse homogéneamente en el
+ambiente, otra concentrarse en parches asociados a microhábitats
+favorables, y una tercera exhibir una separación regular inducida por
+competencia intensa o territorialidad. La disposición espacial refleja,
+por tanto, procesos ecológicos subyacentes.
+
+Desde los trabajos pioneros de [Ward Clyde Allee]{.underline} [@allee1949principles] y
+colaboradores (1949), se reconoció que la **distribución 
+agregada\index{Distribución!agregada} o
+contagiosa es la condición más frecuente en la naturaleza**. La
+agregación puede originarse por heterogeneidad ambiental, limitación de
+recursos, comportamiento social, reproducción clonal, dispersión
+limitada o procesos históricos del hábitat. En contraste, la
+distribución uniforme\index{Distribución!uniforme} suele asociarse con mecanismos de exclusión o
+interacciones negativas entre individuos.
+
+En campo, pueden presentarse dos escenarios metodológicos. El primero,
+ideal pero poco frecuente, consiste en disponer de un **mapeo completo**
+de la población, permitiendo aplicar modelos espaciales precisos. El
+segundo, más común en estudios reales, implica trabajar con muestras
+parciales (cuadrantes, subparcelas, transectos), a partir de las cuales
+se infiere el patrón espacial mediante herramientas estadísticas.
+
+Este capítulo articula teoría ecológica clásica con procedimientos
+cuantitativos robustos para identificar patrones de distribución
+aleatoria, agrupada o uniforme, y para estimar la densidad poblacional
+mediante métodos directos e indirectos basados en distancias. El enfoque
+integra modelos probabilísticos, pruebas de bondad de ajuste e índices
+de dispersión, manteniendo coherencia entre interpretación ecológica y
+análisis matemático.
+
+------------------------------------------------------------------------
+
+## Objetivo general
+
+Analizar cuantitativamente los patrones de distribución espacial y
+estimar la densidad de poblaciones mediante modelos probabilísticos e
+índices de dispersión, integrando fundamentos ecológicos clásicos con
+procedimientos estadísticos reproducibles.
+
+### Objetivos específicos
+
+1.  Distinguir conceptualmente densidad absoluta y densidad relativa en
+    estudios poblacionales.
+
+2.  Identificar los patrones espaciales aleatorio, agrupado y uniforme y
+    sus implicaciones ecológicas.
+
+3.  Evaluar la hipótesis de aleatoriedad mediante la distribución
+    Poisson y prueba $\chi^2$.
+
+4.  Determinar patrones agrupados mediante la distribución Binomial
+    Negativa.
+
+5.  Calcular e interpretar índices de dispersión (ID, IC, IH, $m^*$,
+    $I_c^{Lloyd}$, $I_M$).
+
+6.  Comparar métodos de estimación de densidad basados en distancias
+    (Holgate, King y Hayne).
+
+7.  Integrar resultados estadísticos con interpretación ecológica.
+
+------------------------------------------------------------------------
+
+## Competencias
+
+### a. Competencias conceptuales
+
+-   Comprende la relación entre densidad y distribución espacial en
+    poblaciones naturales.
+
+-   Interpreta los supuestos ecológicos de los modelos Poisson y
+    Binomial Negativa.
+
+-   Reconoce los fundamentos matemáticos de los índices de dispersión.
+
+-   Analiza la conexión entre heterogeneidad ambiental y agregación
+    espacial.
+
+-   Comprende las limitaciones metodológicas de los muestreos
+    espaciales.
+
+### b. Competencias procedimentales
+
+-   Construye tablas de frecuencias observadas y esperadas.
+
+-   Aplica la prueba $\chi^2$ de bondad de ajuste para contrastar
+    aleatoriedad.
+
+-   Calcula correctamente $ID$, $IC$, $IH$, $m^*$, $I_c^{Lloyd}$ y
+    $I_M$.
+
+-   Implementa los modelos en R de forma reproducible.
+
+-   Estima densidades poblacionales usando métodos basados en
+    distancias.
+
+-   Integra múltiples índices para llegar a una conclusión
+    ecológicamente consistente.
+
+### c. Competencias actitudinales
+
+-   Desarrolla pensamiento crítico frente a resultados estadísticos.
+
+-   Valora la importancia del rigor metodológico en el muestreo
+    ecológico.
+
+-   Integra teoría ecológica con análisis cuantitativo.
+
+-   Reconoce las limitaciones y supuestos de cada modelo antes de
+    interpretarlo.
+
+-   Fortalece una actitud ética hacia el manejo responsable de datos
+    ecológicos.
+
+------------------------------------------------------------------------
+
+\newpage
+
+## Marco conceptual y metodología del análisis
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| out-width: "0.9\\linewidth"
+#| fig-align: center
+#| fig-pos: 'H'
+knitr::include_graphics("intro.distrib.png")
+```
+
+### 1. Fundamento ecológico de la distribución espacial
+
+La estructura espacial\index{Distribución!espacial} de una población 
+emerge de la interacción entre
+procesos demográficos y heterogeneidad ambiental. Si el ambiente es
+homogéneo y la presencia de un individuo no afecta la posición de otro,
+se espera una disposición aleatoria. Este supuesto de independencia
+espacial constituye la base del modelo de Poisson.
+
+Sin embargo, la naturaleza raramente presenta homogeneidad perfecta. Las
+discontinuidades del sustrato, gradientes de recursos, refugios,
+competencia local o comportamiento social introducen dependencia
+espacial. Cuando individuos tienden a concentrarse en zonas favorables,
+surge la distribución agrupada\index{Distribución!agrupada}. Cuando la interacción negativa es
+intensa, aparece una distribución más regular o uniforme.
+
+La identificación de estos patrones no es únicamente descriptiva: cada
+arreglo espacial sugiere hipótesis ecológicas sobre los mecanismos que
+operan en la población. Por ello, la inferencia estadística debe
+interpretarse siempre en contexto biológico [@allee1949principles; @ludwig1988statistical].
+
+::: callout-note
+## Idea central del diseño
+
+El procedimiento contrasta **frecuencias observadas** en unidades
+muestrales ($UM$) contra **frecuencias esperadas** bajo un modelo
+teórico (Poisson o Binomial Negativa).\
+Si el ajuste es pobre ($valor-p < 0.05$), el patrón espacial observado
+**no** se comporta como aleatorio bajo ese modelo.
+:::
+
+### 2. Modelos probabilísticos como hipótesis ecológicas
+
+Consiste en desarrollar un procedimiento que permita comparar la
+distribución espacial\index{Distribución!espacial} de 
+**frecuencias observadas** en los cuadrantes
+muestreados contra una distribución espacial de **frecuencias
+esperadas** (tabuladas) que se genera aleatoriamente (técnicas
+estadísticas). Con ello probamos la hipótesis nula ($H_0$) mediante una
+prueba de bondad de ajuste Chi Cuadrado ($\chi^2$) la cual infiere:
+$H_0$ = la distribución de la población es aleatoria y se presenta
+cuando la probabilidad de que ambas distribuciones de frecuencia
+(observada y esperada) se ajustan o corresponden a la misma población
+estadística. Si, por el contrario, el patrón de frecuencia observado
+difiere significativamente del esperado (no se ajusta), rechazamos a la
+$H_0$ y el patrón podrá ser agrupado o uniforme. En esta última opción
+aceptamos la hipótesis alterna ($H_1$: la distribución de la población
+no es aleatoria) y aplicamos índices o coeficientes de dispersión para
+determinar si el patrón es agrupado o uniforme (algunos de estos índices
+se verifican con pruebas de bondad de ajuste).
+
+#### 2.1) Distribución Poisson como modelo de aleatoriedad
+
+La distribución Poisson\index{Distribución!Poisson} representa el caso más simple de arreglo
+espacial (distribución) bajo los siguientes supuestos ecológicos:
+
+-   Igual probabilidad de ocupación en cada UM.
+
+-   Independencia entre individuos.
+
+-   Homogeneidad ambiental.
+
+-   Densidad relativamente baja respecto al máximo posible.
+
+::: callout-tip
+## Requisitos prácticos antes de probar Poisson
+
+Conviene verificar tres condiciones mínimas:\
+1) UM definidas con el mismo tamaño/área (comparabilidad).\
+2) Conteos independientes (evitar UM superpuestas o no equivalentes).\
+3) La mayoría de clases con $E_x \ge 5$; si no se cumple, es preferible
+**agrupar colas** o complementar con **índices de dispersión**.
+:::
+
+Por medio de este modelo matemático se evalua si el patrón de
+distribución de la población que satisface mejor las condiciones de un
+arreglo al azar o aleatorio. Representa a la distribución aleatoria\index{Distribución!aleatoria} de acuerdo a las siguientes consideraciones:
+
+-   Cada unidad muestral (UM) tiene igual probabilidad de contener a un
+    individuo.
+
+-   La ocurrencia de un individuo en una UM no es influenciada por la
+    presencia de otro.
+
+-   Igual disponibilidad de espacio entre cada UM.
+
+-   El número de individuos es relativamente bajo al máximo posible.
+
+Bajo estas condiciones, la media y la varianza del número de individuos
+por unidad muestral tienden a ser similares. El contraste formal se
+realiza mediante la prueba:
+
+$$
+\chi^2_{baj} = \sum \frac{(F_x - E_x)^2}{E_x}
+$$
+
+Donde,
+
+$F_x$ = frecuencia observada.\
+$E_x$ = frecuencia esperada bajo distribución Poisson.\
+$gl = k - 1 - p$ con $k$ = número de clases (tras agrupar colas) y
+$p = 1$ parámetro estimado ($\lambda = \bar x$).
+
+Este paso corresponde a la prueba de bondad de ajuste (Goodness of fit
+test) chi-cuadrado $\chi^2$
+
+Si el ajuste es adecuado (valor-p ≥ 0.05), la evidencia empírica no
+permite rechazar la hipótesis de aleatoriedad (si $\chi^2_{baj}$ es
+menor al valor tabulado). En caso contrario, la estructura espacial
+puede ser agrupada o unoforme (presenta dependencia).
+
+::: callout-note
+## Sobre clases raras y $E_x < 5$
+
+Cuando aparecen clases con frecuencias esperadas pequeñas ($E_x < 5$),
+el estadístico $\chi^2$ puede volverse inestable.\
+En ese caso se recomienda **agrupar categorías poco frecuentes** (colas)
+para reducir el número de clases $k$, y reportar $gl = k - 1 - p$.
+:::
+
+------------------------------------------------------------------------
+
+#### 2.2) Distribución Binomial Negativa y agregación
+
+Cuando se detecta exceso de varianza respecto al promedio, la
+distribución Binomial Negativa\index{Distribución!Binomial Negativa (BN)} proporciona un modelo apropiado para
+patrones agregados. En este sentido, esta prueba se realiza en el caso
+que los organismos no presenten una distribución aleatoria (Distribución
+Poisson). El parámetro $k$ adquiere especial importancia:
+
+-   $k \to 0$ indica fuerte agregación o agrupamiento en parches.
+
+-   $k \to \infty$ aproxima la distribución aleatoria o Poisson.
+
+Ecológicamente, $k$ puede interpretarse como una medida inversa del
+grado de contagio espacial. Valores pequeños sugieren que los individuos
+tienden a concentrarse en parches con alta disponibilidad de recursos o
+condiciones favorables.
+
+El modelo matemático evalúa si el patrón de distribución de la población
+que satisface mejor las condiciones es de un arreglo agrupado o en
+parches. Representa a la distribución agrupada\index{Distribución!agrupada} 
+de acuerdo a las mismas
+consideraciones que Poisson:
+
+-   Cada unidad muestral (UM) tiene igual probabilidad de contener a un
+    individuo,
+
+-   La ocurrencia de un individuo en una UM no es influenciada por la
+    presencia de otro,
+
+-   Igual disponibilidad de espacio entre cada UM y
+
+-   El número de individuos es relativamente bajo al máximo posible.
+
+Encontrar las **probabilidades Binomial Negativa (**$P_x$): es la
+probabilidad de encontrar $x$ individuos en una $UM$ y está dada por la
+siguiente ecuación:
+
+$$
+P_{(x)}=[\frac{\mu}{(\mu + k)}].\{{\frac{(k+x-1)!}{[x!(k-1)]!.{(\frac{\mu}{\mu+k})}}}\}^k
+$$
+
+Donde,
+
+$\mu$ = Es la media poblacional\
+$k$ = Mide grado de agrupamiento de los individuos de la muestra.\
+si, $k$ = Tiende a 0 $\Rightarrow$ se da el máximo agrupamiento.\
+Si, $k$ = Tiende a ∞ $\Rightarrow$ la distribución. será Poisson o
+aleatoria.
+
+Aquí se tiene que la constante $k$ es la incognita a encontrar. Para
+calcular el valor de $k$, primero se debe estimar $\hat k$ con la
+siguiente formula:
+
+$$
+\hat k=\frac{\bar chi^2}{(s^2-\bar x)}
+$$
+
+El valor de $k$ exacto debe satisfaccer la siguiente igualdad, partiendo
+de $\hat k$:
+
+$$
+s^2=x + \frac{\bar chi^2}{k}
+$$
+
+El valor de $k$ exacto debe satisfaccer la siguiente igualdad, partiendo
+de $\hat k$:
+
+$$
+log_{10}(N/N_0)=\hat k.log_{10}[1+(\bar x/\hat k)]
+$$
+
+En caso que los datos no se ajusten a las distribuciones Poisson
+(*prueba 1*) y Binomial Negativa (*prueba 2*), por descarte se presenta
+una **distribución uniforme** (la más rara en la naturaleza)\index{Distribución!uniforme}. Estas
+pruebas deben complementarse con los **índices de dispersión** que se
+relacionan a continuación.
+
+::: callout-note
+## Qué significa $k$ en términos biológicos
+
+El parámetro $k$ resume el **grado de agregación**:\
+- $k \to 0$ sugiere agregación intensa (parches muy marcados).\
+- $k \to \infty$ aproxima aleatoriedad (Poisson).
+
+Por ello, además del ajuste estadístico, $k$ ayuda a interpretar la
+fuerza del agrupamiento.
+:::
+
+------------------------------------------------------------------------
+
+### 3. Patrón de distribución espacial, mediante índices de dispersión
+
+Los índices de dispersión permiten sintetizar la relación entre varianza
+y promedio y ofrecen criterios prácticos cuando las pruebas de bondad de
+ajuste presentan limitaciones (por ejemplo, clases o UM con \$E_x \<
+5\$), permitiendo validar la distribución de forma más apropiada (ej.
+@morisita1959measuring $I_M$, entre otros).
+
+::: callout-tip
+## Cuándo los índices son más útiles
+
+Los índices de dispersión son especialmente útiles cuando:\
+- hay **baja densidad** por UM,\
+- aparecen muchas clases con $E_x < 5$, o\
+- el tamaño muestral es limitado.
+
+En esos escenarios, los índices ofrecen una lectura más robusta del
+patrón espacial.
+:::
+
+#### 3.1) Razón Varianza Promedio o Índice de Dispersión ($ID$).
+
+constituye la base conceptual de múltiples transformaciones posteriores.
+Si $ID > 1$, existe sobre-dispersión (agregación); si $ID < 1$, el
+arreglo tiende a uniformidad.\index{Índice!Dispersión (ID)}
+
+$$
+ID=\frac{s^2}{\bar x}
+$$
+
+Donde,
+
+$s^2=\frac{\sum[(x_i-\bar x)^2.F_x]}{N-1}$ $s^2$ = varianza del número
+de individuos por UM.  $\bar x$ = media de individuos por UM. $x$ =
+número de individuos en cada UM.
+
+Interpretación: $ID = 1$ → aleatorio,\
+$ID > 1$ → agrupado,\
+$ID < 1$ → uniforme.
+
+#### 3.2) Índice de Agrupamiento (IC) (David & Moore 1964).
+
+Este índice es una transformación del $ID$, pero dependiente del tamaño
+de muestra ($n$).
+
+$$
+IC=\left(\frac{s^2}{\bar x}\right)-1
+$$
+
+Donde,
+
+$IC = 0$ → aleatorio.  $IC = -1$ → máxima uniformidad.\
+$IC = n-1$ → máximo agrupamiento.
+
+#### 3.3) Índice de Holgate ($IH$) (broker, Zar y Ende 1988).
+
+Se utiliza con **datos de distancias** a los dos vecinos más cercanos
+desde un punto aleatorio. Es sensible al efecto de borde.
+
+$$
+IH=\frac{\sum(d^2/d'^2)}{n}-0.5
+$$
+
+Donde,
+
+$n$ = total de puntos de intersección.\
+$d$ = distancia al primer individuo más cercano.\
+$d'$ = distancia al segundo individuo más cercano.
+
+Interpretación:
+
+$IH = 0$ → aleatorio.\
+$IH > 0$ → agrupado.\
+$IH < 0$ → uniforme.
+
+#### 3.4) Media de hacinamiento de Lloyd ($m^*$)
+
+Cuantifica el hacinamiento promedio que experimenta un individuo. Es
+útil para describir el grado absoluto de agrupamiento  [@lloyd1967mean].
+
+$$
+m^* = \bar x + \frac{s^2}{\bar x} - 1
+$$
+
+Donde,
+
+$\bar x$ = media de individuos por UM,  $s^2$ = varianza muestral.\
+Valores altos de $m^*$ indican mayor hacinamiento.
+
+Interpretación:
+
+$m^* = \bar x$ → distribución aleatoria.\
+$m^* > \bar x$ → distribución agrupada.\
+$m^* < \bar x$ → distribución uniforme (poco frecuente en la
+naturaleza).
+
+#### 3.5) Índice de Clumping de Lloyd ($I_c^{Lloyd}$)
+
+Índice relativo de agregación que no depende del tamaño de muestra.
+
+$$
+I_c^{Lloyd} = \frac{m^*}{\bar x}
+$$
+
+Donde,
+
+$m^*$ = media de hacinamiento de Lloyd,\
+$\bar x$ = media de individuos por UM.
+
+Interpretación:
+
+$I_c^{Lloyd} \approx 1$ → aleatorio,\
+$I_c^{Lloyd} > 1$ → agrupado,\
+$I_c^{Lloyd} < 1$ → uniforme.
+
+Este índice se comose como *la media de hacinamiento de Lloyd* y conecta
+directamente a la estadística con experiencia ecológica del individuo,
+pues estima el número promedio de vecinos que experimenta un organismo
+dentro del conjunto poblacional.
+
+#### 3.6) Índice de Morisita ($I_M$)
+
+Mide el grado de agregación con menor dependencia de la densidad. Es
+apropiado para comparar patrones entre sitios o estudios con diferente
+densidad de individuos.\index{Índice!Morisita (I_M)}
+
+$$
+I_M = \frac{n \cdot \sum x_i(x_i - 1)}{N(N - 1)}
+$$
+
+Donde,
+
+$n$ = número de UM,\
+$N = \sum x_i$ = número total de individuos, $x_i$ = conteo en la UM
+$i$.
+
+Interpretación:
+
+$I_M \approx 1$ → aleatorio,\
+$I_M > 1$ → agrupado,\
+$I_M < 1$ → uniforme.
+
+#### 3.7) Prueba de dispersión basada en $ID$ ($\chi^2_{disp}$)
+
+Contraste rápido de aleatoriedad usando la razón varianza/media.
+
+$$
+\chi^2_{disp} = (n - 1) \cdot ID
+$$
+
+Donde,
+
+$n$ = número de UM,\
+$ID = s^2/\bar x$\
+Con grados de libertad $gl = n - 1$.\
+Un $\chi^2_{disp}$ alto → agrupado; bajo → uniforme.
+
+Finalmente, estos índices no sustituyen a las pruebas probabilísticas;
+las complementan y fortalecen la interpretación.
+
+------------------------------------------------------------------------
+
+#### Tabla comparativa de índices de dispersión
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#| label: tbl-c6-1
+#| tbl-cap: "Resumen didáctico de índices de dispersión"
+
+library(dplyr)
+library(knitr)
+library(kableExtra)
+
+comp <- tibble::tibble(
+  `Índice` = c(
+    "Varianza/Media (ID)",
+    "Agrupamiento (IC)",
+    "Holgate (IH)",
+    "Lloyd m*",
+    "Clumping de Lloyd (Ic)",
+    "Morisita (IM)",
+    "chi^2 de dispersión"
+  ),
+  `Fórmula` = c(
+    "s^2 / x̄",
+    "(s^2 / x̄) - 1",
+    "(Σ d^2/d'^2)/n - 0.5",
+    "x̄ + (s^2/x̄) - 1",
+    "m* / x̄",
+    "n · Σ xᵢ(xᵢ-1) / [N(N-1)]",
+    "(n - 1) · ID"
+  ),
+  `Uniformidad` = c("< 1", "-1", "< 0", "Baja", "< 1", "< 1", "Baja"),
+  `Aleatorio`   = c("= 1", "0", "0", "—", "≈ 1", "≈ 1", "—"),
+  `Agrupado`    = c("> 1", "n-1", "> 0", "Alta", "> 1", "> 1", "Alta"),
+  `Observaciones` = c(
+    "Simple; base de IC y chi^2_disp.",
+    "Depende de n; comparabilidad limitada.",
+    "Usa distancias; sensible al borde.",
+    "Mide hacinamiento absoluto.",
+    "Índice relativo; no depende de n.",
+    "Robusto; útil entre sitios/escala.",
+    "Contraste del ID; gl = n-1."
+  )
+)
+
+  kbl(comp,  
+    align = c("l","l","c","c","c","l"),
+    booktabs  = TRUE) %>% 
+  kable_classic(full_width = FALSE) %>% 
+  kable_styling(
+    full_width = FALSE,
+    font_size  = 8,
+    latex_options = c("repeat_header")  # ok con longtable
+  )
+```
+
+::: callout-note
+## Recomendación didáctica de reporte
+
+Para un reporte claro, se sugiere:\
+1) indicar el resultado de Poisson (valor-p),\
+2) si aplica, el resultado de Binomial Negativa (valor-p y/o $k$),\
+3) reportar 2–3 índices (por ejemplo $ID$, $I_M$, $I_c^{Lloyd}$) y
+concluir el patrón espacial con base en la **concordancia** entre ellos.
+:::
+
+------------------------------------------------------------------------
+
+### 4. Estimación de densidad basada en distancias
+
+Cuando el conteo exhaustivo no es viable, se emplean métodos indirectos
+basados en la distancia al individuo más cercano o al transecto.
+
+El método de *Holgate*, el *método de King* y el *método de Hayne*
+parten del principio geométrico de que la densidad puede inferirse a
+partir del espaciado promedio entre individuos. Sin embargo, cada método
+presenta\
+supuestos particulares:
+
+-   Independencia espacial.
+
+-   Muestreo aleatorio de puntos.
+
+-   Medición precisa de distancias.
+
+-   Ausencia de sesgos por efecto de borde.
+
+Comparar los valores de densidad obtenidos mediante diferentes métodos
+permite evaluar consistencia y detectar posibles subestimaciones o
+sobreestimaciones asociadas al patrón espacial.
+
+::: callout-tip
+## Cuidado con las unidades en métodos de densidad
+
+En métodos basados en distancias, pequeñas inconsistencias de unidades
+cambian drásticamente $D$.\
+Antes de calcular, conviene verificar que:\
+- todas las distancias estén en **metros**,\
+- $L$ esté en **metros**,\
+- y que no existan ceros o distancias imposibles (errores de
+digitación).
+:::
+
+------------------------------------------------------------------------
+
+#### 4.1) Método de Holtage (con puntos de intersección al azar)
+
+Estimar la densidad de los individuos con los datos de distancias (tabla
+2) utilizando las siguientes ecuaciones:
+
+$$
+IH_D=\frac{n}{\pi \sum(chi^2_i)}
+$$
+
+Donde,
+
+$n$ = número UM (cuadriculas o cuadrantes muestreados)\
+$x_i$ = distancia desde un punto aleatorio al individuo más cercano\
+$π$ = 3.141592654
+
+#### 4.2) Método de King (con transecto diagonal)
+
+$$
+D=\frac{n^2}{2L \sum(d_i)}
+$$
+
+Donde,\
+$D$ = Densidad de la población (\*hacerlo para plántulas y adultos)\
+$n$ = Número de individuos contados en el transecto.\
+$d_i$ = Distancia ($m$) de los individuos al transecto.\
+$L$ = Longitud del transecto en metros.
+
+::: callout-note
+## Por qué comparar King vs Hayne
+
+El método de Hayne suele reducir sesgos de subestimación asociados al
+uso de promedios de distancia.\
+Comparar ambos permite detectar si las distancias observadas están
+dominadas por pocos individuos muy cercanos o si hay colas largas de
+distancias grandes.
+:::
+
+#### 4.3) 2. Método de Hayne (evita subestimaciones del método de King)  \*
+
+$$
+D=\frac{\sum(1/d_i)}{2L}
+$$
+
+Para las tres ecuaciones, los datos deben estar en metros. \* La idea es
+comparar diferencias entre métodos
+
+------------------------------------------------------------------------
+
+\newpage
+
+## Ejercicio de distribución y densidad con parches de *Calotropis procera*
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| out-width: "0.5\\linewidth"
+#| fig-align: center
+#| fig-pos: 'H'
+knitr::include_graphics("calotropis.distrib.png")
+```
+
+En el capítulo anterior (Ejercicio C), el énfasis estuvo en la
+**organización de los individuos por estados** (plántulas, juveniles y
+adultos) y en la construcción de una **tabla de vida estática**, a
+partir de la cual se modeló la estructura poblacional mediante matrices
+de transición. En ese contexto, los datos se estructuraron para
+describir **cómo cambia la población entre estados en el tiempo**.
+
+En el presente ejercicio el enfoque cambia de dimensión analítica: ahora
+el interés no es la transición entre estados, sino la **disposición
+espacial de los individuos en el espacio** y la estimación de su
+**densidad** en una parcela definida. Mientras el capítulo anterior
+respondió a preguntas de tipo estructural y dinámico, este ejercicio
+responde a preguntas de tipo espacial: ¿los individuos se distribuyen
+aleatoriamente?, ¿se agrupan en parches?, ¿existe uniformidad?, y ¿cuál
+es su densidad real en el área de estudio?
+
+De esta manera, los datos de *Calotropis procera* se analizan ahora
+desde la perspectiva espacial, complementando el estudio demográfico
+previo y ampliando la comprensión integral de la población en estudio.
+
+### Objetivo general
+
+Analizar el patrón de distribución espacial de una muestra de individuos
+censados de *Calotropis procera* ubicada en una parcela de bosque seco.
+
+**Objetivos específicos.** 1) Determinar el **patrón de distribución
+espacial** de los parches censados, con base a pruebas estadísticas
+(Poisson y Binomial Negativa) e índices de dispersión. 2) Determinar la
+**densidad** de individuos en los parches censados de *C. procera*.
+
+------------------------------------------------------------------------
+
+### Diseño metodológico
+
+El diseño de muestreo consiste en la colecta de datos, de acuerdo a
+metodologías orientadas para densidades y distribución de individuos de
+la especie en estudio, presentes en una parcela con las condiciones
+requeridas.
+
+La @fig-c6-1 y @fig-c6-2 esquematizan el diseño de muestreo para
+responder las preguntas relacionadas con: (A) la **distribución** de la
+especies (diseño de la parcela) y (b) la abundancia o **densidad**
+(transecto diagonal). Es un esquema del diseño del croquis y de la
+parcela a evaluar, para la selección de cuadrantes o cuadriculas de 2 x
+2 m y los puntos de intersección, de los cuales se seleccionarán 58
+puntos al azar (para calcular densidad de individuos), modificado de
+Bonilla & Guillot (2003).
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: fig-c6-1
+#| fig-cap: Diseño del croquis para el censo de individuos de Calotropis.
+#| out-width: "0.9\\linewidth"
+#| fig-pos: 'H'
+knitr::include_graphics("parcela.distrib1.png")
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: fig-c6-2
+#| fig-cap: Diseño para las estimaciones de densidad de individuos en la parcela.
+#| out-width: "0.95\\linewidth"
+#| fig-pos: 'H'
+knitr::include_graphics("parcela.distrib2.png")
+```
+
+En este sentido, se debe elaborar en papel, el croquis de un lote o
+**parcela** con dimensiones de 20 x 20 m (400 m^2^) dividido en
+**cuadriculas** de 2 x 2 m (100 cuadros) y numerarse de manera
+secuencial contando hasta las 100 cuadriculas. En estas cuadriculas se
+realizan sub-divisiones en su periferia a cada metro para obtener 441
+puntos de intersección (200 subcuadriculas de 1m^2^).
+
+Para el siguiente procedimiento, se debe contar con los datos tabulados
+en Excel (**datos.c6.xlsx**), los cuales serán utilizados en el
+procedimiento paso a paso que se describe a continuación.
+
+::: callout-tip
+## Relación entre escala y patrón espacial
+
+El tamaño de la unidad muestral (2 × 2 m en este diseño) influye
+directamente en la detección del patrón espacial.\
+Un cuadrante demasiado grande puede ocultar agrupaciones pequeñas,
+mientras que uno demasiado pequeño puede exagerar la presencia de celdas
+vacías.\
+La escala de muestreo debe ser coherente con la biología y el tamaño
+promedio del individuo.
+:::
+
+------------------------------------------------------------------------
+
+### Preparación de los datos
+
+Inicialmente se cargan las librerías requeridas por el ejercicio.
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#| label: setup2
+#| include: false
+
+suppressPackageStartupMessages({
+  library(readxl); 
+  library(dplyr); 
+  library(tidyr)
+  library(ggplot2); 
+  library(kableExtra); 
+  library(stringr)
+})
+```
+
+A continuación se carga la base de datos (datos) y se calculan algunos
+estimadores descriptivos (número de cuadriculas **n**, número de
+individuos **N**, media estimada **µ**, varianza de la muestra **s\^2**)
+(@tbl-c6-2).
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-c6-2
+#| tbl-cap: "Estimadores descriptivos de la muestra evaluada"
+
+#| label: carga-datos
+# Cargar la base de datos
+datos <- read_xlsx("datos.c6.xlsx", sheet = "poisson")
+
+# Se usa la columna de conteos por cuadrícula
+# (en el archivo proporcionado se llama 'Individuos')
+conteos <- 
+  datos %>% 
+  dplyr::rename(x = Individuos) %>% 
+  dplyr::mutate(x = as.integer(x)) %>% 
+  dplyr::pull(x)
+
+# Estimadores descriptivos
+n  <- length(conteos)
+N  <- sum(conteos)
+mu <- mean(conteos)         # µ estimado
+s2 <- stats::var(conteos)   # varianza muestral
+
+# Elaboración de la tabla resumen
+resumen <- tibble::tibble(
+  `n (cuadrículas)` = n,
+  `N (individuos)`  = N,
+  `µ (media)`       = mu,
+  `s^2 (varianza)`   = s2
+)
+resumen %>% 
+  kbl(booktabs  = TRUE,
+      digits = c(0,0,2,2),
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+ 
+```
+
+::: callout-note
+## Interpretación preliminar de µ y s\^2
+
+Antes de aplicar cualquier prueba probabilística, la comparación entre
+la media ($µ$) y la varianza ($s^2$) ofrece una señal diagnóstica
+inicial:
+
+-   Si $s^2 ≈ µ$ → posible aleatoriedad (Poisson).
+-   Si $s^2 > µ$ → tendencia a agregación.
+-   Si $s^2 < µ$ → tendencia a uniformidad.
+
+Este diagnóstico es exploratorio y debe confirmarse con pruebas
+formales.
+:::
+
+------------------------------------------------------------------------
+
+\newpage
+
+### *A. Estimación estadística de la distribución espacial de la población.*
+
+#### 1. Diseños estadísticos
+
+##### 1.1) Prueba de Poisson.
+
+###### Paso 1. Cálculo de las Frecuencias observadas, Poisson esperada y contribuciones a $\chi^2$
+
+A continuación se construye la tabla de frecuencias de individuos por
+unidad muestral ($F_x$), a partir de los conteos observados en campo
+(@tbl-c6-3). Posteriormente, bajo el supuesto de aleatoriedad espacial,
+se calculan las probabilidades teóricas de la distribución Poisson
+($P_x$) usando la media muestral ($\hat\mu$).\index{Distribución!Poisson}
+
+Con estas probabilidades se estiman las frecuencias esperadas
+($E_x = n P_x$) y la contribución de cada clase al estadístico $\chi^2$,
+lo cual permitirá evaluar la concordancia entre el patrón observado y el
+modelo Poisson.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-c6-3
+#| tbl-cap: "Frecuencias, Poisson esperada y chi^2"
+
+# Número máx de individuos por cuadricula (filas de la tabla)
+x_max <- max(conteos)
+
+# Frecuencias observadas (Fx)
+fx <- tibble::tibble(x = conteos) %>% 
+  count(x, name = "Fx") %>% 
+  complete(x = 0:x_max, fill = list(Fx = 0)) %>% 
+  arrange(x)
+
+# Tabla de la distribución Poisson completa
+fx <- 
+  fx %>% 
+  mutate(
+    Px = dpois(x, mu),
+    Ex = n * Px,
+    `chi^2 comp` = (Fx - Ex)^2 / Ex
+  )
+
+# Impresión de la tabla de frecuencias
+fx %>% 
+  kbl(booktabs  = TRUE,
+      digits = c(0,0,2,1,2),
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+::: callout-warning
+## Supuesto crítico de la prueba $\chi^2$
+
+La prueba de bondad de ajuste $\chi^2$ requiere que las frecuencias
+esperadas por clase sean ≥ 5.\
+Cuando µ es pequeño, las clases de la cola (x ≥ 2) suelen violar esta
+condición.\
+En tales casos, se deben agrupar clases o complementar la interpretación
+con índices de dispersión.
+:::
+
+------------------------------------------------------------------------
+
+###### Paso 2. Agrupación automática (0, 1, ≥2)
+
+Con el fin de cumplir el supuesto de frecuencias esperadas suficientes
+por clase ($E_x \geq 5$), las categorías originales de abundancia se
+agrupan en tres clases: ausencia (0), presencia simple (1) y presencia
+múltiple (≥2). Esta reducción busca mejorar la validez estadística del
+contraste $\chi^2$, disminuyendo el número de clases con valores
+esperados pequeños.
+
+El resultado de esta agrupación se presenta en la @tbl-c6-4, donde se
+resumen las frecuencias observadas ($F_x$), las frecuencias esperadas
+bajo Poisson ($E_x$) y la contribución de cada clase al estadístico
+$\chi^2$.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-c6-4
+#| tbl-cap: "Frecuencias agrupadas (solo 3 clases)"
+
+# Resumen de la tabla de frecuencia a tres clases de cobertura
+fx_agrup <- 
+  fx %>% 
+  mutate(clase = dplyr::case_when(
+    x == 0 ~ "0",
+    x == 1 ~ "1",
+    x >= 2 ~ "≥2"
+  )) %>% 
+  group_by(clase) %>% 
+  summarise(
+    Fx = sum(Fx),
+    Ex = sum(Ex),
+    .groups = "drop"
+  ) %>% 
+  mutate(`chi^2 comp` = (Fx - Ex)^2 / Ex)
+
+# Impresión de la tabla resumida
+fx_agrup %>% 
+  kbl(digits = 2,
+      col.names = c(
+        "clase","Fx","Ex","chi^2 comp"
+      ),
+      booktabs  = TRUE, 
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+A partir de las frecuencias agrupadas (@tbl-c6-4), se calcula el
+estadístico global de bondad de ajuste $\chi^2$ como la suma de las
+contribuciones parciales. Los grados de libertad se calculan como
+$gl = k - 1 - p$, donde $k$ es el número de clases agrupadas y $p$ el
+número de parámetros estimados. En el modelo Poisson, $p = 1$ (la
+media).
+
+El resultado del contraste se presenta en la @tbl-c6-5, que resume el
+valor de $\chi^2$ calculado, los grados de libertad y el valor–p
+asociado.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-c6-5
+#| tbl-cap: "Prueba de bondad de ajuste chi^2"
+
+# Prueba de hipótesis de aleatoriedad Poisson
+chi2  <- sum(fx_agrup$`chi^2 comp`)  # chi^2 calculado (no tabulado)
+gl    <- nrow(fx_agrup) - 1 - 1   # grados de libertad
+p_val <- if (gl > 0) 
+         pchisq(chi2, df = gl, 
+         lower.tail = FALSE) else NA_real_  # Valor p 
+
+# Tabulación de la prueba de hipótesis
+# Bondad de ajuste - chi^2 (baj)
+tibble::tibble(
+  `chi^2 (baj)` = chi2,
+  `gl`       = gl,
+  `p-valor`  = p_val) %>% 
+  kbl(booktabs  = TRUE, digits = c(2, 0,3),
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+::: callout-warning
+## Criterio de interpretación antes de concluir
+
+Si la prueba $\chi^2$ no rechaza Poisson, **no se concluye** agregación
+solo porque $ID>1$.\
+En ese caso, $ID>1$ se reporta como **tendencia** y la interpretación se
+apoya en evidencia convergente (por ejemplo $I_M$ de Morisita y, más
+adelante, el ajuste a Binomial Negativa).
+
+Si $gl = 0$ o existen clases con $E_x < 5$ aun tras agrupar, la prueba
+$\chi^2$ puede ser **no concluyente**, y los índices de dispersión
+adquieren mayor peso interpretativo.
+:::
+
+------------------------------------------------------------------------
+
+###### Paso 3. Gráficos: Observado vs. Poisson esperado
+
+Luego de calcular las frecuencias observadas y esperadas bajo el modelo
+Poisson (ver @tbl-c6-3)\index{Distribución!Poisson}, es conveniente visualizar la correspondencia
+entre ambas distribuciones. La comparación gráfica permite identificar
+de manera intuitiva si el modelo teórico reproduce el patrón espacial
+registrado en campo o si existen desviaciones sistemáticas.
+
+La @fig-c6-3 presenta las frecuencias observadas ($F_x$) y las
+frecuencias esperadas bajo Poisson ($E_x$) para cada número de
+individuos por cuadrícula.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: fig-c6-3
+#| fig-cap: "Distribución de frecuencias observadas vs. esperadas (Poisson)"
+#| fig-pos: 'H'
+
+# 
+obs_exp <- 
+  fx %>% 
+  dplyr::select(x, Fx, Ex) %>% 
+  tidyr::pivot_longer(cols = c(Fx, Ex),
+                      names_to = "tipo", 
+                      values_to = "frecuencia")
+
+# Figura
+ggplot(obs_exp, aes(x = factor(x), y = frecuencia, fill = tipo)) +
+  geom_col(position = "dodge") +
+  labs(x = "Individuos por cuadrícula (x)",
+       y = "Frecuencia",
+       fill = "",
+       title = "") +
+  theme_bw(base_size = 13)
+```
+
+La @fig-c6-3 permite evaluar visualmente si la estructura espacial
+observada se aproxima al patrón aleatorio esperado bajo un proceso de
+dispersión independiente. Desviaciones marcadas —por ejemplo, exceso de
+cuadrículas vacías o exceso de cuadrículas con abundancias altas—
+sugieren procesos ecológicos subyacentes como dispersión limitada,
+heterogeneidad ambiental o interacciones intraespecíficas.
+
+Además del contraste formal $\chi^2$ (@tbl-c6-5), resulta útil
+incorporar índices de dispersión que no dependan directamente de la
+agrupación en clases. El índice de Morisita ($I_M$)\index{Índice!Morisita (I_M)} se calcula a partir
+de los conteos originales y constituye una medida robusta del grado de
+agregación espacial.
+
+La @tbl-c6-6 presenta el valor estimado de $I_M$ junto con su
+interpretación cualitativa del patrón espacial.
+
+------------------------------------------------------------------------
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-c6-6
+#| tbl-cap: "Índice de Morisita para el patrón espacial"
+
+# Índice de Morisita (IM)
+# n = número de UM (cuadrículas)
+# N = número total de individuos
+# xi = conteo en UM i
+IM <- (n * sum(conteos * (conteos - 1))) / (N * (N - 1))
+
+tibble::tibble(
+  `I_M (Morisita)` = IM,
+  `Interpretación` = dplyr::case_when(
+    is.na(IM) ~ "No calculable (verificar N).",
+    IM > 1 ~ "Agrupado",
+    IM < 1 ~ "Uniforme",
+    TRUE ~ "Aleatorio"
+  )
+) %>%
+  kbl(booktabs  = TRUE, digits = 3,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+::: callout-note
+## Triangulación rápida
+
+El índice de Morisita ($I_M$; ver Tabla @tbl-c6-6) complementa al índice
+de dispersión $ID$ porque suele ser menos sensible a la presencia de
+numerosas cuadrículas vacías.
+
+Cuando $I_M>1$ y $ID>1$, la evidencia converge hacia un patrón agregado.
+Si la prueba χ² (Tabla @tbl-c6-5) es no concluyente —por grados de
+libertad bajos o valores esperados pequeños— estos índices adquieren
+mayor peso en la interpretación ecológica del patrón espacial.
+:::
+
+------------------------------------------------------------------------
+
+**Patrón espacial a partir de la @fig-c6-3**
+
+La @fig-c6-3 no solo compara barras; también cuenta una historia
+espacial. Cuando el paisaje tiene microhábitats favorables y zonas poco
+aptas, es común observar muchas cuadrículas vacías y unos pocos
+“núcleos” con varios individuos. A continuación se resume la lectura
+ecológica de las diferencias entre $F_x$ y $E_x$.
+
+1.  **Predominio de cuadrículas vacías (**$x = 0$):
+
+-   Se observa que la mayor parte de las cuadrículas muestreadas no
+    contienen individuos, lo cual es consistente con la **expectativa
+    teórica de Poisson** en poblaciones dispersas al azar.
+
+-   Sin embargo, las frecuencias observadas en $x = 0$ son **más altas
+    que las esperadas**, indicando que hay más unidades vacías de lo que
+    el modelo aleatorio predice.
+
+-   Esto puede reflejar que los individuos tienden a concentrarse en
+    algunos puntos, dejando otras unidades completamente vacías.
+
+2.  **Baja coincidencia en cuadrículas con un individuo (**$x = 1$):
+
+-   El **modelo Poisson** indica una frecuencia relativamente alta en
+    las cuadrículas con un individuo.
+
+-   En cambio, la observación muestra **menos cuadrículas con un solo
+    individuo** de lo que se esperaba.
+
+-   Esta diferencia complementa el exceso de cuadrículas vacías: los
+    individuos no están distribuidos homogéneamente, sino que tienden a
+    agruparse.
+
+3.  **Diferencias en clases con más individuos (**$x ≥ 2$):
+
+-   A medida que aumenta el número de individuos por cuadrícula, las
+    frecuencias absolutas son bajas en ambos casos (observadas y
+    esperadas).
+
+-   Sin embargo, se observa que en las categorías $x = 2$ y $x = 4$, la
+    frecuencia real supera ligeramente lo esperado.
+
+-   Esto sugiere la presencia de **cuadrículas con pequeños grupos de
+    individuos**, que puede indicar un leve **patrón agrupado**.
+
+Este patrón es típico de muchas poblaciones naturales:
+
+-   En ambientes heterogéneos, los recursos o microhábitats favorables
+    no están distribuidos al azar, lo que lleva a la concentración de
+    individuos en determinadas áreas.
+
+-   Las cuadrículas vacías representan zonas menos aptas, mientras que
+    las pocas cuadrículas con varios individuos indican “parches” donde
+    la especie encuentra condiciones adecuadas.
+
+-   En este sentido, aunque la prueba de Poisson parte de la hipótesis
+    nula de **aleatoriedad espacial**, la comparación de frecuencias y
+    los índices de dispersión complementarios sugieren que la
+    **población presenta un patrón agrupado**, más consistente con una
+    distribución **binomial negativa** que con una Poisson estricta.
+
+------------------------------------------------------------------------
+
+###### Conclusión automatizada
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: conclusion
+# Primero se calcula el valor-p
+chi2  <- sum(fx_agrup$`chi^2 comp`)
+gl    <- nrow(fx_agrup) - 1 - 1
+p_val <- if (gl > 0) pchisq(chi2, 
+                            df = gl, 
+                            lower.tail = FALSE) else NA_real_
+
+# Índice de dispersión (ya calculado arriba, pero se recalcula por claridad)
+ID <- s2 / mu
+
+# Ahora la conclusión (usa también IM)
+conclusion <- dplyr::case_when(
+  is.na(p_val) & IM > 1 & ID > 1 ~ "La chi^2 no es concluyente con estas clases; los índices (ID e I_M) sugieren patrón agrupado. Confirmar con Binomial Negativa.",
+  is.na(p_val) & IM < 1 & ID < 1 ~ "La chi^2 no es concluyente con estas clases; los índices (ID e I_M) sugieren patrón uniforme/regular (poco frecuente). Confirmar con índices adicionales.",
+  is.na(p_val) ~ "La chi^2 no es concluyente con estas clases; interpretar con índices (ID, I_M) y continuar con Binomial Negativa.",
+  p_val < 0.05 & ID > 1 ~ "Se rechaza aleatoriedad: patrón agrupado.",
+  p_val < 0.05 & ID < 1 ~ "Se rechaza aleatoriedad: patrón uniforme/regular.",
+TRUE ~ "No se rechaza la hipótesis de aleatoriedad (Poisson) con la chi^2;\nreportar ID e I_M como contraste y continuar con Binomial Negativa."
+)
+```
+
+```{r}
+cat(conclusion)
+```
+
+Desde el punto de vista estadístico, la prueba $\chi^2$ puede llevar a
+dos escenarios: (i) **no rechazar** $H_0$ (valor-p ≥ 0.05), indicando
+que los datos son compatibles con Poisson; o (ii) ser **no concluyente**
+si $gl = 0$ o persisten clases con $E_x < 5$ aun después de agrupar.
+
+En ambos casos, la lectura ecológica se fortalece al contrastar el
+resultado con $ID$ y $I_M$ (Morisita). Un exceso de cuadrículas vacías y
+la presencia de algunas cuadrículas con varios individuos pueden ser
+compatibles con una **tendencia a agregación**, que se confirma o se
+descarta en el ajuste a **Binomial Negativa** y con los índices de
+dispersión del apartado siguiente.
+
+Es importante resaltar que con **tamaños de muestra relativamente
+pequeños** o frecuencias bajas ($E_x < 5$ en algunas clases), la
+**prueba** $\chi^2$ puede perder poder estadístico, por lo que se
+sugiere complementar con **índices de dispersión** (ej.
+$ID, IC, Morisita$, etc.), que pueden ser más sensibles que las pruebas
+estadísticas.
+
+En este sentido, aunque la prueba Poisson parte de la hipótesis nula de
+**aleatoriedad espacial**, la comparación de frecuencias, junto con $ID$
+y $I_M$, permite plantear una **hipótesis de trabajo**: la población
+podría presentar **tendencia al agrupamiento**. Esta hipótesis se
+verifica formalmente en el siguiente apartado mediante el ajuste a la
+**Binomial Negativa** y la comparación con otros índices de dispersión.
+
+------------------------------------------------------------------------
+
+\newpage
+
+##### 1.2) Prueba Binomial Negativa - BN.
+
+Cuando la varianza supera a la media ($s^2 > \mu$), la hipótesis de
+aleatoriedad Poisson pierde consistencia y surge la necesidad de evaluar
+un modelo que incorpore sobredispersión. La distribución Binomial
+Negativa representa precisamente ese escenario: mantiene la estructura
+probabilística de conteos, pero permite que la varianza exceda a la
+media, como ocurre en poblaciones con parches o agregación espacial.
+
+###### Paso 1. Estimación del parámetro de agrupamiento $k$
+
+De acuerdo con el contexto teórico, cuando $s^2 > \mu$ se sugiere un
+patrón **agrupado** y la **Binomial Negativa** puede ser un modelo
+apropiado. La constante $k$ cuantifica el grado de agrupamiento
+(@tbl-estimacion-k).
+
+-   Estimador de momentos (inicial):
+    $\hat k = \dfrac{\bar chi^2}{(s^2 - \bar x)}$
+-   Si $s^2 \le \mu$, $\hat k$ no es positivo; en tal caso, el ajuste
+    Binomial Negativa no es recomendable y el patrón puede ser
+    **Poisson** (aleatorio) o más uniforme.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-estimacion-k
+#| tbl-cap: "Estimador inicial de k (método de momentos)"
+k_hat <- if (s2 > mu) (mu^2) / 
+         (s2 - mu) else NA_real_
+
+tibble::tibble(
+  `k̂ (momentos)` = k_hat) %>% 
+  kbl(booktabs  = TRUE, digits = 3,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+::: callout-tip
+## Refinamiento opcional de $k$
+
+El estimador por momentos es adecuado para fines didácticos y para una
+evaluación inicial del grado de agregación.
+
+En análisis avanzados, $k$ puede estimarse por máxima verosimilitud
+(MLE), lo que suele producir ajustes más estables y permite comparar
+modelos mediante criterios como AIC. En este capítulo se emplea
+$\hat{k}$ por simplicidad y claridad pedagógica.
+:::
+
+------------------------------------------------------------------------
+
+###### Paso 2. Frecuencias observadas, probabilidades Binomial Negativa y esperadas
+
+Una vez estimado el parámetro de agrupamiento $k$ (@tbl-estimacion-k),
+se procede a calcular las probabilidades teóricas bajo la distribución
+Binomial Negativa (BN). Este modelo mantiene la naturaleza discreta de
+los conteos, pero permite que la varianza exceda a la media, lo que
+resulta coherente con escenarios de sobredispersión o agregación
+espacial (@tbl-frecuencias-BN).
+
+La Binomial Negativa describe sistemas donde los individuos no se
+distribuyen independientemente, sino que se concentran en microhábitats
+favorables, generando cuadrículas vacías y núcleos con mayor abundancia.
+
+En este paso se reconstruye la tabla de frecuencias observadas ($F_x$),
+se calculan las probabilidades Binomial Negativa ($P_x$) usando la
+parametrización de R `dnbinom(x, size = k, mu = µ)`, y se estiman las
+frecuencias esperadas ($E_x = n \cdot P_x$).
+
+La suma de las contribuciones parciales $(F_x - E_x)^2 / E_x$ permitirá
+evaluar el ajuste global mediante el estadístico $\chi^2$.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-frecuencias-BN
+#| tbl-cap: "Frecuencias observadas, Binomial Negativa esperada y contribuciones chi^2"
+x_max <- max(conteos)
+
+# Frecuencias observadas (Fx)
+fx_BN <- tibble::tibble(x = conteos) %>% 
+  count(x, name = "Fx") %>% 
+  complete(x = 0:x_max, fill = list(Fx = 0)) %>% 
+  arrange(x)
+
+# Probabilidades BN y esperadas (si k_hat es válido)
+fx_BN <- fx_BN %>% 
+  mutate(
+    Px = if (!is.na(k_hat) && k_hat > 0) dnbinom(x, size = k_hat, mu = mu) else NA_real_,
+    Ex = n * Px,
+    `chi^2 comp` = (Fx - Ex)^2 / Ex
+  )
+
+fx_BN %>% 
+  kbl(booktabs  = TRUE,
+      digits = c(0,0,3,3,3),
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+**Validez:** Al igual que en Poisson, la prueba $\chi^2$ requiere que
+$E_x \ge 5$ por clase. Cuando existen valores esperados bajos, se
+agrupan categorías extremas para mantener la validez aproximada del
+contraste.
+
+------------------------------------------------------------------------
+
+###### Paso 3. Agrupación automática (0, 1, 2, ≥3)
+
+Dado que algunas clases pueden presentar valores esperados pequeños bajo
+la BN, se resumen las frecuencias en cuatro categorías (0, 1, 2, ≥3).
+Esta partición conserva mayor detalle que la utilizada en Poisson, pero
+garantiza grados de libertad positivos para la prueba de bondad de
+ajuste. El resumen agrupado y las nuevas contribuciones al estadístico
+$\chi^2$ se muestran en @tbl-agrupacion-BN-4clases.
+
+Esta agrupación no altera la señal espacial del sistema, sino que mejora
+la estabilidad del contraste estadístico. Si el modelo BN captura
+adecuadamente la agregación observada en campo, las discrepancias entre
+$F_x$ y $E_x$ deberían reducirse respecto al modelo Poisson.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-agrupacion-BN-4clases
+#| tbl-cap: "Frecuencias agrupadas (4 clases: 0, 1, 2, ≥3) — Binomial Negativa"
+
+fx_BN_agrup <- fx_BN %>% 
+  mutate(clase = dplyr::case_when(
+    x == 0 ~ "0",
+    x == 1 ~ "1",
+    x == 2 ~ "2",
+    x >= 3 ~ "≥3"
+  )) %>% 
+  group_by(clase) %>% 
+  summarise(
+    Fx = sum(Fx),
+    Ex = sum(Ex),
+    .groups = "drop"
+  ) %>% 
+  mutate(`chi^2 comp` = (Fx - Ex)^2 / Ex)
+
+fx_BN_agrup %>% 
+  kbl(digits = 3,
+      col.names = c(
+        "clase","Fx","Ex","chi^2 comp"
+      ),
+      booktabs  = TRUE, 
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+::: callout-warning
+## Nota sobre $\chi^2$ en Binomial Negativa
+
+En la Binomial Negativa, el estadístico $\chi^2$ funciona como
+diagnóstico orientativo. Su validez puede verse afectada porque el
+parámetro $k$ ha sido estimado a partir de los mismos datos.
+
+Por ello, la inferencia no debe descansar exclusivamente en este
+contraste. Es recomendable triangular la evidencia con los índices de
+dispersión (por ejemplo $I_M$ y Lloyd) y con comparación de modelos
+mediante máxima verosimilitud (AIC).
+:::
+
+------------------------------------------------------------------------
+
+###### Paso 4. Bondad de ajuste ($\chi^2$ baj) para Binomial Negativa (4 clases)
+
+Para evaluar la bondad de ajuste de la BN se utiliza el estadístico
+$\chi^2$ calculado a partir de las clases agrupadas en
+@tbl-agrupacion-BN-4clases.
+
+En este ejercicio, los grados de libertad se toman como
+$gl = k_{clases} - 1$, donde $k_{clases}$ corresponde al número de
+clases con valores esperados definidos.
+
+Dado que el parámetro $k$ fue estimado por momentos (@tbl-estimacion-k),
+el resultado de $\chi^2$ debe interpretarse como un diagnóstico
+orientativo y complementarse con los índices de dispersión y con la
+comparación por MLE (AIC).
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-baj-BN-4clases
+#| tbl-cap: "Prueba de bondad de ajuste χ2 para Binomial Negativa (4 clases)"
+
+k_clases <- sum(!is.na(fx_BN_agrup$Ex))
+gl_BN <- k_clases - 1
+
+chi2_BN  <- sum(fx_BN_agrup$`chi^2 comp`, na.rm = TRUE)
+p_BN     <- if (gl_BN > 0) pchisq(chi2_BN, df = gl_BN, lower.tail = FALSE) else NA_real_
+
+tibble::tibble(
+  `chi^2 (baj BN)` = chi2_BN,
+  `gl (BN)`     = gl_BN,
+  `p-valor (BN)`= p_BN
+) %>% 
+  kbl(digits = 3,
+      col.names = c(
+        "chi^2 (baj BN)","gl (BN)","p-valor (BN)"
+      ),
+      booktabs  = TRUE, 
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+::: callout-note
+## Interpretación guía
+
+-   Si alguna clase tiene $E_x < 5$, considerar reagrupar y reportar la
+    limitación.\
+-   Si $gl > 0$ y $p < 0.05$, se rechaza el ajuste BN.\
+-   Si $p \ge 0.05$, no se rechaza.
+:::
+
+Complementar con $ID$, $I_M$ y comparación BN vs Poisson mediante AIC.
+
+Con la distribución de frecuencias en 4 clases, el análisis de
+frecuencias observadas frente a las esperadas bajo la **Binomial
+Negativa** mostró diferencias (no se cumple la distribución agrupada o
+BN), debido a lo siguiente:
+
+-   $\chi^2$ = 5.69 con **gl = 1** y **p = 0.017**.\
+    Bajo este nivel de agrupación, **se rechaza la hipótesis de ajuste
+    BN** (es decir, las frecuencias no se explican bien por el modelo
+    Binomial Negativa en este caso).
+
+-   Este resultado debe leerse junto con el contraste Poisson (y con
+    $ID$ y $I_M$), ya que el diagnóstico por clases puede ser sensible a
+    la forma de agrupación y a la presencia/ausencia de clases
+    intermedias.
+
+-   Para **x = 0** (cuadrículas vacías), el ajuste es muy bueno: 33
+    observadas frente a 33.4 esperadas.
+
+-   Para **x = 1**, la BN subestima ligeramente la frecuencia (11
+    observadas vs. 8.5 esperadas).
+
+-   En **x = 2**, el modelo sobreestima claramente (0 observadas vs. 3.3
+    esperadas), generando la mayor contribución al $\chi^2$.
+
+-   En las clases con **≥3 individuos**, el ajuste es más razonable,
+    aunque todavía la BN subestima (4 observadas vs. 2.1 esperadas).
+
+Este resultado sugiere que la muestra censada de *Calotropis procera,*
+**no sigue el patrón de agrupación Binomial Negativo** bajo la partición
+de 4 clases. Aunque la BN es un modelo diseñado para describir
+poblaciones **agrupadas o en parches**, en este caso estadístico, el
+patrón observado se desvía de la expectativa, especialmente en la
+ausencia de cuadrículas con dos individuos (clase *x = 2*).
+
+Esto refleja que los individuos tienden a distribuirse en dos extremos:
+**ausentes** en gran parte de las unidades muestrales (vacíos
+abundantes) y presentes en cantidades **mayores a lo esperado en ciertos
+parches** (≥3 individuos). Este patrón purde ser consistente con
+especies vegetales colonizadoras o en expansión inicial, que suelen
+formar núcleos localizados de mayor densidad en un parche donde la
+mayoría de los sitios o hábitats no han sido ocupados (en espacios
+abiertos como se observa en el área evaluada).
+
+::: callout-note
+## Por qué $\chi^2$ y AIC pueden dar mensajes distintos
+
+La prueba $\chi^2$ depende de cómo se agrupan las clases (0, 1, 2, ≥3) y
+puede verse dominada por una sola clase intermedia mal representada (por
+ejemplo, ausencia de $x=2$).\
+En cambio, la comparación por AIC (MLE) evalúa el ajuste global del
+modelo a los conteos, sin depender de particiones por clases.\
+Por ello, es posible que $\chi^2$ rechace el ajuste por clases mientras
+AIC favorece la Binomial Negativa como descripción global de la
+sobre-dispersión.
+:::
+
+###### Paso 5. Gráfico: Observado vs. BN esperado
+
+En @fig-c6-4 se comparan las frecuencias observadas por cuadrícula
+($F_x$) con las frecuencias esperadas bajo BN ($E_x = n\,P_x$), usando
+los parámetros $\mu$ y $k$ estimados en los pasos previos. Esta
+comparación ayuda a identificar en qué clases (vacías, intermedias o
+altas) se concentra el desacuerdo entre el patrón observado y el modelo.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: fig-c6-4
+#| fig-cap: "Distribución de frecuencias observadas vs. esperadas (Binomial Negativa)"
+
+
+#| fig-pos: 'H'
+
+obs_exp_BN <- 
+fx_BN %>% 
+  select(x, Fx, Ex) %>% 
+  tidyr::pivot_longer(cols = c(Fx, Ex),
+                      names_to = "tipo", values_to = "frecuencia")
+
+ggplot(obs_exp_BN, aes(x = factor(x), y = frecuencia, fill = tipo)) +
+  geom_col(position = "dodge") +
+  labs(x = "Individuos por cuadrícula (x)",
+       y = "Frecuencia",
+       fill = "",
+       title = "") +
+  theme_bw(base_size = 13)
+```
+
+La @fig-c6-4 permite leer el ajuste de BN por zonas:
+
+**- Cuadrículas vacías (**$x=0$): cuando el modelo reproduce bien los
+vacíos, las barras observada y esperada quedan cercanas; si no, se
+evidencia exceso/defecto de vacíos.
+
+**- Clases intermedias (**$x=1,2$): suelen concentrar el mayor
+desacuerdo cuando hay “saltos” en la ocupación (por ejemplo, ausencia de
+$x=2$).
+
+**- Clases altas (**$x \ge 3$): resumen la capacidad del modelo para
+capturar los parches; una subestimación persistente sugiere colas más
+pesadas que las esperadas con el $k$ calculado.
+
+Un desajuste como el observado —exceso de vacíos junto a varias UM con
+valores relativamente altos— es típico de **colonización en parches** o
+de **microhábitats muy heterogéneos**. La BN modela agregación, pero si
+el paisaje tiene **grandes zonas sin individuos** y **núcleos densos**,
+el ajuste puede fallar en clases intermedias (p. ej., x = 2).
+
+------------------------------------------------------------------------
+
+###### Conclusión automatizada
+
+A partir de la prueba de bondad de ajuste calculada en
+@tbl-baj-BN-4clases, se resume el diagnóstico global para la
+distribución BN.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: conclusion-BN
+conclusion_BN <- 
+dplyr::case_when(
+  is.na(k_hat) ~ "BN no aplicable: s^2 ≤ µ (no hay evidencia de sobre-dispersión).",
+is.na(gl_BN) | gl_BN <= 0 ~ "chi^2 (BN) no es concluyente con las clases definidas; interpretar la tabla y usar índices.",
+  !is.na(p_BN) & p_BN < 0.05 ~ "Se rechaza el ajuste BN a las frecuencias (p < 0.05).",
+  !is.na(p_BN) & p_BN >= 0.05 ~ "No se rechaza el ajuste BN (frecuencias consistentes con patrón agrupado BN).",
+  TRUE ~ "Resultado indeterminado; revisar clases o estimación de k."
+)
+```
+
+```{r}
+cat(conclusion_BN)
+```
+
+La **conclusión de BN** indica el resultado de la prueba de bondad de
+ajuste $\chi^2$ usando la tabla **agrupada en 4 clases (0, 1, 2, ≥3)**,
+lo que provee **gl = 1** siempre que todas las clases tengan $E_x$
+válidas.
+
+-   Si **p \< 0.05** (como ocurrió al evaluar tu tabla con
+    $\chi^2 = 5.69$, gl = 1, **p = 0.017**), se **rechaza** el ajuste
+    BN: las frecuencias observadas difieren de las esperadas bajo BN.\
+-   Si **p ≥ 0.05**, **no se rechaza** el ajuste BN.
+
+::: callout-note
+## Lectura integrada
+
+Cuando el diagnóstico por clases rechaza BN, conviene contrastarlo con
+la evidencia de sobredispersión (por ejemplo $ID$, Lloyd, Morisita) y
+con la comparación Poisson vs BN por MLE (AIC), porque el resultado de
+$\chi^2$ puede ser sensible a la forma de agrupar clases y a la
+presencia/ausencia de clases intermedias.
+:::
+
+------------------------------------------------------------------------
+
+##### 1.3). Comparación de modelos: Poisson vs. Binomial Negativa (AIC, MLE)
+
+> Objetivo: evaluar, con **máxima verosimilitud (MLE)**, cuál modelo
+> describe mejor los conteos por unidad muestral, comparando **AIC**
+> entre Poisson y Binomial Negativa. No modifica los pasos anteriores;
+> es un **complemento final**.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-aic-mle
+#| tbl-cap: "Comparación de modelos por AIC (MLE)"
+
+suppressPackageStartupMessages({
+  library(MASS)      # glm.nb
+  library(dplyr)
+  library(kableExtra)
+})
+
+# Datos como data.frame simple
+df_counts <- data.frame(y = conteos)
+
+# Ajustes (intercepto únicamente): y ~ 1
+mod_pois <- glm(y ~ 1, data = df_counts, family = poisson(link = "log"))
+mod_nb   <- tryCatch(glm.nb(y ~ 1, data = df_counts), error = function(e) NULL)
+
+# Resumen AIC
+get_row <- function(name, fit){
+  if (is.null(fit)) return(data.frame(Modelo = name, logLik = NA, k = NA, AIC = NA))
+  ll <- as.numeric(logLik(fit))
+  k  <- attr(logLik(fit), "df")  # número de parámetros estimados
+  data.frame(Modelo = name, logLik = ll, k = k, AIC = AIC(fit))
+}
+
+tab <- bind_rows(
+  get_row("Poisson (glm)", mod_pois),
+  get_row("Binomial Negativa (glm.nb)", mod_nb)
+)
+
+# ΔAIC y pesos de Akaike
+minAIC <- min(tab$AIC, na.rm = TRUE)
+tab$Delta_AIC <- tab$AIC - minAIC
+tab$wAIC <- exp(-0.5 * tab$Delta_AIC)
+tab$wAIC <- tab$wAIC / sum(tab$wAIC, na.rm = TRUE)
+
+tab %>%
+  mutate(
+    logLik = round(logLik, 3),
+    AIC = round(AIC, 3),
+    Delta_AIC = round(Delta_AIC, 3),
+    wAIC = round(wAIC, 3)
+  ) %>%
+  kbl( 
+    align = c("l","c","c","c","c","c"),
+    booktabs  = TRUE, 
+    longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+Escoger el modelo con $AIC$ más bajo ($ΔAIC$ = 0 y mayor peso de Akaike,
+wAIC) (@tbl-aic-mle).\
+Si **BN** tiene un AIC marcadamente menor que **Poisson**, se apoya el
+**patrón agregado**; si **Poisson** gana, se respalda **aleatoriedad**.\
+Esta comparación es **complementaria** a las tablas de frecuencias y a
+los **índices de dispersión**.
+
+-   **BN**: $AIC$ = **98.589**, $\Delta\ AIC$ = **0.000**, $w\ AIC$ =
+    **0.993**.\
+-   **Poisson**: $AIC$ = **108.533**, $\Delta\ AIC$ = **9.944**,
+    $w\ AIC$ = **0.007**.
+
+Esto indica **evidencia muy fuerte** a favor de **Binomial Negativa**
+frente a **Poisson** en términos de **verosimilitud penalizada por
+complejidad** ($AIC$). Ecológicamente, respalda que la población
+presenta **sobre-dispersión** (varianza \> media) y, por tanto, un
+patrón de **agregación** más compatible con BN que con Poisson.
+
+::: callout-note
+## Interpretación integrada
+
+Aunque la BN no ajustó adecuadamente las frecuencias en la prueba
+$\chi^2$ con 4 clases —principalmente por el comportamiento de las
+clases intermedias—, la comparación por AIC indica que la BN describe
+mucho mejor los conteos que Poisson ($\Delta AIC \approx 10$;
+$w_{AIC} \approx 0.99$).
+
+En conjunto, la evidencia apunta a un patrón **agregado**, con parches
+más marcados que los que captura el modelo Poisson.
+:::
+
+En consecuencia, la decisión final sobre el patrón espacial debe basarse
+en evidencia convergente: comparación de modelos (AIC), junto con
+índices de dispersión ($ID$, $I_M$, Lloyd) y la interpretación ecológica
+del sistema muestreado.
+
+------------------------------------------------------------------------
+
+\newpage
+
+#### 2.) Patrón de distribución espacial, mediante índices de dispersión
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-diagnosticos
+#| tbl-cap: "Diagnósticos de patrón espacial"
+
+# --- Índices clásicos de dispersión ---
+
+# 1) Índice de dispersión (ID)
+# n_quad: número de cuadrículas (UM) para el análisis espacial
+n_quad <- length(conteos)
+
+ID <- s2 / mu
+chi2_disp <- (n_quad - 1) * ID
+p_disp <- pchisq(chi2_disp, df = n_quad - 1, lower.tail = FALSE)
+# 2) Índice de agrupamiento (IC, David & Moore 1964)
+IC <- (s2 / mu) - 1
+
+# 3) Índice de Holgate (IH) 
+# (Nota: requiere datos de distancias d y d2; aquí se deja NA si no se calculan)
+IH <- NA_real_
+
+# 4) Lloyd: media de hacinamiento (m*)
+m_crowd <- mu + (s2 / mu) - 1
+
+# 5) Lloyd: índice de clumping (I_c)
+I_c <- m_crowd / mu
+
+# 6) Morisita (IM)
+IM <- if (N > 1) {
+  n * sum(conteos * (conteos - 1)) / (N * (N - 1))
+} else NA_real_
+
+# --- Tabla resumen ---
+diag_tbl <- tibble::tibble(
+  `ID = s^2/µ̂`        = ID,
+  `IC (D. & M.)`      = IC,
+  `IH (Holgate)`      = IH,
+  `Lloyd m*`          = m_crowd,
+  `Ic (Lloyd)`        = I_c,
+  `Morisita IM`       = IM,
+  `chi^2_disp`          = chi2_disp,
+  `gl`                = n - 1,
+  `p`                 = p_disp
+)
+
+diag_tbl %>%
+  kbl(digits = c(2,2,2,2,2,2,2,0,5),
+      col.names = c(
+        "ID = s^2/µ̂","IC (D. & M.)","IH (Holgate)","Lloyd m*",
+        "Ic (Lloyd)","Morisita IM","chi^2_disp","gl","p"
+      ),
+      booktabs  = TRUE) %>% 
+  kable_classic(full_width = FALSE) %>%
+  kable_styling(
+    full_width = FALSE,
+    font_size  = 10,
+    latex_options = c("repeat_header")  # ok con longtable
+  )
+```
+
+-   **Índice de dispersión (**$ID$ = 2.12) e $IC$ (1.12)
+    (@tbl-diagnosticos):\
+    Ambos valores son **mayores a 1**, lo que indica que la varianza
+    excede a la media, un signo de **distribución agregada**.\index{Índice!Dispersión (ID)}
+
+-   **Lloyd** $m^*$ (1.66) e $I_c$ (3.06):\*\
+    El hacinamiento medio es mayor que la media poblacional y el índice
+    de clumping está muy por encima de 1. Esto confirma que **los
+    individuos no se distribuyen de forma independiente**, sino que
+    tienden a concentrarse en ciertos cuadrantes.
+
+-   **Morisita (**$I_M$ = 3.1):\
+    Reafirma un **fuerte patrón de agregación**, dado que valores
+    significativamente mayores a 1 son evidencia de parches o clústeres
+    de individuos.\index{Índice!Morisita (I_M)}
+
+-   **Prueba** $\chi^2$ de dispersión ($\chi^2$ = 99.54, $gl$ = 47, $p$
+    = $1 x 10^{-05}$):\
+    El contraste estadístico rechaza la hipótesis de aleatoriedad
+    (Poisson), indicando que la varianza excede significativamente a la
+    media (sobredispersión). Esto sugiere que el patrón no es compatible
+    con una distribución Poisson estricta y que modelos con agregación o
+    heterogeneidad (p. ej. Binomial Negativa) pueden describir mejor los
+    datos.
+
+::: callout-note
+## Por qué los contrastes pueden diferir
+
+La $\chi^2$ de bondad de ajuste (por clases) depende de la partición de
+clases y de que ($E_x \ge 5$).\
+En conteos con muchas celdas vacías, la necesidad de agrupar reduce el
+número de clases y el poder del test.\
+En cambio, la prueba basada en ($ID = s^2/\mu$) utiliza ($gl = n-1$) y
+contrasta directamente si ($s^2$) difiere de ($\mu$), por lo que puede
+detectar sobredispersión aun cuando la $\chi^2$ por clases sea poco
+informativa.
+:::
+
+Estos diagnósticos en conjunto muestran que la población estudiada
+**presenta un patrón claramente agrupado**. En términos ecológicos, esto
+puede explicarse porque los individuos de *Calotropis* tienden a ocupar
+**lugares favorables** en parches, por lo que se observan muchas
+cuadrículas vacías. Factores ambientales o bióticos (competencia,
+dispersión limitada, tipo de sustrato, exposición al sol) podrían estar
+reforzando la agregación natural.
+
+------------------------------------------------------------------------
+
+\newpage
+
+### *B. Estimación ecológica de la densidad de la población*
+
+A continuación, se estimará la densidad de *Calotropis* usando tres
+enfoques matemáticos:
+
+-   **Holtage** con puntos de intersección al azar:\
+    $IH_D = \frac{n}{\pi \sum x_i^2}$\
+-   **King** con transecto diagonal:\
+    $D = \frac{n^2}{2 L \sum d_i}$\
+-   **Hayne** (evita subestimaciones de King):\
+    $D = \frac{\sum (1/d_i)}{2 L}$
+
+> Todas las distancias deben estar en **metros** y $L$ (longitud del
+> transecto) en **metros**. Se reportan resultados en
+> $\text{ind}\cdot \text{m}^{-2}$ y $\text{ind}\cdot \text{ha}^{-1}$.
+
+::: callout-note
+## Nota terminológica
+
+Holtage se utiliza aquí a un estimador de densidad basado en distancias
+desde puntos aleatorios al individuo más cercano. No debe confundirse
+con el índice de Holgate (1964), utilizado para análisis de patrón
+espacial basado en distancias entre individuos.
+:::
+
+------------------------------------------------------------------------
+
+#### 1.) Método de Holtage (con puntos de intersección al azar)
+
+Se estima la densidad mediante el estimador:
+$IH_D = \frac{n}{\pi \sum x_i^2}$
+
+donde $x_i$ corresponde a la distancia desde cada punto de intersección
+al individuo más cercano (en metros). Este método integra la información
+espacial a través del término $\sum x_i^2$, lo que lo hace sensible a la
+presencia de claros o zonas vacías.
+
+##### Paso 1. Cargar las librerías requeridas
+
+Primero se cargan las librerías necesarias para el ejercicio.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: setup_c6
+#
+suppressPackageStartupMessages({
+  library(readxl)
+  library(dplyr)
+  library(tidyr)
+  library(stringr)
+  library(kableExtra)
+  library(ggplot2)
+})
+
+```
+
+##### Paso 2. Lectura de la base de datos para calcular IH
+
+Los datos empleados para el estimador de Holtage provienen de mediciones
+de distancias desde puntos de intersección distribuidos aleatoriamente
+en la parcela evaluada. Una vista preliminar se presenta en la
+@tbl-c6-8. Las columnas `Indv_1_m` e `Indv_2_m` representan las
+distancias medidas en metros, mientras que x2_m corresponde a $x_i^2$,
+valor utilizado directamente en el cálculo de $IH_D$.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-c6-8
+#| tbl-cap: "Vista previa — Densidad por puntos aleatorios de intersección"
+
+datos1 <- read_xlsx("datos.c6.xlsx", sheet = "densidad1")
+
+head(datos1, 4) %>% 
+  kbl(booktabs  = TRUE, digits = 3,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+##### Paso 3. Cálculo de IH en metros cuadrados (m2) y en hectáreas (ha)
+
+A partir de $\sum x_i^2$ se estima la densidad por el método de
+Holtage.\
+Los resultados agregados del cálculo se presentan en @tbl-c6-9.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-c6-9
+#| tbl-cap: "Holtage — Densidad estimada por distancias (IH)"
+
+# Cálculo de Holtage (IH) a partir de chi^2 en metros cuadrados
+res_ih <- 
+  datos1 %>%
+  rename_with(tolower) %>%
+  transmute(x2_m = as.numeric(x2_m)) %>%
+  filter(!is.na(x2_m), x2_m > 0) %>%
+  summarise(
+    n_puntos   = n(),
+    sum_x2_m2  = sum(x2_m),
+    D_Ht_m2    = n_puntos / (pi * sum_x2_m2),
+    D_Ht_ha    = D_Ht_m2 * 10000
+  )
+
+#
+res_ih %>%
+  kbl(booktabs  = TRUE,
+      digits = c(0, 3, 6, 0),
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+##### Paso 4. Visualización de las frecuencias observadas
+
+El histograma\index{Visualización!histogramas} de las distancias al individuo más cercano se muestra en
+@fig-c6-5.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: fig-c6-5
+#| fig-cap: "Distribución de distancias usadas en IH (Holtage)"
+#| fig-pos: 'H'
+
+# Chequeo visual simple (opcional y didáctico)
+ggplot(datos1, aes(x = sqrt(x2_m))) +
+  geom_histogram(bins = 20, fill = "skyblue", color = "white") +
+  geom_vline(aes(xintercept = mean(sqrt(x2_m), na.rm = TRUE)), 
+             linetype = 2, color = "red") +
+  labs(x = "Distancia al 1er individuo, xᵢ (m)",
+       y = "Frecuencia",
+       title = "") +
+  theme_bw()
+
+```
+
+Se presenta una amplia dispersión de distancias al primer individuo, con
+la media (línea punteada roja) en torno a valores intermedios y una cola
+hacia $x_i$ grandes. Esto sugiere un ensamble parcheado: hay sectores
+con parches claros amplios ($x_i$ grandes) alternados con vecindades
+densas ($x_i$ pequeños). Como $D_{Ht}$ usa $\sum x_i^2$, esos claros
+quedan muy penalizados, empujando la estimación hacia valores bajos
+(coherente con $D_{Ht} \approx 0.048\ \text{ind}\cdot \text{m}^{-2}$).
+Esto indica que la parcela evaluada puede presentar amplios espacios
+vacíos entre los grupos de individuos.
+
+------------------------------------------------------------------------
+
+\newpage
+
+#### 2.) Índices de King y de Hayne (con transecto diagonal)
+
+Se estiman dos densidades basadas en distancias perpendiculares medidas
+desde un transecto diagonal de longitud $L$:
+
+-   **King:** $D = \frac{n^2}{2 L \sum d_i}$\
+-   **Hayne:** (evita subestimaciones de King)
+    $D = \frac{\sum (1/d_i)}{2 L}$
+
+Ambos estimadores utilizan la misma información básica ($d_i$), pero
+difieren en la forma de ponderarla.
+
+##### Paso 1. Leer las dos bases de datos
+
+A continuación se se carga la segunda hoja de cálculo (densidad2),
+requerida para los índices de King y de Hayne. Los datos corresponden a
+distancias perpendiculares desde cada individuo al transecto. Una vista
+preliminar se presenta en @tbl-c6-10. Las columnas `di_m` representan
+las distancias en metros, mientras que `1/di` corresponde al inverso
+utilizado en el estimador de Hayne.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-c6-10
+#| tbl-cap: "Vista previa — Densidad por puntos en transecto diagonal"
+
+# 1) Leer y previsualizar
+datos2 <- read_xlsx("datos.c6.xlsx", sheet = "densidad2")
+
+head(datos2, 4) %>%
+  kbl(booktabs  = TRUE, digits = 3,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+
+```
+
+##### Paso 2. Cálculos de los índices King y Hayne.
+
+Los resultados de ambos estimadores se resumen en @tbl-c6-11.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-c6-11
+#| tbl-cap: "Índices de King y Hayne — Densidad estimada por puntos aleatorios en la parcela evaluada"
+
+# 2) Cálculo mínimo (King y Hayne)
+d2 <- 
+  datos2 %>% 
+  dplyr::rename_with(tolower)
+
+L <- 28.284271  # Hipotenusa (L) tomada de tu hoja de resultados
+
+d <- d2 %>% 
+  transmute(
+    di    = as.numeric(di_m),
+    invdi = as.numeric(`1/di`)
+  ) %>% 
+  filter(is.finite(di), di > 0, is.finite(invdi))   # excluir d_i <= 0
+
+n       <- nrow(d)
+sum_di  <- sum(d$di)
+sum_inv <- sum(d$invdi)
+
+res <- tibble::tibble(
+  `L (m)`              = L,
+  `n (puntos)`         = n,
+  `∑ d_i (m)`          = sum_di,
+  `∑ (1/d_i) (m⁻¹)`    = sum_inv,
+  `King D (ind·m⁻^2)`   = (n^2) / (2 * L * sum_di),
+  `King D (ind·ha⁻¹)`  = ((n^2) / (2 * L * sum_di)) * 10000,
+  `Hayne D (ind·m⁻^2)`  =  sum_inv / (2 * L),
+  `Hayne D (ind·ha⁻¹)` = (sum_inv / (2 * L)) * 10000
+)
+
+res %>%
+  kbl(booktabs  = TRUE,
+      digits = c(2,0,3,3,3,0,2,0)) %>% 
+  kable_classic(full_width = FALSE) %>% 
+  kable_styling(
+    full_width = FALSE,
+    font_size  = 10,
+    latex_options = c("repeat_header")  # ok con longtable
+  )
+```
+
+En este caso:
+
+$D_{\text{King}} \approx 0.298\ \text{ind·m}^{-2}$ (≈ 2979
+ind·ha$^{-1}$).
+
+$D_{\text{Hayne}} \approx 0.65\ \text{ind·m}^{-2}$ (≈ 6509
+ind·ha$^{-1}$).
+
+La diferencia entre ambos valores se debe a la forma en que cada método
+pondera las distancias: King utiliza la media aritmética implícita en
+$\sum d_i$, mientras que Hayne incorpora el inverso de las distancias,
+dando mayor peso a valores pequeños.
+
+Esta divergencia anticipa que el patrón espacial capturado por el
+transecto no es homogéneo y que existen sectores donde los individuos se
+ubican muy cerca de la línea de muestreo.
+
+------------------------------------------------------------------------
+
+##### Paso 3. Visualización de las frecuencias observadas
+
+```{r, message=FALSE, warning=FALSE}
+#| label: fig-c6-6
+#| fig-cap: "Distribución de dᵢ (m) — método King"
+#| fig-pos: 'H'
+
+# Partimos de la misma lectura que ya tienes:
+# datos2 <- read_xlsx("datos.c6.xlsx", sheet = "densidad2")
+
+# Preparar datos (usa tus nombres reales: di_m y `1/di`)
+d <- datos2 %>% 
+  dplyr::rename_with(tolower) %>% 
+  dplyr::transmute(
+    di    = as.numeric(di_m),
+    invdi = as.numeric(`1/di`)
+  ) %>% 
+  dplyr::filter(is.finite(di), di > 0, is.finite(invdi))
+
+# --- Gráfico 1: KING (distribución de d_i)
+ggplot(d, aes(x = di)) +
+  geom_histogram(bins = 20, fill = "skyblue", color = "white") +
+  geom_vline(aes(xintercept = mean(di, na.rm = TRUE)),
+             linetype = 2, color = "red") +
+  labs(x = "Distancia perpendicular, dᵢ (m)",
+       y = "Frecuencia",
+       title = "") +
+  theme_bw()
+```
+
+En la @fig-c6-6 se observa que la distribución de las distancias $d_i$
+se concentra alrededor de valores medios, con algunas $d_i$ pequeñas y
+una extensión moderada hacia $d_i$ mayores. Esa forma sugiere que, a lo
+largo del transecto, se atravesó franjas con presencia regular de
+individuos, alternadas con pequeños trechos más despejados. Al usar la
+media aritmética de $d_i$, *King* actúa como una lectura promedio del
+transecto: no magnifica las $d_i$ muy pequeñas ni castiga de más las
+grandes, por eso la densidad resultante es intermedia (≈ 0.298
+ind·m⁻\^2) y supera a Holtage cuando el transecto pasa por zonas
+relativamente densas del sitio.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: fig-c6-7
+#| fig-cap: "Distribución de 1/dᵢ (m^-1) - método Hayn"
+#| fig-pos: 'H'
+
+# --- Gráfico 2: HAYNE (distribución de 1/d_i)
+ggplot(d, aes(x = invdi)) +
+  geom_histogram(bins = 20, fill = "skyblue", color = "white") +
+  geom_vline(xintercept = mean(d$invdi, na.rm = TRUE),
+             linetype = 2, color = "red") +
+  labs(
+    x = "Distancia perpendicular, 1/dᵢ (m^-1)",
+    y = "Frecuencia",
+    title = "e"
+  ) +
+  theme_bw()  # <- sin base_family
+```
+
+En el histograma\index{Visualización!histogramas} de la @fig-c6-7 $1/d_i$ es **asimétrico a la derecha**:
+la mayoría de valores se agrupan en la parte baja, pero hay picos altos
+producidos por unos pocas $d_i$ muy pequeñas (individuos pegados a la
+línea). Eso puede indicar **micro-parches** o agrupaciones que el
+transecto encontró de cerca. Como *Hayne* usa la media armónica (vía
+$∑1/d_i$), sobrerrepresenta esas cercanías y eleva la densidad (≈ 0.651
+ind·m⁻\^2), quedando por encima de *King*.
+
+------------------------------------------------------------------------
+
+##### Análisis comparativo
+
+Los valores resumidos en @tbl-c6-12 muestran un gradiente claro entre
+los tres estimadores:
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#| label: tbl-c6-12
+#| tbl-cap: "Comparación de densidades: Holtage, King y Hayne"
+
+comp <- dplyr::bind_rows(
+  tibble::tibble(
+    Metodo         = "Holtage",
+    `D (ind·m^{-2})`  = res_ih$D_Ht_m2,
+    `D (ind·ha^{-1})` = res_ih$D_Ht_ha,
+    `n (puntos)`   = res_ih$n_puntos
+  ),
+  tibble::tibble(
+    Metodo         = "King",
+    `D (ind·m^{-2})`  = res$`King D (ind·m^{-2})`,
+    `D (ind·ha^{-1})` = res$`King D (ind·ha^{-1})`,
+    `n (puntos)`   = res$`n (puntos)`
+  ),
+  tibble::tibble(
+    Metodo         = "Hayne",
+    `D (ind·m^{-2})`  = res$`Hayne D (ind·m^{-2})`,
+    `D (ind·ha^{-1})` = res$`Hayne D (ind·ha^{-1})`,
+    `n (puntos)`   = res$`n (puntos)`
+  )
+)
+
+comp %>%
+  kbl(booktabs = TRUE,
+      digits = c(NA, 3, 0, 0),
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+##### Análisis comparativo
+
+Los valores resumidos en @tbl-c6-12 muestran un gradiente claro entre
+los tres estimadores:
+
+$$
+D_{Ht} < D_{\text{King}} < D_{\text{Hayne}}
+$$
+
+Esta jerarquía es coherente con la forma en que cada método pondera la
+información espacial.
+
+-   **Holtage** integra distancias desde puntos aleatorios distribuidos
+    en toda la parcela y utiliza $\sum x_i^2$ en el denominador. Las
+    distancias grandes incrementan rápidamente ese término, reduciendo
+    la densidad estimada. Por ello, este método es sensible a la
+    presencia de claros y tiende a reflejar un promedio paisajístico.
+
+-   **King** se basa en las distancias perpendiculares al transecto y
+    utiliza implícitamente la media aritmética de $d_i$. Cuando existen
+    valores pequeños y grandes mezclados, la media suaviza la variación
+    y produce una densidad intermedia.
+
+-   **Hayne** reemplaza la media aritmética por una media armónica
+    (mediante $\sum 1/d_i$), otorgando mayor peso a distancias pequeñas.
+    Esto eleva la estimación cuando hay individuos muy cercanos a la
+    línea de muestreo.
+
+En este caso:
+
+-   $D_{\text{Hayne}} > D_{\text{King}}$ indica presencia de varias
+    distancias pequeñas.
+-   Ambos superan ampliamente a $D_{Ht}$, lo que sugiere que el
+    transecto interceptó sectores relativamente densos en comparación
+    con el promedio espacial de la parcela.
+
+Además, la diferencia en cobertura espacial es relevante: Holtage
+utilizó 58 puntos distribuidos en toda la unidad de estudio, mientras
+que King y Hayne se basaron en 20 puntos a lo largo de una trayectoria
+específica. Si el transecto atraviesa un núcleo denso, la estimación
+aumenta respecto al promedio global.
+
+En distribuciones agregadas es común observar el patrón:
+
+$$
+D_{Ht} < D_{\text{King}} < D_{\text{Hayne}}
+$$
+
+mientras que en distribuciones cercanas a la aleatoriedad, King y Hayne
+tienden a converger y aproximarse al valor de Holtage.
+
+En este sentido, los tres métodos concuerdan en que la densidad no es
+homogénea. Con el transecto diagonal se sugiere una franja densa (King)
+que, al ponderar fuertemente distancias pequeñas, lleva a una cota
+superior (Hayne). En contraste, los puntos aleatorios en toda la parcela
+(Holtage) integran claros extensos del sitio y entregan la cota
+inferior. La lectura conjunta es consistente con una **estructura
+espacial agrupada**, consistente con los resultados de los índices de
+dispersión calculados anteriormente.
+
+------------------------------------------------------------------------
+
+\newpage
+
+### Errores comunes e interpretación
+
+-   **Confundir “rechazo del modelo Poisson” con “prueba concluyente de
+    agregación”.** Que $ID>1$ y que el contraste $\chi^2_{disp}$ sea
+    significativo indica **sobredispersión** (varianza mayor que media)
+    e incompatibilidad con aleatoriedad Poisson; sin embargo, la
+    inferencia ecológica debe basarse en evidencia convergente (por
+    ejemplo $I_M$, @lloyd1967mean y la comparación Poisson vs BN por AIC),
+    especialmente cuando las pruebas por clases tienen limitaciones por
+    $E_x<5$ o por agrupación de colas.
+
+-   **Interpretar índices sin considerar la escala de muestreo.** El
+    patrón espacial depende del tamaño de la UM (2×2 m) y del tipo de
+    muestreo (puntos aleatorios vs transecto). Cambiar la escala puede
+    transformar un patrón aparentemente aleatorio en agregado (o
+    viceversa).
+
+-   **No verificar supuestos de validez en pruebas** $\chi^2$. Tanto en
+    Poisson como en BN, la bondad de ajuste por $\chi^2$ requiere
+    frecuencias esperadas suficientemente grandes por clase. Si
+    persisten $E_x<5$ tras agrupar, el contraste puede ser **poco
+    informativo** y se debe reportar la limitación.
+
+-   **No diferenciar entre pruebas por clases y comparación por MLE
+    (AIC).** La prueba $\chi^2$ depende de cómo se agrupan las clases
+    (0, 1, 2, ≥3), mientras que el AIC evalúa el ajuste global del
+    modelo a los conteos. Por ello, ambos enfoques pueden producir
+    mensajes distintos, que deben integrarse en una conclusión única.
+
+-   **Confundir Holgate (índice por distancias a vecinos) con Holtage
+    (densidad por puntos aleatorios).** “Holgate” corresponde a un
+    índice basado en distancias a vecinos; “Holtage” se utiliza aquí
+    como un estimador de densidad basado en distancias desde puntos
+    aleatorios al individuo más cercano.
+
+------------------------------------------------------------------------
+
+### Aplicaciones ecológicas y ambientales
+
+-   **Ecología de invasiones y colonización.**\
+    Patrones agregados con exceso de vacíos y núcleos densos son típicos
+    de especies colonizadoras; cuantificar sobredispersión ayuda a
+    inferir etapas de expansión y focos de establecimiento.
+
+-   **Manejo y control de poblaciones problema.**\
+    En plagas, malezas o especies invasoras, identificar “parches”
+    permite estrategias de manejo focalizado (aplicación localizada) más
+    eficientes que intervenciones homogéneas.
+
+-   **Monitoreo en ambientes heterogéneos.**\
+    Los índices de dispersión y la comparación Poisson vs BN permiten
+    evaluar si la heterogeneidad ambiental (microhábitats) está
+    estructurando la ocupación espacial, útil en restauración y
+    evaluación de disturbio.
+
+-   **Diseño de muestreos y estimación de densidad.**\
+    Comparar Holtage, King y Hayne muestra cómo distintos diseños pueden
+    sesgar estimaciones cuando existen parches. Esto guía la selección
+    del método más apropiado según el objetivo (promedio paisajístico vs
+    densidad sobre un corredor/transecto).
+
+-   **Conservación y priorización espacial.**\
+    En especies raras o de interés de conservación, el patrón agregado
+    puede orientar la búsqueda de núcleos poblacionales, delimitación de
+    áreas críticas y evaluación de conectividad.
+
+------------------------------------------------------------------------
+
+### Conclusiones del capítulo
+
+1.  La caracterización del patrón espacial requiere integrar **pruebas
+    probabilísticas** (Poisson y BN), **índices de dispersión** ($ID$,
+    $I_M$, Lloyd) y el **contexto ecológico** del sistema muestreado.
+
+2.  En la muestra analizada, los índices $ID$, Lloyd e $I_M$ son
+    consistentes con **sobredispersión** y un patrón **agregado**, es
+    decir, presencia de parches con abundancias relativamente altas y
+    muchas unidades sin individuos.
+
+3.  La estimación de densidad mostró que distintos métodos capturan
+    facetas complementarias del patrón: Holtage tiende a representar un
+    promedio sensible a claros (cota inferior en paisajes parcheados),
+    mientras King y Hayne reflejan condiciones a lo largo del transecto,
+    donde Hayne amplifica la influencia de distancias pequeñas.
+
+4.  En distribuciones agregadas, no se espera una “densidad única” sin
+    especificar el diseño de muestreo; por ello, la interpretación debe
+    reportar método, escala y cobertura espacial, además de justificar
+    la discrepancia entre estimadores.
+
+------------------------------------------------------------------------
+
+### Transición hacia el capítulo siguiente: diversidad taxonómica
+
+Los patrones de distribución y densidad describen **cuántos individuos**
+hay y **cómo se organizan en el espacio**, lo cual define el escenario
+en el que se ensamblan las comunidades. En el capítulo siguiente, el
+enfoque se desplaza desde una sola especie hacia la **diversidad
+taxonómica**, incorporando preguntas sobre **cuántas especies**
+coexisten en un sitio, cómo se distribuyen sus abundancias y cómo
+comparar sitios con distinta riqueza o dominancia. Posteriormente, esta
+base se amplía a la diversidad **funcional** y **filogenética**, que
+permiten interpretar no solo el número de especies, sino también sus
+roles ecológicos y su historia evolutiva.
+
+::: callout-note
+## Idea fuerza
+
+En sistemas parcheados, la inferencia espacial y la densidad dependen de
+la **escala** y del **diseño de muestreo**; por ello, la conclusión más
+robusta surge de la **convergencia** entre modelos (Poisson/BN), índices
+de dispersión y estimadores de densidad.
+:::
+
+------------------------------------------------------------------------
+
+\newpage
+
+

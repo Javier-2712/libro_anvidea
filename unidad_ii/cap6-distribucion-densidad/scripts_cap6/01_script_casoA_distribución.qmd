@@ -1,0 +1,470 @@
+
+## Caso guiado: Distribución y densidad con parches de *Calotropis procera*
+
+
+### Preparación de los datos
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+#| label: setup2
+#| include: false
+
+suppressPackageStartupMessages({
+  library(readxl); 
+  library(dplyr); 
+  library(tidyr)
+  library(ggplot2); 
+  library(kableExtra); 
+  library(stringr)
+})
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-c6-2
+#| tbl-cap: "Estimadores descriptivos de la muestra evaluada"
+
+#| label: carga-datos
+# Cargar la base de datos
+datos <- read_xlsx("datos.c6.xlsx", sheet = "poisson")
+
+# Se usa la columna de conteos por cuadrícula
+# (en el archivo proporcionado se llama 'Individuos')
+conteos <- 
+  datos %>% 
+  dplyr::rename(x = Individuos) %>% 
+  dplyr::mutate(x = as.integer(x)) %>% 
+  dplyr::pull(x)
+
+# Estimadores descriptivos
+n  <- length(conteos)
+N  <- sum(conteos)
+mu <- mean(conteos)         # µ estimado
+s2 <- stats::var(conteos)   # varianza muestral
+
+# Elaboración de la tabla resumen
+resumen <- tibble::tibble(
+  `n (cuadrículas)` = n,
+  `N (individuos)`  = N,
+  `µ (media)`       = mu,
+  `s^2 (varianza)`   = s2
+)
+resumen %>% 
+  kbl(booktabs  = TRUE,
+      digits = c(0,0,2,2),
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+ 
+```
+
+
+### *A. Estimación estadística de la distribución espacial de la población.*
+
+#### 1. Diseños estadísticos
+
+##### 1.1) Prueba de Poisson.
+
+###### Paso 1. Cálculo de las Frecuencias observadas, Poisson esperada y contribuciones a $\chi^2$
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-c6-3
+#| tbl-cap: "Frecuencias, Poisson esperada y chi^2"
+
+# Número máx de individuos por cuadricula (filas de la tabla)
+x_max <- max(conteos)
+
+# Frecuencias observadas (Fx)
+fx <- tibble::tibble(x = conteos) %>% 
+  count(x, name = "Fx") %>% 
+  complete(x = 0:x_max, fill = list(Fx = 0)) %>% 
+  arrange(x)
+
+# Tabla de la distribución Poisson completa
+fx <- 
+  fx %>% 
+  mutate(
+    Px = dpois(x, mu),
+    Ex = n * Px,
+    `chi^2 comp` = (Fx - Ex)^2 / Ex
+  )
+
+# Impresión de la tabla de frecuencias
+fx %>% 
+  kbl(booktabs  = TRUE,
+      digits = c(0,0,2,1,2),
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+------------------------------------------------------------------------
+
+###### Paso 2. Agrupación automática (0, 1, ≥2)
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-c6-4
+#| tbl-cap: "Frecuencias agrupadas (solo 3 clases)"
+
+# Resumen de la tabla de frecuencia a tres clases de cobertura
+fx_agrup <- 
+  fx %>% 
+  mutate(clase = dplyr::case_when(
+    x == 0 ~ "0",
+    x == 1 ~ "1",
+    x >= 2 ~ "≥2"
+  )) %>% 
+  group_by(clase) %>% 
+  summarise(
+    Fx = sum(Fx),
+    Ex = sum(Ex),
+    .groups = "drop"
+  ) %>% 
+  mutate(`chi^2 comp` = (Fx - Ex)^2 / Ex)
+
+# Impresión de la tabla resumida
+fx_agrup %>% 
+  kbl(digits = 2,
+      col.names = c(
+        "clase","Fx","Ex","chi^2 comp"
+      ),
+      booktabs  = TRUE, 
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-c6-5
+#| tbl-cap: "Prueba de bondad de ajuste chi^2"
+
+# Prueba de hipótesis de aleatoriedad Poisson
+chi2  <- sum(fx_agrup$`chi^2 comp`)  # chi^2 calculado (no tabulado)
+gl    <- nrow(fx_agrup) - 1 - 1   # grados de libertad
+p_val <- if (gl > 0) 
+         pchisq(chi2, df = gl, 
+         lower.tail = FALSE) else NA_real_  # Valor p 
+
+# Tabulación de la prueba de hipótesis
+# Bondad de ajuste - chi^2 (baj)
+tibble::tibble(
+  `chi^2 (baj)` = chi2,
+  `gl`       = gl,
+  `p-valor`  = p_val) %>% 
+  kbl(booktabs  = TRUE, digits = c(2, 0,3),
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+------------------------------------------------------------------------
+
+###### Paso 3. Gráficos: Observado vs. Poisson esperado
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: fig-c6-3
+#| fig-cap: "Distribución de frecuencias observadas vs. esperadas (Poisson)"
+#| fig-pos: 'H'
+
+# 
+obs_exp <- 
+  fx %>% 
+  dplyr::select(x, Fx, Ex) %>% 
+  tidyr::pivot_longer(cols = c(Fx, Ex),
+                      names_to = "tipo", 
+                      values_to = "frecuencia")
+
+# Figura
+ggplot(obs_exp, aes(x = factor(x), y = frecuencia, fill = tipo)) +
+  geom_col(position = "dodge") +
+  labs(x = "Individuos por cuadrícula (x)",
+       y = "Frecuencia",
+       fill = "",
+       title = "") +
+  theme_bw(base_size = 13)
+```
+
+-----------------------------------------------------------------------
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-c6-6
+#| tbl-cap: "Índice de Morisita para el patrón espacial"
+
+# Índice de Morisita (IM)
+# n = número de UM (cuadrículas)
+# N = número total de individuos
+# xi = conteo en UM i
+IM <- (n * sum(conteos * (conteos - 1))) / (N * (N - 1))
+
+tibble::tibble(
+  `I_M (Morisita)` = IM,
+  `Interpretación` = dplyr::case_when(
+    is.na(IM) ~ "No calculable (verificar N).",
+    IM > 1 ~ "Agrupado",
+    IM < 1 ~ "Uniforme",
+    TRUE ~ "Aleatorio"
+  )
+) %>%
+  kbl(booktabs  = TRUE, digits = 3,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+\newpage
+
+##### 1.2) Prueba Binomial Negativa - BN.
+
+###### Paso 1. Estimación del parámetro de agrupamiento $k$
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-estimacion-k
+#| tbl-cap: "Estimador inicial de k (método de momentos)"
+k_hat <- if (s2 > mu) (mu^2) / 
+         (s2 - mu) else NA_real_
+
+tibble::tibble(
+  `k̂ (momentos)` = k_hat) %>% 
+  kbl(booktabs  = TRUE, digits = 3,
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+------------------------------------------------------------------------
+
+###### Paso 2. Frecuencias observadas, probabilidades Binomial Negativa y esperadas
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-frecuencias-BN
+#| tbl-cap: "Frecuencias observadas, Binomial Negativa esperada y contribuciones chi^2"
+x_max <- max(conteos)
+
+# Frecuencias observadas (Fx)
+fx_BN <- tibble::tibble(x = conteos) %>% 
+  count(x, name = "Fx") %>% 
+  complete(x = 0:x_max, fill = list(Fx = 0)) %>% 
+  arrange(x)
+
+# Probabilidades BN y esperadas (si k_hat es válido)
+fx_BN <- fx_BN %>% 
+  mutate(
+    Px = if (!is.na(k_hat) && k_hat > 0) dnbinom(x, size = k_hat, mu = mu) else NA_real_,
+    Ex = n * Px,
+    `chi^2 comp` = (Fx - Ex)^2 / Ex
+  )
+
+fx_BN %>% 
+  kbl(booktabs  = TRUE,
+      digits = c(0,0,3,3,3),
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+------------------------------------------------------------------------
+
+###### Paso 3. Agrupación automática (0, 1, 2, ≥3)
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-agrupacion-BN-4clases
+#| tbl-cap: "Frecuencias agrupadas (4 clases: 0, 1, 2, ≥3) — Binomial Negativa"
+
+fx_BN_agrup <- fx_BN %>% 
+  mutate(clase = dplyr::case_when(
+    x == 0 ~ "0",
+    x == 1 ~ "1",
+    x == 2 ~ "2",
+    x >= 3 ~ "≥3"
+  )) %>% 
+  group_by(clase) %>% 
+  summarise(
+    Fx = sum(Fx),
+    Ex = sum(Ex),
+    .groups = "drop"
+  ) %>% 
+  mutate(`chi^2 comp` = (Fx - Ex)^2 / Ex)
+
+fx_BN_agrup %>% 
+  kbl(digits = 3,
+      col.names = c(
+        "clase","Fx","Ex","chi^2 comp"
+      ),
+      booktabs  = TRUE, 
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+------------------------------------------------------------------------
+
+###### Paso 4. Bondad de ajuste ($\chi^2$ baj) para Binomial Negativa (4 clases)
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-baj-BN-4clases
+#| tbl-cap: "Prueba de bondad de ajuste χ2 para Binomial Negativa (4 clases)"
+
+k_clases <- sum(!is.na(fx_BN_agrup$Ex))
+gl_BN <- k_clases - 1
+
+chi2_BN  <- sum(fx_BN_agrup$`chi^2 comp`, na.rm = TRUE)
+p_BN     <- if (gl_BN > 0) pchisq(chi2_BN, df = gl_BN, lower.tail = FALSE) else NA_real_
+
+tibble::tibble(
+  `chi^2 (baj BN)` = chi2_BN,
+  `gl (BN)`     = gl_BN,
+  `p-valor (BN)`= p_BN
+) %>% 
+  kbl(digits = 3,
+      col.names = c(
+        "chi^2 (baj BN)","gl (BN)","p-valor (BN)"
+      ),
+      booktabs  = TRUE, 
+      longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+
+###### Paso 5. Gráfico: Observado vs. BN esperado
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: fig-c6-4
+#| fig-cap: "Distribución de frecuencias observadas vs. esperadas (Binomial Negativa)"
+
+
+#| fig-pos: 'H'
+
+obs_exp_BN <- 
+fx_BN %>% 
+  select(x, Fx, Ex) %>% 
+  tidyr::pivot_longer(cols = c(Fx, Ex),
+                      names_to = "tipo", values_to = "frecuencia")
+
+ggplot(obs_exp_BN, aes(x = factor(x), y = frecuencia, fill = tipo)) +
+  geom_col(position = "dodge") +
+  labs(x = "Individuos por cuadrícula (x)",
+       y = "Frecuencia",
+       fill = "",
+       title = "") +
+  theme_bw(base_size = 13)
+```
+
+------------------------------------------------------------------------
+
+##### 1.3). Comparación de modelos: Poisson vs. Binomial Negativa (AIC, MLE)
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-aic-mle
+#| tbl-cap: "Comparación de modelos por AIC (MLE)"
+
+suppressPackageStartupMessages({
+  library(MASS)      # glm.nb
+  library(dplyr)
+  library(kableExtra)
+})
+
+# Datos como data.frame simple
+df_counts <- data.frame(y = conteos)
+
+# Ajustes (intercepto únicamente): y ~ 1
+mod_pois <- glm(y ~ 1, data = df_counts, family = poisson(link = "log"))
+mod_nb   <- tryCatch(glm.nb(y ~ 1, data = df_counts), error = function(e) NULL)
+
+# Resumen AIC
+get_row <- function(name, fit){
+  if (is.null(fit)) return(data.frame(Modelo = name, logLik = NA, k = NA, AIC = NA))
+  ll <- as.numeric(logLik(fit))
+  k  <- attr(logLik(fit), "df")  # número de parámetros estimados
+  data.frame(Modelo = name, logLik = ll, k = k, AIC = AIC(fit))
+}
+
+tab <- bind_rows(
+  get_row("Poisson (glm)", mod_pois),
+  get_row("Binomial Negativa (glm.nb)", mod_nb)
+)
+
+# ΔAIC y pesos de Akaike
+minAIC <- min(tab$AIC, na.rm = TRUE)
+tab$Delta_AIC <- tab$AIC - minAIC
+tab$wAIC <- exp(-0.5 * tab$Delta_AIC)
+tab$wAIC <- tab$wAIC / sum(tab$wAIC, na.rm = TRUE)
+
+tab %>%
+  mutate(
+    logLik = round(logLik, 3),
+    AIC = round(AIC, 3),
+    Delta_AIC = round(Delta_AIC, 3),
+    wAIC = round(wAIC, 3)
+  ) %>%
+  kbl( 
+    align = c("l","c","c","c","c","c"),
+    booktabs  = TRUE, 
+    longtable = TRUE) %>% 
+  kable_classic(full_width = FALSE)
+```
+
+------------------------------------------------------------------------
+
+\newpage
+
+#### 2.) Patrón de distribución espacial, mediante índices de dispersión
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#| label: tbl-diagnosticos
+#| tbl-cap: "Diagnósticos de patrón espacial"
+
+# --- Índices clásicos de dispersión ---
+
+# 1) Índice de dispersión (ID)
+# n_quad: número de cuadrículas (UM) para el análisis espacial
+n_quad <- length(conteos)
+
+ID <- s2 / mu
+chi2_disp <- (n_quad - 1) * ID
+p_disp <- pchisq(chi2_disp, df = n_quad - 1, lower.tail = FALSE)
+# 2) Índice de agrupamiento (IC, David & Moore 1964)
+IC <- (s2 / mu) - 1
+
+# 3) Índice de Holgate (IH) 
+# (Nota: requiere datos de distancias d y d2; aquí se deja NA si no se calculan)
+IH <- NA_real_
+
+# 4) Lloyd: media de hacinamiento (m*)
+m_crowd <- mu + (s2 / mu) - 1
+
+# 5) Lloyd: índice de clumping (I_c)
+I_c <- m_crowd / mu
+
+# 6) Morisita (IM)
+IM <- if (N > 1) {
+  n * sum(conteos * (conteos - 1)) / (N * (N - 1))
+} else NA_real_
+
+# --- Tabla resumen ---
+diag_tbl <- tibble::tibble(
+  `ID = s^2/µ̂`        = ID,
+  `IC (D. & M.)`      = IC,
+  `IH (Holgate)`      = IH,
+  `Lloyd m*`          = m_crowd,
+  `Ic (Lloyd)`        = I_c,
+  `Morisita IM`       = IM,
+  `chi^2_disp`          = chi2_disp,
+  `gl`                = n - 1,
+  `p`                 = p_disp
+)
+
+diag_tbl %>%
+  kbl(digits = c(2,2,2,2,2,2,2,0,5),
+      col.names = c(
+        "ID = s^2/µ̂","IC (D. & M.)","IH (Holgate)","Lloyd m*",
+        "Ic (Lloyd)","Morisita IM","chi^2_disp","gl","p"
+      ),
+      booktabs  = TRUE) %>% 
+  kable_classic(full_width = FALSE) %>%
+  kable_styling(
+    full_width = FALSE,
+    font_size  = 10,
+    latex_options = c("repeat_header")  # ok con longtable
+  )
+```
+
+
+
+
+

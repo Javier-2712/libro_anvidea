@@ -1,0 +1,249 @@
+---
+title: "ANVIDEA - Reporte reproducible"
+subtitle: "Capítulo 3. Análisis climático y ecológico en ambientes contrastantes"
+author: "Javier Rodríguez-Barrios"
+date: last-modified
+lang: es
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    number-sections: false
+    code-fold: false
+    code-tools: false
+    embed-resources: true
+
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+::: {.callout-note}
+## Nota para el lector
+
+Este reporte complementa el Capítulo 3 de ANVIDEA. Su propósito es mostrar, de forma reproducible, las salidas generadas por los scripts del capítulo, sin sustituir la explicación conceptual desarrollada en el libro.
+:::
+
+```{r}
+#| include: false
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(htmltools)
+
+ruta_figuras  <- file.path("outputs", "figuras")
+ruta_tablas   <- file.path("outputs", "tablas")
+ruta_reportes <- file.path("outputs", "reportes")
+
+res <- readRDS(file.path(ruta_reportes, "resultado_cap3.RDS"))
+
+tabla_html <- function(df, digits = 2, caption = NULL, max_filas = NULL) {
+  if (is.null(df) || !is.data.frame(df) || ncol(df) == 0 || nrow(df) == 0) {
+    return(htmltools::HTML("<p><em>Tabla no disponible en esta ejecución.</em></p>"))
+  }
+  if (!is.null(max_filas)) df <- head(df, max_filas)
+  # Formatear cada columna de forma segura:
+  # - columnas realmente numéricas (double/integer) → round
+  # - todo lo demás → sin transformación
+  df[] <- lapply(df, function(col) {
+    if (is.double(col) || is.integer(col)) {
+      tryCatch(round(as.numeric(col), digits), error = function(e) col)
+    } else {
+      col
+    }
+  })
+  kableExtra::kbl(df, caption = caption, booktabs = TRUE, format = "html") %>%
+    kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria")
+}
+
+mostrar_figura <- function(fig, titulo = NULL, width = "85%") {
+  ruta <- file.path(ruta_figuras, fig)
+  if (!is.null(titulo)) cat("**", titulo, "**\n\n", sep = "")
+  if (file.exists(ruta)) {
+    cat("![](", ruta, "){fig-align='center' out-width='", width, "'}\n", sep = "")
+  } else {
+    cat("_Figura no disponible._\n")
+  }
+}
+```
+
+# Caso guiado: Análisis climático y ecológico en ambientes contrastantes
+
+## Preparación de los datos
+
+### Tabla 3.1. Información de las estaciones climáticas
+
+```{r}
+res$tabla_estaciones %>%
+  tabla_html("Tabla 3.1. Información climática resumida por estación utilizada en el estudio.")
+```
+
+---
+
+# 1. Visualización temporal
+
+## 1.1 Patrón temporal de temperatura
+
+### Temperatura media mensual por estación
+
+```{r}
+res$serie_temp_mensual %>%
+  tabla_html("Temperatura media mensual por estación.", max_filas = 6)
+```
+
+### Figura 3.1. Variación mensual de la temperatura promedio
+
+```{r results='asis'}
+mostrar_figura("cap3_fig_temp_mensual.png",
+  "Figura 3.1. Variación mensual de la temperatura promedio en tres estaciones del gradiente altitudinal. Las líneas grises representan años individuales y la línea negra el promedio multianual.")
+```
+
+### Figura 3.2. Patrón anual de temperatura promedio
+
+```{r results='asis'}
+mostrar_figura("cap3_fig_temp_anual.png",
+  "Figura 3.2. Patrón anual de temperatura promedio en las diferentes localidades evaluadas. La línea negra representa el promedio general y las líneas de colores muestran los promedios de cada mes.")
+```
+
+## 1.2 Patrón temporal de precipitación
+
+### Precipitación media mensual por estación
+
+```{r}
+res$serie_pp_mensual %>%
+  tabla_html("Precipitación media mensual por estación.", max_filas = 6)
+```
+
+### Figura 3.3. Patrón mensual de precipitación
+
+```{r results='asis'}
+mostrar_figura("cap3_fig_precipit_mensual.png",
+  "Figura 3.3. Patrón mensual de precipitación en las diferentes localidades evaluadas. La línea negra representa el promedio general y las líneas de colores muestran los promedios del total de precipitación de cada mes.")
+```
+
+### Figura 3.5. Patrón anual de precipitación total mensual
+
+```{r results='asis'}
+mostrar_figura("cap3_fig_precipit_anual.png",
+  "Figura 3.5. Patrón anual de precipitación total mensual en las diferentes localidades evaluadas. La línea negra representa el promedio general y las líneas de colores muestran los promedios de cada mes.")
+```
+
+---
+
+# 2. Climatograma
+
+### Tabla climática base
+
+```{r}
+res$clima %>%
+  tabla_html("Primeras filas de los datos climáticos base utilizados en los climatogramas.", max_filas = 6)
+```
+
+### Figura 3.6. Climatograma de las localidades evaluadas
+
+```{r results='asis'}
+mostrar_figura("cap3_climatograma.png",
+  "Figura 3.6. Climatogramas en las diferentes localidades evaluadas. La línea roja representa la temperatura media multianual y las barras azules corresponden a la precipitación total multianual.")
+```
+
+---
+
+# 3. Índice pluviométrico de Lang
+
+### Tabla 3.2. Ponderaciones del índice de Lang
+
+```{r}
+res$lang_ponderaciones %>%
+  tabla_html("Tabla 3.2. Ponderaciones del índice de Lang (mm/°C).")
+```
+
+### Tabla 3.3. Valores del índice de Lang por estación
+
+```{r}
+res$lang_tabla %>%
+  tabla_html("Tabla 3.3. Valores del índice de Lang por estación, calculados desde la hoja 'clima'.")
+```
+
+### Figura 3.7. Índice de Lang calculado para las estaciones de estudio
+
+```{r results='asis'}
+mostrar_figura("cap3_fig_lang.png",
+  "Figura 3.7. Visualización del índice de Lang calculado para las tres estaciones de estudio, con valores ordenados de menor a mayor humedad.")
+```
+
+---
+
+# 4. Balance Hídrico
+
+### Tabla climática con variables para ETP corregida
+
+```{r}
+res$clima_etp %>%
+  tabla_html("Seis primeras filas de datos climáticos con variables para ETP corregida.", max_filas = 6)
+```
+
+### Tabla de balance hídrico mensual
+
+```{r}
+res$balance %>%
+  tabla_html("Primeras filas del balance hídrico mensual por estación.", max_filas = 6)
+```
+
+### Figura 3.8. Balance hídrico calculado para las estaciones de estudio
+
+```{r results='asis'}
+mostrar_figura("cap3_balance_hidrico.png",
+  "Figura 3.8. Visualización del balance hídrico calculado para las tres estaciones de estudio, con valores ordenados de menor a mayor humedad.")
+```
+
+---
+
+# 5. Biomas, zonas de vida o formaciones vegetales
+
+### Tabla 3.4. Datos climáticos con ETP corregida
+
+```{r}
+res$clima_etp %>%
+  tabla_html("Tabla 3.4. Seis primeras filas de datos climáticos incluida la ETP_corr calculada.", max_filas = 6)
+```
+
+### Tabla 3.5. Resumen de caracterización climática
+
+```{r}
+res$resumen %>%
+  tabla_html("Tabla 3.5. Resumen de la caracterización climática, sin datos de zonas de vida, formaciones vegetales ni biomas.")
+```
+
+### Tabla 3.6. Resumen ecológico final
+
+```{r}
+res$resumen_final %>%
+  tabla_html("Tabla 3.6. Resumen de la caracterización climática con todos los datos tabulados.")
+```
+
+---
+
+# Archivos generados
+
+```{r}
+if (!is.null(res$figuras) && length(res$figuras) > 0) {
+  tibble(archivo = res$figuras) %>%
+    tabla_html("Figuras exportadas en outputs/figuras/.")
+}
+```
+
+```{r}
+if (!is.null(res$tablas) && length(res$tablas) > 0) {
+  tibble(archivo = res$tablas) %>%
+    tabla_html("Tablas exportadas en outputs/tablas/.")
+}
+```
+
+# Sesión de trabajo
+
+```{r}
+sessionInfo()
+```

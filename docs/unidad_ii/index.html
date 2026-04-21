@@ -185,17 +185,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#cómo-usar-este-material" id="toc-cómo-usar-este-material" class="nav-link" data-scroll-target="#cómo-usar-este-material">💻 ¿Cómo usar este material?</a></li>
   <li><a href="#acceso-al-código" id="toc-acceso-al-código" class="nav-link" data-scroll-target="#acceso-al-código">📂 Acceso al código</a></li>
   <li><a href="#selecciona-un-capítulo" id="toc-selecciona-un-capítulo" class="nav-link" data-scroll-target="#selecciona-un-capítulo">📘 Selecciona un capítulo</a></li>
-  <li><a href="#ejecución-rápida" id="toc-ejecución-rápida" class="nav-link" data-scroll-target="#ejecución-rápida">▶️ Ejecución rápida</a></li>
-  <li><a href="#información-de-la-unidad" id="toc-información-de-la-unidad" class="nav-link" data-scroll-target="#información-de-la-unidad">🔽 Información de la unidad</a>
-  <ul class="collapse">
+  <li><a href="#ejecución-rápida-de-toda-la-unidad" id="toc-ejecución-rápida-de-toda-la-unidad" class="nav-link" data-scroll-target="#ejecución-rápida-de-toda-la-unidad">▶️ Ejecución rápida de toda la unidad</a></li>
+  <li><a href="#información-de-la-unidad" id="toc-información-de-la-unidad" class="nav-link" data-scroll-target="#información-de-la-unidad">🔽 Información de la unidad</a></li>
   <li><a href="#propósito" id="toc-propósito" class="nav-link" data-scroll-target="#propósito">Propósito</a></li>
-  <li><a href="#prerrequisitos" id="toc-prerrequisitos" class="nav-link" data-scroll-target="#prerrequisitos">Prerrequisitos</a></li>
-  <li><a href="#orden-recomendado-de-trabajo" id="toc-orden-recomendado-de-trabajo" class="nav-link" data-scroll-target="#orden-recomendado-de-trabajo">Orden recomendado de trabajo</a></li>
-  <li><a href="#recomendaciones-de-ejecución" id="toc-recomendaciones-de-ejecución" class="nav-link" data-scroll-target="#recomendaciones-de-ejecución">Recomendaciones de ejecución</a></li>
-  <li><a href="#datos-y-paquetes-necesarios" id="toc-datos-y-paquetes-necesarios" class="nav-link" data-scroll-target="#datos-y-paquetes-necesarios">Datos y paquetes necesarios</a></li>
-  <li><a href="#relación-con-el-libro-anvidea" id="toc-relación-con-el-libro-anvidea" class="nav-link" data-scroll-target="#relación-con-el-libro-anvidea">Relación con el libro ANVIDEA</a></li>
   <li><a href="#enlace-de-retorno" id="toc-enlace-de-retorno" class="nav-link" data-scroll-target="#enlace-de-retorno">Enlace de retorno</a></li>
-  </ul></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/Javier-2712/libro_anvidea/blob/main/unidad_ii/index.qmd" class="toc-action">Ver el código</a></p><p><a href="https://github.com/Javier-2712/libro_anvidea/issues/new" class="toc-action">Informar de un problema</a></p></div></div></nav>
     </div>
@@ -227,13 +220,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="empezar-aquí" class="level2">
 <h2 class="anchored" data-anchor-id="empezar-aquí">🚀 Empezar aquí</h2>
 <ol type="1">
-<li>Descarga el repositorio<br>
-</li>
-<li>Abre la carpeta en RStudio<br>
-</li>
+<li>Descarga el repositorio</li>
+<li>Abre la carpeta <code>unidad_ii/</code> en RStudio</li>
 <li>Ejecuta:</li>
 </ol>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"unidad_ii/run_unidad2.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_unidad2.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <hr>
 </section>
 <section id="cómo-usar-este-material" class="level2">
@@ -251,12 +242,9 @@ Nota
 <p>Este portal no ejecuta código directamente.</p>
 <p>Para trabajar con los análisis de esta unidad:</p>
 <ol type="1">
-<li>Descarga el repositorio o abre la carpeta en GitHub<br>
-</li>
-<li>Guarda los archivos en tu computador<br>
-</li>
-<li>Abre la carpeta en RStudio<br>
-</li>
+<li>Descarga el repositorio o abre la carpeta en GitHub</li>
+<li>Guarda los archivos en tu computador</li>
+<li>Abre la carpeta <code>unidad_ii/</code> en RStudio</li>
 <li>Ejecuta el script principal (<code>run_unidad2.R</code>)</li>
 </ol>
 <p>👉 Todos los análisis se realizan de forma local en R</p>
@@ -274,151 +262,84 @@ Nota
 <section id="selecciona-un-capítulo" class="level2">
 <h2 class="anchored" data-anchor-id="selecciona-un-capítulo">📘 Selecciona un capítulo</h2>
 <p>Explora cada capítulo de la unidad con acceso directo a sus scripts, datos y resultados:</p>
-<section id="capítulo-4-modelos-poblacionales" class="level3">
-<h3 class="anchored" data-anchor-id="capítulo-4-modelos-poblacionales">🔹 Capítulo 4 — Modelos poblacionales</h3>
+<section id="capítulo-4-modelos-de-crecimiento-poblacional" class="level3">
+<h3 class="anchored" data-anchor-id="capítulo-4-modelos-de-crecimiento-poblacional">🔹 Capítulo 4 — Modelos de crecimiento poblacional</h3>
+<p>Versión reproducible y descargable del capítulo, diseñada para ejecutar los modelos de crecimiento exponencial continuo, exponencial discreto y logístico que complementan el texto del libro y generar un reporte HTML de validación.</p>
+<p><strong>Contenido del capítulo:</strong></p>
 <ul>
-<li>📁 <a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_ii/cap4-modelos-poblacionales">Abrir carpeta del capítulo</a></li>
-<li>📄 Incluye:
+<li><code>R/</code> scripts completos (casos + funciones auxiliares + guardado + render)</li>
+<li><code>data/raw/</code> → datos del capítulo 4</li>
+<li><code>run_cap4.R</code> → ejecución automática</li>
+<li><code>limpiar_outputs.R</code> → reinicio de salidas</li>
+<li><code>reporte_cap4.qmd</code> → validación en HTML</li>
+</ul>
+<p><strong>Ejecución:</strong></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_cap4.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Esto generará:</strong></p>
 <ul>
-<li>Modelo exponencial y logístico</li>
-<li>Simulación de crecimiento poblacional</li>
-<li>Exportación de resultados</li>
-</ul></li>
+<li><p>tablas en <code>outputs/tablas/</code></p></li>
+<li><p>figuras en <code>outputs/figuras/</code></p></li>
+<li><p>reporte HTML en <code>outputs/reportes/</code></p></li>
+<li><p>📁 <a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_ii/cap4-modelos-crecimiento">Abrir carpeta del capítulo</a></p></li>
 </ul>
 <hr>
 </section>
 <section id="capítulo-5-tablas-de-vida-y-modelos-matriciales" class="level3">
 <h3 class="anchored" data-anchor-id="capítulo-5-tablas-de-vida-y-modelos-matriciales">🔹 Capítulo 5 — Tablas de vida y modelos matriciales</h3>
+<p>Versión reproducible del capítulo, con cuatro casos guiados que cubren tablas de vida por edades, tablas de vida clásicas (Gotelli), modelo matricial de Leslie y modelo matricial de Lefkovitch.</p>
+<p><strong>Contenido del capítulo:</strong></p>
 <ul>
-<li>📁 <a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_ii/cap5-tablas-vida">Abrir carpeta del capítulo</a></li>
-<li>📄 Incluye:
+<li><code>R/</code> scripts completos (casos A1, A2, B y C + funciones auxiliares + guardado + render)</li>
+<li><code>data/raw/</code> → <code>datos.c5.xlsx</code></li>
+<li><code>run_cap5.R</code> → ejecución automática</li>
+<li><code>limpiar_outputs.R</code> → reinicio de salidas</li>
+<li><code>reporte_cap5.qmd</code> → validación en HTML</li>
+</ul>
+<p><strong>Ejecución:</strong></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_cap5.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Esto generará:</strong></p>
 <ul>
-<li>Tablas de vida (cementerios y Gotelli)</li>
-<li>Modelo de Leslie</li>
-<li>Modelo de Lefkovitch</li>
-</ul></li>
+<li><p>tablas en <code>outputs/tablas/</code></p></li>
+<li><p>objetos <code>.rds</code> en <code>outputs/reportes/</code></p></li>
+<li><p>reporte HTML en <code>outputs/reportes/</code></p></li>
+<li><p>📁 <a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_ii/cap5-tablas-vida">Abrir carpeta del capítulo</a></p></li>
 </ul>
 <hr>
 </section>
-<section id="capítulo-6-distribución-espacial-y-estimación-de-densidad" class="level3">
-<h3 class="anchored" data-anchor-id="capítulo-6-distribución-espacial-y-estimación-de-densidad">🔹 Capítulo 6 — Distribución espacial y estimación de densidad</h3>
+<section id="capítulo-6-patrones-de-distribución-y-estimación-de-la-densidad" class="level3">
+<h3 class="anchored" data-anchor-id="capítulo-6-patrones-de-distribución-y-estimación-de-la-densidad">🔹 Capítulo 6 — Patrones de distribución y estimación de la densidad</h3>
+<p>Versión reproducible del capítulo, con dos casos guiados que integran ajuste a distribuciones espaciales (Poisson y Binomial Negativa), índices de dispersión y estimación de densidad por métodos de distancia (Holgate, King y Hayne).</p>
+<p><strong>Contenido del capítulo:</strong></p>
 <ul>
-<li>📁 <a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_ii/cap6-distribucion-densidad">Abrir carpeta del capítulo</a></li>
-<li>📄 Incluye:
+<li><code>R/</code> scripts completos (casos A y B + funciones auxiliares + guardado + render)</li>
+<li><code>data/raw/</code> → <code>datos.c6.xlsx</code></li>
+<li><code>run_cap6.R</code> → ejecución automática</li>
+<li><code>limpiar_outputs.R</code> → reinicio de salidas</li>
+<li><code>reporte_cap6.qmd</code> → validación en HTML</li>
+</ul>
+<p><strong>Ejecución:</strong></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_cap6.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Esto generará:</strong></p>
 <ul>
-<li>Patrones espaciales</li>
-<li>Métodos de estimación de densidad</li>
-<li>Análisis ecológico aplicado</li>
-</ul></li>
+<li><p>tablas en <code>outputs/tablas/</code></p></li>
+<li><p>objetos <code>.rds</code> en <code>outputs/reportes/</code></p></li>
+<li><p>reporte HTML en <code>outputs/reportes/</code></p></li>
+<li><p>📁 <a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_ii/cap6-distribucion-densidad">Abrir carpeta del capítulo</a></p></li>
 </ul>
 <hr>
 </section>
 </section>
-<section id="ejecución-rápida" class="level2">
-<h2 class="anchored" data-anchor-id="ejecución-rápida">▶️ Ejecución rápida</h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"unidad_ii/run_unidad2.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="callout-tip callout callout-style-default callout-captioned">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-caption-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Esta unidad integra crecimiento, estructura y espacio en ecología de poblaciones.<br>
-Se recomienda ejecutar los capítulos en orden para mantener la progresión conceptual.</p>
-</div>
-</div>
+<section id="ejecución-rápida-de-toda-la-unidad" class="level2">
+<h2 class="anchored" data-anchor-id="ejecución-rápida-de-toda-la-unidad">▶️ Ejecución rápida de toda la unidad</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_unidad2.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <hr>
 </section>
-<section id="información-de-la-unidad" class="level1">
-<h1>🔽 Información de la unidad</h1>
+<section id="información-de-la-unidad" class="level2">
+<h2 class="anchored" data-anchor-id="información-de-la-unidad">🔽 Información de la unidad</h2>
+</section>
 <section id="propósito" class="level2">
 <h2 class="anchored" data-anchor-id="propósito">Propósito</h2>
-<p>La Unidad II fortalece la comprensión de la <strong>ecología de poblaciones</strong> mediante flujos de trabajo reproducibles en R. El usuario podrá explorar cómo cambian las poblaciones en el tiempo, cómo se estructuran por edades o estados, y cómo se distribuyen en el espacio.</p>
-<hr>
-</section>
-<section id="prerrequisitos" class="level2">
-<h2 class="anchored" data-anchor-id="prerrequisitos">Prerrequisitos</h2>
-<ul>
-<li>conocimientos básicos de R y RStudio<br>
-</li>
-<li>manejo elemental de scripts y directorios de trabajo<br>
-</li>
-<li>familiaridad con objetos, funciones y lectura de datos<br>
-</li>
-<li>nociones introductorias sobre crecimiento poblacional y tablas de vida</li>
-</ul>
-<hr>
-</section>
-<section id="orden-recomendado-de-trabajo" class="level2">
-<h2 class="anchored" data-anchor-id="orden-recomendado-de-trabajo">Orden recomendado de trabajo</h2>
-<ol type="1">
-<li>Capítulo 4 — Modelos poblacionales<br>
-</li>
-<li>Capítulo 5 — Tablas de vida y modelos matriciales<br>
-</li>
-<li>Capítulo 6 — Distribución y estimación de densidad</li>
-</ol>
-<hr>
-</section>
-<section id="recomendaciones-de-ejecución" class="level2">
-<h2 class="anchored" data-anchor-id="recomendaciones-de-ejecución">Recomendaciones de ejecución</h2>
-<ul>
-<li>Trabaja desde el directorio raíz del proyecto<br>
-</li>
-<li>Verifica que la estructura de carpetas no haya sido modificada<br>
-</li>
-<li>Ejecuta preferiblemente <code>run_unidad2.R</code><br>
-</li>
-<li>Confirma que los paquetes requeridos estén instalados</li>
-</ul>
-<div class="callout-warning callout callout-style-default callout-captioned">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-caption-container flex-fill">
-Advertencia
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>El script principal detendrá la ejecución si detecta archivos faltantes.<br>
-Este comportamiento ayuda a mantener la reproducibilidad del flujo de trabajo.</p>
-</div>
-</div>
-<hr>
-</section>
-<section id="datos-y-paquetes-necesarios" class="level2">
-<h2 class="anchored" data-anchor-id="datos-y-paquetes-necesarios">Datos y paquetes necesarios</h2>
-<p><strong>Paquetes frecuentes</strong></p>
-<ul>
-<li><code>tidyverse</code></li>
-<li><code>ggplot2</code></li>
-<li><code>dplyr</code></li>
-<li><code>readxl</code></li>
-<li><code>popbio</code></li>
-<li><code>plotrix</code></li>
-</ul>
-<p><strong>Tipos de archivos de datos</strong></p>
-<ul>
-<li><code>.csv</code></li>
-<li><code>.xlsx</code></li>
-</ul>
-<p><strong>Carpetas usuales</strong></p>
-<ul>
-<li><code>R/</code></li>
-<li><code>data/raw/</code></li>
-<li><code>outputs/figuras/</code></li>
-<li><code>outputs/tablas/</code></li>
-</ul>
-<hr>
-</section>
-<section id="relación-con-el-libro-anvidea" class="level2">
-<h2 class="anchored" data-anchor-id="relación-con-el-libro-anvidea">Relación con el libro ANVIDEA</h2>
-<p>Esta unidad desarrolla herramientas conceptuales y reproducibles para analizar la dinámica de las poblaciones biológicas en <strong>R</strong>, integrando modelos de crecimiento, tablas de vida, enfoques matriciales y patrones espaciales. Su propósito es acompañar la lectura del libro <strong>ANVIDEA</strong> con scripts organizados por capítulos, casos guiados y una ruta clara de ejecución.</p>
+<p>La Unidad II desarrolla competencias en el <strong>análisis cuantitativo de poblaciones ecológicas</strong>, usando modelos matemáticos y estadísticos implementados en R. A lo largo de esta unidad, el usuario aprenderá a modelar el crecimiento poblacional, construir tablas de vida, proyectar poblaciones estructuradas y analizar patrones espaciales, como paso hacia el análisis de comunidades de la Unidad III.</p>
 <hr>
 </section>
 <section id="enlace-de-retorno" class="level2">
@@ -426,7 +347,6 @@ Este comportamiento ayuda a mantener la reproducibilidad del flujo de trabajo.</
 <p>👉 <a href="../index.html">Volver a la página principal</a></p>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

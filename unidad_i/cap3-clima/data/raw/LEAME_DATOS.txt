@@ -1,6 +1,6 @@
-Capítulo 3 - Archivos requeridos
+Capítulo 3 — Archivos requeridos en data/raw/
 
-Ubique en esta carpeta los siguientes archivos antes de ejecutar los scripts:
+Ubique aquí los archivos de entrada antes de ejecutar los scripts:
 
 1. datos.xlsx
    Hojas esperadas:
@@ -15,7 +15,5 @@ Ubique en esta carpeta los siguientes archivos antes de ejecutar los scripts:
 3. bal_hid.R
    Script auxiliar para el cálculo del balance hídrico.
 
-Ruta esperada:
-data/raw/
-
-No cambie los nombres de los archivos, a menos que también ajuste las rutas dentro de los scripts.
+No cambie los nombres de los archivos ni de las hojas, a menos que también
+ajuste las rutas dentro de los scripts.

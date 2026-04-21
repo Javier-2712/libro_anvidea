@@ -12,18 +12,22 @@ editor:
     wrap: 72
 ---
 
+<div style="text-align: center; margin-top: 10px; margin-bottom: 20px;">
+  <img src="Logo_GIEN.png" alt="GIEN - Grupo de Investigación en Ecología Neotropical" width="280">
+</div>
+
 Material reproducible del libro **ANVIDEA** para trabajar en R.
 
 ---
 
 ## 🚀 Empezar aquí
 
-1. Descarga el repositorio  
-2. Abre la carpeta en RStudio  
+1. Descarga el repositorio
+2. Abre la carpeta `unidad_i/` en RStudio
 3. Ejecuta:
 
 ```r
-source("unidad_i/run_unidad1.R")
+source("run_unidad1.R")
 ```
 
 ---
@@ -36,10 +40,10 @@ Este portal no ejecuta código directamente.
 
 Para trabajar con los análisis de esta unidad:
 
-1. Descarga el repositorio o abre la carpeta en GitHub  
-2. Guarda los archivos en tu computador  
-3. Abre la carpeta en RStudio  
-4. Ejecuta el script principal (`run_unidad1.R`)  
+1. Descarga el repositorio o abre la carpeta en GitHub
+2. Guarda los archivos en tu computador
+3. Abre la carpeta `unidad_i/` en RStudio
+4. Ejecuta el script principal (`run_unidad1.R`)
 
 👉 Todos los análisis se realizan de forma local en R
 
@@ -62,11 +66,55 @@ Explora cada capítulo de la unidad con acceso directo a sus scripts, datos y re
 
 ### 🔹 Capítulo 1 — Fundamentos de manipulación de datos
 
+Versión reproducible y descargable del capítulo, diseñada para ejecutar los códigos completos que complementan el texto del libro y generar un reporte HTML de validación.
+
+**Contenido del capítulo:**
+
+- `R/` scripts completos (casos A y B + funciones auxiliares + guardado + render)
+- `data/raw/` → `plancton.xlsx`, `invert.xlsx`
+- `run_cap1.R` → ejecución automática
+- `limpiar_outputs.R` → reinicio de salidas
+- `reporte_cap1.qmd` → validación en HTML
+
+**Ejecución:**
+
+```r
+source("run_cap1.R")
+```
+
+**Esto generará:**
+
+- tablas en `outputs/tablas/`
+- figuras en `outputs/figuras/`
+- reporte HTML en `outputs/reportes/`
+
 - 📁 [Abrir carpeta del capítulo](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap1-datos)
 
 ---
 
 ### 🔹 Capítulo 2 — Visualización gráfica exploratoria
+
+Versión reproducible del capítulo, con dos casos guiados que cubren correlogramas, histogramas, cajas y bigotes, y figuras de burbujas para datos ecológicos.
+
+**Contenido del capítulo:**
+
+- `R/` scripts completos (casos A y B + funciones auxiliares + guardado + render)
+- `data/raw/` → `plancton.xlsx`, `invert.xlsx`
+- `run_cap2.R` → ejecución automática
+- `limpiar_outputs.R` → reinicio de salidas
+- `reporte_cap2.qmd` → validación en HTML
+
+**Ejecución:**
+
+```r
+source("run_cap2.R")
+```
+
+**Esto generará:**
+
+- figuras en `outputs/figuras/`
+- tablas en `outputs/tablas/`
+- reporte HTML en `outputs/reportes/`
 
 - 📁 [Abrir carpeta del capítulo](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap2-visualizacion-exploratoria)
 
@@ -74,14 +122,36 @@ Explora cada capítulo de la unidad con acceso directo a sus scripts, datos y re
 
 ### 🔹 Capítulo 3 — Visualización gráfica de patrones climáticos
 
+Versión reproducible del capítulo, con un caso guiado que integra series temporales, climatogramas, índice de Lang, balance hídrico y clasificación ecológica.
+
+**Contenido del capítulo:**
+
+- `R/` scripts completos (caso guiado + funciones auxiliares + guardado + render)
+- `data/raw/` → `datos.c3.xlsx`, `bal_hid.R`
+- `run_cap3.R` → ejecución automática
+- `limpiar_outputs.R` → reinicio de salidas
+- `reporte_cap3.qmd` → validación en HTML
+
+**Ejecución:**
+
+```r
+source("run_cap3.R")
+```
+
+**Esto generará:**
+
+- figuras en `outputs/figuras/`
+- tablas en `outputs/tablas/`
+- reporte HTML en `outputs/reportes/`
+
 - 📁 [Abrir carpeta del capítulo](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap3-clima)
 
 ---
 
-## ▶️ Ejecución rápida
+## ▶️ Ejecución rápida de toda la unidad
 
 ```r
-source("unidad_i/run_unidad1.R")
+source("run_unidad1.R")
 ```
 
 ---
