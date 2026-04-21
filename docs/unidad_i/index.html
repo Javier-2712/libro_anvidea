@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>ANVIDEA — Material reproducible - Unidad I. Análisis de datos ecológicos</title>
+<title>ANVIDEA — Material reproducible - Unidad I — Análisis de datos ecológicos</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -181,14 +181,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <h2 id="toc-title">En esta página</h2>
    
   <ul class="collapse">
-  <li><a href="#empezar-aquí" id="toc-empezar-aquí" class="nav-link active" data-scroll-target="#empezar-aquí">🚀 Empezar aquí</a></li>
-  <li><a href="#cómo-usar-este-material" id="toc-cómo-usar-este-material" class="nav-link" data-scroll-target="#cómo-usar-este-material">💻 ¿Cómo usar este material?</a></li>
-  <li><a href="#acceso-al-código" id="toc-acceso-al-código" class="nav-link" data-scroll-target="#acceso-al-código">📂 Acceso al código</a></li>
-  <li><a href="#selecciona-un-capítulo" id="toc-selecciona-un-capítulo" class="nav-link" data-scroll-target="#selecciona-un-capítulo">📘 Selecciona un capítulo</a></li>
-  <li><a href="#ejecución-rápida-de-toda-la-unidad" id="toc-ejecución-rápida-de-toda-la-unidad" class="nav-link" data-scroll-target="#ejecución-rápida-de-toda-la-unidad">▶️ Ejecución rápida de toda la unidad</a></li>
-  <li><a href="#información-de-la-unidad" id="toc-información-de-la-unidad" class="nav-link" data-scroll-target="#información-de-la-unidad">🔽 Información de la unidad</a></li>
-  <li><a href="#propósito" id="toc-propósito" class="nav-link" data-scroll-target="#propósito">Propósito</a></li>
-  <li><a href="#enlace-de-retorno" id="toc-enlace-de-retorno" class="nav-link" data-scroll-target="#enlace-de-retorno">Enlace de retorno</a></li>
+  <li><a href="#empezar-aquí" id="toc-empezar-aquí" class="nav-link active" data-scroll-target="#empezar-aquí">Empezar aquí</a></li>
+  <li><a href="#capítulos" id="toc-capítulos" class="nav-link" data-scroll-target="#capítulos">Capítulos</a></li>
+  <li><a href="#acceso-al-material" id="toc-acceso-al-material" class="nav-link" data-scroll-target="#acceso-al-material">Acceso al material</a></li>
+  <li><a href="#ejecución" id="toc-ejecución" class="nav-link" data-scroll-target="#ejecución">Ejecución</a></li>
+  <li><a href="#paquetes-requeridos" id="toc-paquetes-requeridos" class="nav-link" data-scroll-target="#paquetes-requeridos">Paquetes requeridos</a></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/Javier-2712/libro_anvidea/blob/main/unidad_i/index.qmd" class="toc-action">Ver el código</a></p><p><a href="https://github.com/Javier-2712/libro_anvidea/issues/new" class="toc-action">Informar de un problema</a></p></div></div></nav>
     </div>
@@ -197,7 +194,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Unidad I. Análisis de datos ecológicos</h1>
+<h1 class="title">Unidad I — Análisis de datos ecológicos</h1>
 </div>
 
 
@@ -212,23 +209,50 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 </header>
 
-<div style="text-align: center; margin-top: 10px; margin-bottom: 20px;">
-<p><img src="Logo_GIEN.png" alt="GIEN - Grupo de Investigación en Ecología Neotropical" width="280"></p>
+<div style="text-align:center; margin: 1.5rem 0 2rem;">
+<img src="../Logo_GIEN.png" alt="GIEN" style="width:64px; border-radius:50%;">
+<p style="color:#4a6282; font-size:0.9rem; margin-top:0.5rem;">
+Material reproducible · ANVIDEA
+</p>
 </div>
-<p>Material reproducible del libro <strong>ANVIDEA</strong> para trabajar en R.</p>
+<p>Esta unidad desarrolla las herramientas fundamentales para el <strong>análisis y visualización de datos ecológicos y ambientales</strong> en R, desde la exploración inicial hasta el análisis de variables climáticas.</p>
 <hr>
 <section id="empezar-aquí" class="level2">
-<h2 class="anchored" data-anchor-id="empezar-aquí">🚀 Empezar aquí</h2>
-<ol type="1">
-<li>Descarga el repositorio</li>
-<li>Abre la carpeta <code>unidad_i/</code> en RStudio</li>
-<li>Ejecuta:</li>
-</ol>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_unidad1.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<hr>
-</section>
-<section id="cómo-usar-este-material" class="level2">
-<h2 class="anchored" data-anchor-id="cómo-usar-este-material">💻 ¿Cómo usar este material?</h2>
+<h2 class="anchored" data-anchor-id="empezar-aquí">Empezar aquí</h2>
+<div class="pasos">
+<div class="paso">
+<div class="paso-num">
+1
+</div>
+<p>
+Descarga el material y descomprímelo
+</p>
+</div>
+<div class="paso">
+<div class="paso-num">
+2
+</div>
+<p>
+Abre <code>unidad_i/</code> en RStudio
+</p>
+</div>
+<div class="paso">
+<div class="paso-num">
+3
+</div>
+<p>
+Instala los paquetes requeridos
+</p>
+</div>
+<div class="paso">
+<div class="paso-num">
+4
+</div>
+<p>
+Ejecuta <code>run_unidad1.R</code>
+</p>
+</div>
+</div>
 <div class="callout-note callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -239,112 +263,69 @@ Nota
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Este portal no ejecuta código directamente.</p>
-<p>Para trabajar con los análisis de esta unidad:</p>
-<ol type="1">
-<li>Descarga el repositorio o abre la carpeta en GitHub</li>
-<li>Guarda los archivos en tu computador</li>
-<li>Abre la carpeta <code>unidad_i/</code> en RStudio</li>
-<li>Ejecuta el script principal (<code>run_unidad1.R</code>)</li>
-</ol>
-<p>👉 Todos los análisis se realizan de forma local en R</p>
+<p>Este portal no ejecuta código. Todos los análisis se realizan de forma local en RStudio.</p>
 </div>
 </div>
 <hr>
 </section>
-<section id="acceso-al-código" class="level2">
-<h2 class="anchored" data-anchor-id="acceso-al-código">📂 Acceso al código</h2>
-<div style="margin-top: 0.5em; margin-bottom: 1em;">
-<p><a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i" target="_blank" style="display:inline-block; padding:0.6em 1em; margin-right:0.6em; background:#2b8cbe; color:white; text-decoration:none; border-radius:8px;">Ver código en GitHub</a> <a href="https://github.com/Javier-2712/libro_anvidea/archive/refs/heads/main.zip" target="_blank" style="display:inline-block; padding:0.6em 1em; background:#238b45; color:white; text-decoration:none; border-radius:8px;">Descargar repositorio (ZIP)</a></p>
+<section id="capítulos" class="level2">
+<h2 class="anchored" data-anchor-id="capítulos">Capítulos</h2>
+<div class="card-unidad">
+<h3 class="anchored">
+Capítulo 1 — Exploración y manipulación de datos
+</h3>
+<p>
+Importación, limpieza y transformación de datos ecológicos con <code>tidyverse</code>.
+</p>
+<p><span class="badge-tema">Importación</span> <span class="badge-tema">Limpieza</span> <span class="badge-tema">Transformación</span><br> <a class="btn-anvidea" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap1-datos" target="_blank" style="margin-top:0.8rem;">Ver carpeta en GitHub →</a></p>
+</div>
+<div class="card-unidad">
+<h3 class="anchored">
+Capítulo 2 — Visualización exploratoria
+</h3>
+<p>
+Construcción e interpretación de figuras con <code>ggplot2</code> para datos ecológicos y ambientales.
+</p>
+<p><span class="badge-tema">ggplot2</span> <span class="badge-tema">Distribuciones</span> <span class="badge-tema">Relaciones</span><br> <a class="btn-anvidea" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap2-visualizacion-exploratoria" target="_blank" style="margin-top:0.8rem;">Ver carpeta en GitHub →</a></p>
+</div>
+<div class="card-unidad">
+<h3 class="anchored">
+Capítulo 3 — Análisis climático
+</h3>
+<p>
+Procesamiento de series temporales climáticas y análisis de variables ambientales.
+</p>
+<p><span class="badge-tema">Series temporales</span> <span class="badge-tema">Clima</span> <span class="badge-tema">Balance hídrico</span><br> <a class="btn-anvidea" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap3-clima" target="_blank" style="margin-top:0.8rem;">Ver carpeta en GitHub →</a></p>
 </div>
 <hr>
 </section>
-<section id="selecciona-un-capítulo" class="level2">
-<h2 class="anchored" data-anchor-id="selecciona-un-capítulo">📘 Selecciona un capítulo</h2>
-<p>Explora cada capítulo de la unidad con acceso directo a sus scripts, datos y resultados:</p>
-<section id="capítulo-1-fundamentos-de-manipulación-de-datos" class="level3">
-<h3 class="anchored" data-anchor-id="capítulo-1-fundamentos-de-manipulación-de-datos">🔹 Capítulo 1 — Fundamentos de manipulación de datos</h3>
-<p>Versión reproducible y descargable del capítulo, diseñada para ejecutar los códigos completos que complementan el texto del libro y generar un reporte HTML de validación.</p>
-<p><strong>Contenido del capítulo:</strong></p>
-<ul>
-<li><code>R/</code> scripts completos (casos A y B + funciones auxiliares + guardado + render)</li>
-<li><code>data/raw/</code> → <code>plancton.xlsx</code>, <code>invert.xlsx</code></li>
-<li><code>run_cap1.R</code> → ejecución automática</li>
-<li><code>limpiar_outputs.R</code> → reinicio de salidas</li>
-<li><code>reporte_cap1.qmd</code> → validación en HTML</li>
-</ul>
-<p><strong>Ejecución:</strong></p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_cap1.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><strong>Esto generará:</strong></p>
-<ul>
-<li><p>tablas en <code>outputs/tablas/</code></p></li>
-<li><p>figuras en <code>outputs/figuras/</code></p></li>
-<li><p>reporte HTML en <code>outputs/reportes/</code></p></li>
-<li><p>📁 <a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap1-datos">Abrir carpeta del capítulo</a></p></li>
-</ul>
+<section id="acceso-al-material" class="level2">
+<h2 class="anchored" data-anchor-id="acceso-al-material">Acceso al material</h2>
+<p><a class="btn-anvidea btn-verde" href="https://github.com/Javier-2712/libro_anvidea/archive/refs/heads/main.zip" target="_blank">⬇ Descargar repositorio completo (ZIP)</a> <a class="btn-anvidea btn-outline" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i" target="_blank">Ver Unidad I en GitHub</a></p>
 <hr>
 </section>
-<section id="capítulo-2-visualización-gráfica-exploratoria" class="level3">
-<h3 class="anchored" data-anchor-id="capítulo-2-visualización-gráfica-exploratoria">🔹 Capítulo 2 — Visualización gráfica exploratoria</h3>
-<p>Versión reproducible del capítulo, con dos casos guiados que cubren correlogramas, histogramas, cajas y bigotes, y figuras de burbujas para datos ecológicos.</p>
-<p><strong>Contenido del capítulo:</strong></p>
-<ul>
-<li><code>R/</code> scripts completos (casos A y B + funciones auxiliares + guardado + render)</li>
-<li><code>data/raw/</code> → <code>plancton.xlsx</code>, <code>invert.xlsx</code></li>
-<li><code>run_cap2.R</code> → ejecución automática</li>
-<li><code>limpiar_outputs.R</code> → reinicio de salidas</li>
-<li><code>reporte_cap2.qmd</code> → validación en HTML</li>
-</ul>
-<p><strong>Ejecución:</strong></p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_cap2.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><strong>Esto generará:</strong></p>
-<ul>
-<li><p>figuras en <code>outputs/figuras/</code></p></li>
-<li><p>tablas en <code>outputs/tablas/</code></p></li>
-<li><p>reporte HTML en <code>outputs/reportes/</code></p></li>
-<li><p>📁 <a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap2-visualizacion-exploratoria">Abrir carpeta del capítulo</a></p></li>
-</ul>
+<section id="ejecución" class="level2">
+<h2 class="anchored" data-anchor-id="ejecución">Ejecución</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Desde unidad_i/ en RStudio</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_unidad1.R"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># O capítulo por capítulo</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"cap1-datos/run_cap1.R"</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"cap2-visualizacion-exploratoria/run_cap2.R"</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"cap3-clima/run_cap3.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <hr>
 </section>
-<section id="capítulo-3-visualización-gráfica-de-patrones-climáticos" class="level3">
-<h3 class="anchored" data-anchor-id="capítulo-3-visualización-gráfica-de-patrones-climáticos">🔹 Capítulo 3 — Visualización gráfica de patrones climáticos</h3>
-<p>Versión reproducible del capítulo, con un caso guiado que integra series temporales, climatogramas, índice de Lang, balance hídrico y clasificación ecológica.</p>
-<p><strong>Contenido del capítulo:</strong></p>
-<ul>
-<li><code>R/</code> scripts completos (caso guiado + funciones auxiliares + guardado + render)</li>
-<li><code>data/raw/</code> → <code>datos.c3.xlsx</code>, <code>bal_hid.R</code></li>
-<li><code>run_cap3.R</code> → ejecución automática</li>
-<li><code>limpiar_outputs.R</code> → reinicio de salidas</li>
-<li><code>reporte_cap3.qmd</code> → validación en HTML</li>
-</ul>
-<p><strong>Ejecución:</strong></p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_cap3.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><strong>Esto generará:</strong></p>
-<ul>
-<li><p>figuras en <code>outputs/figuras/</code></p></li>
-<li><p>tablas en <code>outputs/tablas/</code></p></li>
-<li><p>reporte HTML en <code>outputs/reportes/</code></p></li>
-<li><p>📁 <a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap3-clima">Abrir carpeta del capítulo</a></p></li>
-</ul>
+<section id="paquetes-requeridos" class="level2">
+<h2 class="anchored" data-anchor-id="paquetes-requeridos">Paquetes requeridos</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"tidyverse"</span>, <span class="st">"readxl"</span>, <span class="st">"writexl"</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ggplot2"</span>, <span class="st">"patchwork"</span>, <span class="st">"cowplot"</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"kableExtra"</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <hr>
-</section>
-</section>
-<section id="ejecución-rápida-de-toda-la-unidad" class="level2">
-<h2 class="anchored" data-anchor-id="ejecución-rápida-de-toda-la-unidad">▶️ Ejecución rápida de toda la unidad</h2>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_unidad1.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<hr>
-</section>
-<section id="información-de-la-unidad" class="level2">
-<h2 class="anchored" data-anchor-id="información-de-la-unidad">🔽 Información de la unidad</h2>
-</section>
-<section id="propósito" class="level2">
-<h2 class="anchored" data-anchor-id="propósito">Propósito</h2>
-<p>La Unidad I busca fortalecer competencias en el <strong>manejo, organización y exploración de datos ecológicos y ambientales</strong>, usando flujos de trabajo reproducibles en R. A lo largo de esta unidad, el usuario aprenderá a importar, depurar, transformar y visualizar bases de datos reales, como paso previo a análisis más avanzados de ecología de poblaciones y comunidades.</p>
-<hr>
-</section>
-<section id="enlace-de-retorno" class="level2">
-<h2 class="anchored" data-anchor-id="enlace-de-retorno">Enlace de retorno</h2>
-<p>👉 <a href="../index.html">Volver a la página principal</a></p>
+<div class="footer-anvidea">
+<p><a href="../index.html">← Volver a la página principal</a></p>
+</div>
 
 
 </section>

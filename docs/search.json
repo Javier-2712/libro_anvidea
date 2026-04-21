@@ -1,240 +1,163 @@
 [
   {
-    "objectID": "index.html#bienvenido",
-    "href": "index.html#bienvenido",
+    "objectID": "index.html",
+    "href": "index.html",
     "title": "ANVIDEA — Material reproducible",
-    "section": "Bienvenido",
-    "text": "Bienvenido\nEste portal reúne los materiales reproducibles del libro:\nAnálisis y Visualización de Datos Ecológicos y Ambientales — ANVIDEA\nMaterial complementario para la ejecución práctica del libro en R\nAquí puedes acceder a los scripts, datos y flujos de trabajo organizados por unidades y capítulos.\n\n\n\n\n\n\n⚠️ Importante\n\n\n\nEste portal es un espacio de navegación y consulta.\nLos códigos en R no se ejecutan aquí en la web.\nPara trabajar con el material es necesario:\n\nDescargar el repositorio o los archivos del capítulo\nAbrirlos en RStudio o Quarto\nEjecutar los scripts de forma local"
+    "section": "",
+    "text": "Análisis y Visualización de Datos Ecológicos y Ambientales — scripts, datos y flujos de trabajo organizados por unidades y capítulos.\n\n⬇ Descargar material (ZIP) Ver repositorio en GitHub"
+  },
+  {
+    "objectID": "index.html#primeros-pasos",
+    "href": "index.html#primeros-pasos",
+    "title": "ANVIDEA — Material reproducible",
+    "section": "Primeros pasos",
+    "text": "Primeros pasos\n\n\n\n1\n\n\nDescarga el ZIP y descomprímelo en tu computador\n\n\n\n\n2\n\n\nAbre la carpeta raíz en RStudio\n\n\n\n\n3\n\n\nInstala los paquetes requeridos de cada capítulo\n\n\n\n\n4\n\n\nEjecuta source(“run_libro.R”)"
   },
   {
     "objectID": "index.html#unidades-del-libro",
     "href": "index.html#unidades-del-libro",
     "title": "ANVIDEA — Material reproducible",
-    "section": "📘 Unidades del libro",
-    "text": "📘 Unidades del libro\n\nUnidad I — Análisis de datos ecológicos\n\nManipulación de datos\n\nVisualización exploratoria\n\nAnálisis climático\n\n👉 Ir a Unidad I\n\n\n\nUnidad II — Ecología de poblaciones\n\nModelos de crecimiento\n\nTablas de vida\n\nModelos matriciales\n\nDistribución y densidad\n\n👉 Ir a Unidad II\n\n\n\nUnidad III — Ecología de comunidades\n\nDiversidad taxonómica\n\nDiversidad funcional\n\nDiversidad filogenética\n\n👉 Ir a Unidad III"
+    "section": "Unidades del libro",
+    "text": "Unidades del libro\n\n\nUnidad I — Análisis de datos ecológicos\n\n\nManipulación de datos, visualización exploratoria y análisis climático.\n\nCap. 1 · Datos Cap. 2 · Visualización Cap. 3 · Clima Ver Unidad I →\n\n\n\nUnidad II — Ecología de poblaciones\n\n\nModelos de crecimiento, tablas de vida, modelos matriciales y análisis espacial.\n\nCap. 4 · Crecimiento Cap. 5 · Tablas de vida Cap. 6 · Distribución Ver Unidad II →\n\n\n\nUnidad III — Ecología de comunidades\n\n\nDiversidad taxonómica, funcional y filogenética con métodos clásicos y números de Hill.\n\nCap. 7 · Diversidad TD Cap. 8 · Diversidad FD y PD iNEXT.3D iNEXTbeta3D Ver Unidad III →"
   },
   {
-    "objectID": "index.html#cómo-usar-el-material",
-    "href": "index.html#cómo-usar-el-material",
+    "objectID": "index.html#organización-del-material",
+    "href": "index.html#organización-del-material",
     "title": "ANVIDEA — Material reproducible",
-    "section": "▶️ Cómo usar el material",
-    "text": "▶️ Cómo usar el material\n\nEjecutar una unidad completa\nsource(\"unidad_i/run_unidad1.R\")\n\n\nEjecutar un capítulo\nsource(\"R/00_setup.R\")"
-  },
-  {
-    "objectID": "index.html#organización",
-    "href": "index.html#organización",
-    "title": "ANVIDEA — Material reproducible",
-    "section": "📂 Organización",
-    "text": "📂 Organización\nCada capítulo contiene:\n\nScripts en R/\n\nDatos en data/raw/\n\nResultados en outputs/"
-  },
-  {
-    "objectID": "index.html#propósito",
-    "href": "index.html#propósito",
-    "title": "ANVIDEA — Material reproducible",
-    "section": "🧠 Propósito",
-    "text": "🧠 Propósito\nEste material permite:\n\nReproducir los análisis del libro\n\nAprender flujos de trabajo en R\n\nAplicar técnicas ecológicas a nuevos datos"
-  },
-  {
-    "objectID": "index.html#repositorio",
-    "href": "index.html#repositorio",
-    "title": "ANVIDEA — Material reproducible",
-    "section": "📎 Repositorio",
-    "text": "📎 Repositorio\nAccede al código completo en GitHub:\n👉 Ver_repositorio_ANVIDEA"
-  },
-  {
-    "objectID": "index.html#licencias",
-    "href": "index.html#licencias",
-    "title": "ANVIDEA — Material reproducible",
-    "section": "📄 Licencias:",
-    "text": "📄 Licencias:\nCódigo en R: MIT\nContenidos: CC BY-NC 4.0"
-  },
-  {
-    "objectID": "index.html#autor",
-    "href": "index.html#autor",
-    "title": "ANVIDEA — Material reproducible",
-    "section": "👨‍🏫 Autor",
-    "text": "👨‍🏫 Autor\nJavier Rodríguez-Barrios"
+    "section": "Organización del material",
+    "text": "Organización del material\nCada capítulo contiene:\n\nrun_capX.R — ejecuta el capítulo completo\nR/ — scripts organizados por casos\ndata/raw/ — datos de entrada listos para usar\noutputs/ — figuras, tablas y reportes generados\n\n\n\nJavier Rodríguez-Barrios · Universidad del Magdalena · GIEN Código: MIT License · Contenidos: CC BY-NC 4.0"
   },
   {
     "objectID": "unidad_i/index.html",
     "href": "unidad_i/index.html",
-    "title": "Unidad I. Análisis de datos ecológicos",
+    "title": "Unidad I — Análisis de datos ecológicos",
     "section": "",
-    "text": "Material reproducible del libro ANVIDEA para trabajar en R."
+    "text": "Material reproducible · ANVIDEA\nEsta unidad desarrolla las herramientas fundamentales para el análisis y visualización de datos ecológicos y ambientales en R, desde la exploración inicial hasta el análisis de variables climáticas."
   },
   {
     "objectID": "unidad_i/index.html#empezar-aquí",
     "href": "unidad_i/index.html#empezar-aquí",
-    "title": "Unidad I. Análisis de datos ecológicos",
-    "section": "🚀 Empezar aquí",
-    "text": "🚀 Empezar aquí\n\nDescarga el repositorio\nAbre la carpeta unidad_i/ en RStudio\nEjecuta:\n\nsource(\"run_unidad1.R\")"
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "Empezar aquí",
+    "text": "Empezar aquí\n\n\n\n1\n\n\nDescarga el material y descomprímelo\n\n\n\n\n2\n\n\nAbre unidad_i/ en RStudio\n\n\n\n\n3\n\n\nInstala los paquetes requeridos\n\n\n\n\n4\n\n\nEjecuta run_unidad1.R\n\n\n\n\n\n\n\n\n\nNota\n\n\n\nEste portal no ejecuta código. Todos los análisis se realizan de forma local en RStudio."
   },
   {
-    "objectID": "unidad_i/index.html#cómo-usar-este-material",
-    "href": "unidad_i/index.html#cómo-usar-este-material",
-    "title": "Unidad I. Análisis de datos ecológicos",
-    "section": "💻 ¿Cómo usar este material?",
-    "text": "💻 ¿Cómo usar este material?\n\n\n\n\n\n\nNota\n\n\n\nEste portal no ejecuta código directamente.\nPara trabajar con los análisis de esta unidad:\n\nDescarga el repositorio o abre la carpeta en GitHub\nGuarda los archivos en tu computador\nAbre la carpeta unidad_i/ en RStudio\nEjecuta el script principal (run_unidad1.R)\n\n👉 Todos los análisis se realizan de forma local en R"
+    "objectID": "unidad_i/index.html#capítulos",
+    "href": "unidad_i/index.html#capítulos",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "Capítulos",
+    "text": "Capítulos\n\n\nCapítulo 1 — Exploración y manipulación de datos\n\n\nImportación, limpieza y transformación de datos ecológicos con tidyverse.\n\nImportación Limpieza Transformación Ver carpeta en GitHub →\n\n\n\nCapítulo 2 — Visualización exploratoria\n\n\nConstrucción e interpretación de figuras con ggplot2 para datos ecológicos y ambientales.\n\nggplot2 Distribuciones Relaciones Ver carpeta en GitHub →\n\n\n\nCapítulo 3 — Análisis climático\n\n\nProcesamiento de series temporales climáticas y análisis de variables ambientales.\n\nSeries temporales Clima Balance hídrico Ver carpeta en GitHub →"
   },
   {
-    "objectID": "unidad_i/index.html#acceso-al-código",
-    "href": "unidad_i/index.html#acceso-al-código",
-    "title": "Unidad I. Análisis de datos ecológicos",
-    "section": "📂 Acceso al código",
-    "text": "📂 Acceso al código\n\nVer código en GitHub Descargar repositorio (ZIP)"
+    "objectID": "unidad_i/index.html#acceso-al-material",
+    "href": "unidad_i/index.html#acceso-al-material",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "Acceso al material",
+    "text": "Acceso al material\n⬇ Descargar repositorio completo (ZIP) Ver Unidad I en GitHub"
   },
   {
-    "objectID": "unidad_i/index.html#selecciona-un-capítulo",
-    "href": "unidad_i/index.html#selecciona-un-capítulo",
-    "title": "Unidad I. Análisis de datos ecológicos",
-    "section": "📘 Selecciona un capítulo",
-    "text": "📘 Selecciona un capítulo\nExplora cada capítulo de la unidad con acceso directo a sus scripts, datos y resultados:\n\n🔹 Capítulo 1 — Fundamentos de manipulación de datos\nVersión reproducible y descargable del capítulo, diseñada para ejecutar los códigos completos que complementan el texto del libro y generar un reporte HTML de validación.\nContenido del capítulo:\n\nR/ scripts completos (casos A y B + funciones auxiliares + guardado + render)\ndata/raw/ → plancton.xlsx, invert.xlsx\nrun_cap1.R → ejecución automática\nlimpiar_outputs.R → reinicio de salidas\nreporte_cap1.qmd → validación en HTML\n\nEjecución:\nsource(\"run_cap1.R\")\nEsto generará:\n\ntablas en outputs/tablas/\nfiguras en outputs/figuras/\nreporte HTML en outputs/reportes/\n📁 Abrir carpeta del capítulo\n\n\n\n\n🔹 Capítulo 2 — Visualización gráfica exploratoria\nVersión reproducible del capítulo, con dos casos guiados que cubren correlogramas, histogramas, cajas y bigotes, y figuras de burbujas para datos ecológicos.\nContenido del capítulo:\n\nR/ scripts completos (casos A y B + funciones auxiliares + guardado + render)\ndata/raw/ → plancton.xlsx, invert.xlsx\nrun_cap2.R → ejecución automática\nlimpiar_outputs.R → reinicio de salidas\nreporte_cap2.qmd → validación en HTML\n\nEjecución:\nsource(\"run_cap2.R\")\nEsto generará:\n\nfiguras en outputs/figuras/\ntablas en outputs/tablas/\nreporte HTML en outputs/reportes/\n📁 Abrir carpeta del capítulo\n\n\n\n\n🔹 Capítulo 3 — Visualización gráfica de patrones climáticos\nVersión reproducible del capítulo, con un caso guiado que integra series temporales, climatogramas, índice de Lang, balance hídrico y clasificación ecológica.\nContenido del capítulo:\n\nR/ scripts completos (caso guiado + funciones auxiliares + guardado + render)\ndata/raw/ → datos.c3.xlsx, bal_hid.R\nrun_cap3.R → ejecución automática\nlimpiar_outputs.R → reinicio de salidas\nreporte_cap3.qmd → validación en HTML\n\nEjecución:\nsource(\"run_cap3.R\")\nEsto generará:\n\nfiguras en outputs/figuras/\ntablas en outputs/tablas/\nreporte HTML en outputs/reportes/\n📁 Abrir carpeta del capítulo"
+    "objectID": "unidad_i/index.html#ejecución",
+    "href": "unidad_i/index.html#ejecución",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "Ejecución",
+    "text": "Ejecución\n# Desde unidad_i/ en RStudio\nsource(\"run_unidad1.R\")\n\n# O capítulo por capítulo\nsource(\"cap1-datos/run_cap1.R\")\nsource(\"cap2-visualizacion-exploratoria/run_cap2.R\")\nsource(\"cap3-clima/run_cap3.R\")"
   },
   {
-    "objectID": "unidad_i/index.html#ejecución-rápida-de-toda-la-unidad",
-    "href": "unidad_i/index.html#ejecución-rápida-de-toda-la-unidad",
-    "title": "Unidad I. Análisis de datos ecológicos",
-    "section": "▶️ Ejecución rápida de toda la unidad",
-    "text": "▶️ Ejecución rápida de toda la unidad\nsource(\"run_unidad1.R\")"
-  },
-  {
-    "objectID": "unidad_i/index.html#información-de-la-unidad",
-    "href": "unidad_i/index.html#información-de-la-unidad",
-    "title": "Unidad I. Análisis de datos ecológicos",
-    "section": "🔽 Información de la unidad",
-    "text": "🔽 Información de la unidad"
-  },
-  {
-    "objectID": "unidad_i/index.html#propósito",
-    "href": "unidad_i/index.html#propósito",
-    "title": "Unidad I. Análisis de datos ecológicos",
-    "section": "Propósito",
-    "text": "Propósito\nLa Unidad I busca fortalecer competencias en el manejo, organización y exploración de datos ecológicos y ambientales, usando flujos de trabajo reproducibles en R. A lo largo de esta unidad, el usuario aprenderá a importar, depurar, transformar y visualizar bases de datos reales, como paso previo a análisis más avanzados de ecología de poblaciones y comunidades."
-  },
-  {
-    "objectID": "unidad_i/index.html#enlace-de-retorno",
-    "href": "unidad_i/index.html#enlace-de-retorno",
-    "title": "Unidad I. Análisis de datos ecológicos",
-    "section": "Enlace de retorno",
-    "text": "Enlace de retorno\n👉 Volver a la página principal"
+    "objectID": "unidad_i/index.html#paquetes-requeridos",
+    "href": "unidad_i/index.html#paquetes-requeridos",
+    "title": "Unidad I — Análisis de datos ecológicos",
+    "section": "Paquetes requeridos",
+    "text": "Paquetes requeridos\ninstall.packages(c(\n  \"tidyverse\", \"readxl\", \"writexl\",\n  \"ggplot2\", \"patchwork\", \"cowplot\",\n  \"kableExtra\"\n))\n\n\n← Volver a la página principal"
   },
   {
     "objectID": "unidad_ii/index.html",
     "href": "unidad_ii/index.html",
-    "title": "Unidad II. Ecología de poblaciones",
+    "title": "Unidad II — Ecología de poblaciones",
     "section": "",
-    "text": "Material reproducible del libro ANVIDEA para trabajar en R."
+    "text": "Material reproducible · ANVIDEA\nEsta unidad integra herramientas cuantitativas para el análisis de la dinámica poblacional, desde modelos de crecimiento hasta el análisis espacial de poblaciones."
   },
   {
     "objectID": "unidad_ii/index.html#empezar-aquí",
     "href": "unidad_ii/index.html#empezar-aquí",
-    "title": "Unidad II. Ecología de poblaciones",
-    "section": "🚀 Empezar aquí",
-    "text": "🚀 Empezar aquí\n\nDescarga el repositorio\nAbre la carpeta unidad_ii/ en RStudio\nEjecuta:\n\nsource(\"run_unidad2.R\")"
+    "title": "Unidad II — Ecología de poblaciones",
+    "section": "Empezar aquí",
+    "text": "Empezar aquí\n\n\n\n1\n\n\nDescarga el material y descomprímelo\n\n\n\n\n2\n\n\nAbre unidad_ii/ en RStudio\n\n\n\n\n3\n\n\nInstala los paquetes requeridos\n\n\n\n\n4\n\n\nEjecuta run_unidad2.R\n\n\n\n\n\n\n\n\n\nNota\n\n\n\nEste portal no ejecuta código. Todos los análisis se realizan de forma local en RStudio."
   },
   {
-    "objectID": "unidad_ii/index.html#cómo-usar-este-material",
-    "href": "unidad_ii/index.html#cómo-usar-este-material",
-    "title": "Unidad II. Ecología de poblaciones",
-    "section": "💻 ¿Cómo usar este material?",
-    "text": "💻 ¿Cómo usar este material?\n\n\n\n\n\n\nNota\n\n\n\nEste portal no ejecuta código directamente.\nPara trabajar con los análisis de esta unidad:\n\nDescarga el repositorio o abre la carpeta en GitHub\nGuarda los archivos en tu computador\nAbre la carpeta unidad_ii/ en RStudio\nEjecuta el script principal (run_unidad2.R)\n\n👉 Todos los análisis se realizan de forma local en R"
+    "objectID": "unidad_ii/index.html#capítulos",
+    "href": "unidad_ii/index.html#capítulos",
+    "title": "Unidad II — Ecología de poblaciones",
+    "section": "Capítulos",
+    "text": "Capítulos\n\n\nCapítulo 4 — Modelos de crecimiento poblacional\n\n\nCrecimiento exponencial, discreto y logístico. Modelación y ajuste de parámetros.\n\nExponencial Logístico Discreto Ver carpeta en GitHub →\n\n\n\nCapítulo 5 — Tablas de vida y modelos matriciales\n\n\nTablas de vida por edades y estados, proyecciones con matrices de Leslie y Lefkovitch.\n\nTablas de vida Leslie Lefkovitch Ver carpeta en GitHub →\n\n\n\nCapítulo 6 — Distribución espacial y densidad\n\n\nAnálisis de patrones de distribución y estimación de densidad poblacional.\n\nDistribución espacial Densidad Transectos Ver carpeta en GitHub →"
   },
   {
-    "objectID": "unidad_ii/index.html#acceso-al-código",
-    "href": "unidad_ii/index.html#acceso-al-código",
-    "title": "Unidad II. Ecología de poblaciones",
-    "section": "📂 Acceso al código",
-    "text": "📂 Acceso al código\n\nVer código en GitHub Descargar repositorio (ZIP)"
+    "objectID": "unidad_ii/index.html#acceso-al-material",
+    "href": "unidad_ii/index.html#acceso-al-material",
+    "title": "Unidad II — Ecología de poblaciones",
+    "section": "Acceso al material",
+    "text": "Acceso al material\n⬇ Descargar repositorio completo (ZIP) Ver Unidad II en GitHub"
   },
   {
-    "objectID": "unidad_ii/index.html#selecciona-un-capítulo",
-    "href": "unidad_ii/index.html#selecciona-un-capítulo",
-    "title": "Unidad II. Ecología de poblaciones",
-    "section": "📘 Selecciona un capítulo",
-    "text": "📘 Selecciona un capítulo\nExplora cada capítulo de la unidad con acceso directo a sus scripts, datos y resultados:\n\n🔹 Capítulo 4 — Modelos de crecimiento poblacional\nVersión reproducible y descargable del capítulo, diseñada para ejecutar los modelos de crecimiento exponencial continuo, exponencial discreto y logístico que complementan el texto del libro y generar un reporte HTML de validación.\nContenido del capítulo:\n\nR/ scripts completos (casos + funciones auxiliares + guardado + render)\ndata/raw/ → datos del capítulo 4\nrun_cap4.R → ejecución automática\nlimpiar_outputs.R → reinicio de salidas\nreporte_cap4.qmd → validación en HTML\n\nEjecución:\nsource(\"run_cap4.R\")\nEsto generará:\n\ntablas en outputs/tablas/\nfiguras en outputs/figuras/\nreporte HTML en outputs/reportes/\n📁 Abrir carpeta del capítulo\n\n\n\n\n🔹 Capítulo 5 — Tablas de vida y modelos matriciales\nVersión reproducible del capítulo, con cuatro casos guiados que cubren tablas de vida por edades, tablas de vida clásicas (Gotelli), modelo matricial de Leslie y modelo matricial de Lefkovitch.\nContenido del capítulo:\n\nR/ scripts completos (casos A1, A2, B y C + funciones auxiliares + guardado + render)\ndata/raw/ → datos.c5.xlsx\nrun_cap5.R → ejecución automática\nlimpiar_outputs.R → reinicio de salidas\nreporte_cap5.qmd → validación en HTML\n\nEjecución:\nsource(\"run_cap5.R\")\nEsto generará:\n\ntablas en outputs/tablas/\nobjetos .rds en outputs/reportes/\nreporte HTML en outputs/reportes/\n📁 Abrir carpeta del capítulo\n\n\n\n\n🔹 Capítulo 6 — Patrones de distribución y estimación de la densidad\nVersión reproducible del capítulo, con dos casos guiados que integran ajuste a distribuciones espaciales (Poisson y Binomial Negativa), índices de dispersión y estimación de densidad por métodos de distancia (Holgate, King y Hayne).\nContenido del capítulo:\n\nR/ scripts completos (casos A y B + funciones auxiliares + guardado + render)\ndata/raw/ → datos.c6.xlsx\nrun_cap6.R → ejecución automática\nlimpiar_outputs.R → reinicio de salidas\nreporte_cap6.qmd → validación en HTML\n\nEjecución:\nsource(\"run_cap6.R\")\nEsto generará:\n\ntablas en outputs/tablas/\nobjetos .rds en outputs/reportes/\nreporte HTML en outputs/reportes/\n📁 Abrir carpeta del capítulo"
+    "objectID": "unidad_ii/index.html#ejecución",
+    "href": "unidad_ii/index.html#ejecución",
+    "title": "Unidad II — Ecología de poblaciones",
+    "section": "Ejecución",
+    "text": "Ejecución\n# Desde unidad_ii/ en RStudio\nsource(\"run_unidad2.R\")\n\n# O capítulo por capítulo\nsource(\"cap4-modelos-crecimiento/run_cap4.R\")\nsource(\"cap5-tablas-vida/run_cap5.R\")\nsource(\"cap6-distribucion-densidad/run_cap6.R\")"
   },
   {
-    "objectID": "unidad_ii/index.html#ejecución-rápida-de-toda-la-unidad",
-    "href": "unidad_ii/index.html#ejecución-rápida-de-toda-la-unidad",
-    "title": "Unidad II. Ecología de poblaciones",
-    "section": "▶️ Ejecución rápida de toda la unidad",
-    "text": "▶️ Ejecución rápida de toda la unidad\nsource(\"run_unidad2.R\")"
-  },
-  {
-    "objectID": "unidad_ii/index.html#información-de-la-unidad",
-    "href": "unidad_ii/index.html#información-de-la-unidad",
-    "title": "Unidad II. Ecología de poblaciones",
-    "section": "🔽 Información de la unidad",
-    "text": "🔽 Información de la unidad"
-  },
-  {
-    "objectID": "unidad_ii/index.html#propósito",
-    "href": "unidad_ii/index.html#propósito",
-    "title": "Unidad II. Ecología de poblaciones",
-    "section": "Propósito",
-    "text": "Propósito\nLa Unidad II desarrolla competencias en el análisis cuantitativo de poblaciones ecológicas, usando modelos matemáticos y estadísticos implementados en R. A lo largo de esta unidad, el usuario aprenderá a modelar el crecimiento poblacional, construir tablas de vida, proyectar poblaciones estructuradas y analizar patrones espaciales, como paso hacia el análisis de comunidades de la Unidad III."
-  },
-  {
-    "objectID": "unidad_ii/index.html#enlace-de-retorno",
-    "href": "unidad_ii/index.html#enlace-de-retorno",
-    "title": "Unidad II. Ecología de poblaciones",
-    "section": "Enlace de retorno",
-    "text": "Enlace de retorno\n👉 Volver a la página principal"
+    "objectID": "unidad_ii/index.html#paquetes-requeridos",
+    "href": "unidad_ii/index.html#paquetes-requeridos",
+    "title": "Unidad II — Ecología de poblaciones",
+    "section": "Paquetes requeridos",
+    "text": "Paquetes requeridos\ninstall.packages(c(\n  \"tidyverse\", \"readxl\", \"writexl\",\n  \"patchwork\", \"kableExtra\", \"MASS\", \"broom\"\n))\n\n\n← Volver a la página principal"
   },
   {
     "objectID": "unidad_iii/index.html",
     "href": "unidad_iii/index.html",
-    "title": "Unidad III. Ecología de comunidades",
+    "title": "Unidad III — Ecología de comunidades",
     "section": "",
-    "text": "Material reproducible del libro ANVIDEA para trabajar en R."
+    "text": "Material reproducible · ANVIDEA\nEsta unidad integra herramientas modernas para el análisis de la diversidad biológica desde sus tres dimensiones: taxonómica, funcional y filogenética."
   },
   {
     "objectID": "unidad_iii/index.html#empezar-aquí",
     "href": "unidad_iii/index.html#empezar-aquí",
-    "title": "Unidad III. Ecología de comunidades",
-    "section": "🚀 Empezar aquí",
-    "text": "🚀 Empezar aquí\n\nDescarga el repositorio\nAbre la carpeta unidad_iii/ en RStudio\nEjecuta:\n\nsource(\"run_unidad3.R\")"
+    "title": "Unidad III — Ecología de comunidades",
+    "section": "Empezar aquí",
+    "text": "Empezar aquí\n\n\n\n1\n\n\nDescarga el material y descomprímelo\n\n\n\n\n2\n\n\nAbre unidad_iii/ en RStudio\n\n\n\n\n3\n\n\nInstala los paquetes requeridos\n\n\n\n\n4\n\n\nEjecuta run_unidad3.R\n\n\n\n\n\n\n\n\n\nNota\n\n\n\nEste portal no ejecuta código. Todos los análisis se realizan de forma local en RStudio."
   },
   {
-    "objectID": "unidad_iii/index.html#cómo-usar-este-material",
-    "href": "unidad_iii/index.html#cómo-usar-este-material",
-    "title": "Unidad III. Ecología de comunidades",
-    "section": "💻 ¿Cómo usar este material?",
-    "text": "💻 ¿Cómo usar este material?\n\n\n\n\n\n\nNota\n\n\n\nEste portal no ejecuta código directamente.\nPara trabajar con los análisis de esta unidad:\n\nDescarga el repositorio o abre la carpeta en GitHub\nGuarda los archivos en tu computador\nAbre la carpeta unidad_iii/ en RStudio\nEjecuta el script principal desde esa carpeta:\n\nsource(\"run_unidad3.R\")\n👉 Todos los análisis se realizan de forma local en R"
+    "objectID": "unidad_iii/index.html#capítulos",
+    "href": "unidad_iii/index.html#capítulos",
+    "title": "Unidad III — Ecología de comunidades",
+    "section": "Capítulos",
+    "text": "Capítulos\n\n\nCapítulo 7 — Diversidad taxonómica\n\n\nÍndices clásicos, curvas rango-abundancia, GLMs, PERMANOVAs, diversidad beta y números de Hill taxonómicos.\n\nAlfa · Beta · Gamma iNEXT iNEXT.3D iNEXTbeta3D vegan Ver carpeta en GitHub →\n\n\n\nCapítulo 8 — Diversidad funcional y filogenética\n\n\nMétricas funcionales (FRic, FEve, FDiv, FDis, RaoQ), partición de Rao y números de Hill funcionales y filogenéticos.\n\nTD · FD · PD FD iNEXT.3D iNEXTbeta3D ape · taxize Ver carpeta en GitHub →"
   },
   {
-    "objectID": "unidad_iii/index.html#acceso-al-código",
-    "href": "unidad_iii/index.html#acceso-al-código",
-    "title": "Unidad III. Ecología de comunidades",
-    "section": "📂 Acceso al código",
-    "text": "📂 Acceso al código\n\nVer código en GitHub Descargar repositorio (ZIP)"
+    "objectID": "unidad_iii/index.html#acceso-al-material",
+    "href": "unidad_iii/index.html#acceso-al-material",
+    "title": "Unidad III — Ecología de comunidades",
+    "section": "Acceso al material",
+    "text": "Acceso al material\n⬇ Descargar repositorio completo (ZIP) Ver Unidad III en GitHub"
   },
   {
-    "objectID": "unidad_iii/index.html#selecciona-un-capítulo",
-    "href": "unidad_iii/index.html#selecciona-un-capítulo",
-    "title": "Unidad III. Ecología de comunidades",
-    "section": "📘 Selecciona un capítulo",
-    "text": "📘 Selecciona un capítulo\n\n🔹 Capítulo 7 — Diversidad taxonómica\n\n📁 Abrir carpeta del capítulo\n📄 Incluye:\n\nDiversidad alfa clásica (q = 0, 1, 2) y curvas rango-abundancia\nGLMs multivariados y PERMANOVAs\nNúmeros de Hill alfa (iNEXT, iNEXT.4steps, iNEXT.3D)\nDiversidad beta clásica y descomposición de varianza (LCBD, SCBD)\nRecambio y diferencia de riqueza (Podani & Schmera, 2011)\nNúmeros de Hill beta (iNEXTbeta3D)\n\n\n\n\n\n🔹 Capítulo 8 — Diversidad funcional y filogenética\n\n📁 Abrir carpeta del capítulo\n📄 Incluye:\n\nMétricas funcionales alfa: FRic, FEve, FDiv, FDis, RaoQ\nCommunity Weighted Means (CWM)\nPartición aditiva de Rao (TD, FD, PD)\nNúmeros de Hill funcional y filogenético — alfa (iNEXT.3D)\nNúmeros de Hill funcional y filogenético — beta (iNEXTbeta3D)"
+    "objectID": "unidad_iii/index.html#ejecución",
+    "href": "unidad_iii/index.html#ejecución",
+    "title": "Unidad III — Ecología de comunidades",
+    "section": "Ejecución",
+    "text": "Ejecución\n# Toda la unidad desde unidad_iii/\nsource(\"run_unidad3.R\")\n\n# Solo capítulo 7 — desde cap7-diversidad-taxonomica/\nsource(\"run_cap7.R\")\n\n# Solo capítulo 8 — desde cap8-diversidad-funcional-filogenetica/\nsource(\"run_cap8.R\")\n\n\n\n\n\n\nTip\n\n\n\nEjecuta primero el Capítulo 7 y luego el Capítulo 8. La progresión conceptual es: Taxonomía → Función → Filogenia."
   },
   {
-    "objectID": "unidad_iii/index.html#ejecución-rápida",
-    "href": "unidad_iii/index.html#ejecución-rápida",
-    "title": "Unidad III. Ecología de comunidades",
-    "section": "▶️ Ejecución rápida",
-    "text": "▶️ Ejecución rápida\n# Toda la unidad (desde unidad_iii/)\nsource(\"run_unidad3.R\")\n\n# Solo capítulo 7 (desde cap7-diversidad-taxonomica/)\nsource(\"run_cap7.R\")\n\n# Solo capítulo 8 (desde cap8-diversidad-funcional-filogenetica/)\nsource(\"run_cap8.R\")\n\n\n\n\n\n\nTip\n\n\n\nEsta unidad avanza desde la diversidad taxonómica hacia enfoques funcionales y filogenéticos. Se recomienda ejecutar primero el Capítulo 7 y luego el Capítulo 8."
+    "objectID": "unidad_iii/index.html#paquetes-requeridos",
+    "href": "unidad_iii/index.html#paquetes-requeridos",
+    "title": "Unidad III — Ecología de comunidades",
+    "section": "Paquetes requeridos",
+    "text": "Paquetes requeridos\n# Capítulo 7\ninstall.packages(c(\n  \"tidyverse\", \"readxl\", \"writexl\", \"vegan\",\n  \"adespatial\", \"betapart\", \"ade4\", \"kableExtra\",\n  \"mvabund\", \"MASS\", \"glmmTMB\", \"RVAideMemoire\"\n))\n\n# Capítulo 8\ninstall.packages(c(\n  \"tidyverse\", \"readxl\", \"writexl\", \"FD\",\n  \"ape\", \"taxize\", \"vegan\", \"ade4\", \"kableExtra\"\n))\n\n# Desde GitHub (ambos capítulos)\nremotes::install_github(\"AnneChao/iNEXT.3D\")\nremotes::install_github(\"AnneChao/iNEXTbeta3D\")\n\n\n\n\n\n\nAdvertencia\n\n\n\nErrores frecuentes: rutas alteradas al mover carpetas, nombres de archivos modificados, paquetes no instalados, o desajustes entre matrices de abundancia, rasgos y filogenia (Cap. 8). Consulta el README de cada capítulo antes de ejecutar."
   },
   {
-    "objectID": "unidad_iii/index.html#ℹ-información-de-la-unidad",
-    "href": "unidad_iii/index.html#ℹ-información-de-la-unidad",
-    "title": "Unidad III. Ecología de comunidades",
-    "section": "ℹ️ Información de la unidad",
-    "text": "ℹ️ Información de la unidad\n\nPropósito\nEsta unidad integra herramientas modernas para el análisis de la biodiversidad desde una perspectiva taxonómica, funcional y filogenética, acompañando la lectura del libro ANVIDEA con scripts reproducibles y bases de datos de ejemplo.\n\n\nProgresión conceptual\nTaxonomía → Función → Filogenia\n\n\n\nDimensión\nCapítulo\n\n\n\n\nTaxonómica (TD): identidad y abundancia\n7\n\n\nFuncional (FD): rasgos ecológicos\n8\n\n\nFilogenética (PD): historia evolutiva\n8\n\n\n\n\n\nPrerrequisitos\n\nconocimientos básicos de R y RStudio\nmanejo elemental de objetos, scripts y directorios de trabajo\nnociones introductorias de diversidad alfa, beta y gamma\nfamiliaridad básica con archivos .xlsx y .rds\n\n\n\nRecomendaciones de ejecución\n\nEjecuta primero 00_setup.R de cada capítulo si trabajas por partes\nTrabaja siempre desde el directorio raíz del capítulo o la unidad\nConserva sin cambios la estructura de carpetas R/, data/raw/ y outputs/\nConfirma que los paquetes requeridos estén instalados\n\n\n\n\n\n\n\nAdvertencia\n\n\n\nLos errores más frecuentes al ejecutar los scripts suelen deberse a:\n\nrutas alteradas por mover carpetas o archivos\nnombres de archivos modificados\npaquetes no instalados\ndesajustes entre matrices de abundancia, rasgos y filogenia (especialmente en el Cap. 8)"
-  },
-  {
-    "objectID": "unidad_iii/index.html#navegación",
-    "href": "unidad_iii/index.html#navegación",
-    "title": "Unidad III. Ecología de comunidades",
-    "section": "⬅️ Navegación",
-    "text": "⬅️ Navegación\n👉 Volver a la página principal"
+    "objectID": "unidad_iii/index.html#progresión-conceptual",
+    "href": "unidad_iii/index.html#progresión-conceptual",
+    "title": "Unidad III — Ecología de comunidades",
+    "section": "Progresión conceptual",
+    "text": "Progresión conceptual\n\n\n\nDimensión\nDescripción\nCapítulo\n\n\n\n\nTaxonómica (TD)\nIdentidad y abundancia de especies\n7\n\n\nFuncional (FD)\nRasgos ecológicos y estrategias de vida\n8\n\n\nFilogenética (PD)\nHistoria evolutiva compartida\n8\n\n\n\n\n\n← Volver a la página principal"
   }
 ]

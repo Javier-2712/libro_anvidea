@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>ANVIDEA — Material reproducible - Unidad III. Ecología de comunidades</title>
+<title>ANVIDEA — Material reproducible - Unidad III — Ecología de comunidades</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -181,13 +181,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <h2 id="toc-title">En esta página</h2>
    
   <ul class="collapse">
-  <li><a href="#empezar-aquí" id="toc-empezar-aquí" class="nav-link active" data-scroll-target="#empezar-aquí">🚀 Empezar aquí</a></li>
-  <li><a href="#cómo-usar-este-material" id="toc-cómo-usar-este-material" class="nav-link" data-scroll-target="#cómo-usar-este-material">💻 ¿Cómo usar este material?</a></li>
-  <li><a href="#acceso-al-código" id="toc-acceso-al-código" class="nav-link" data-scroll-target="#acceso-al-código">📂 Acceso al código</a></li>
-  <li><a href="#selecciona-un-capítulo" id="toc-selecciona-un-capítulo" class="nav-link" data-scroll-target="#selecciona-un-capítulo">📘 Selecciona un capítulo</a></li>
-  <li><a href="#ejecución-rápida" id="toc-ejecución-rápida" class="nav-link" data-scroll-target="#ejecución-rápida">▶️ Ejecución rápida</a></li>
-  <li><a href="#ℹ-información-de-la-unidad" id="toc-ℹ-información-de-la-unidad" class="nav-link" data-scroll-target="#ℹ-información-de-la-unidad">ℹ️ Información de la unidad</a></li>
-  <li><a href="#navegación" id="toc-navegación" class="nav-link" data-scroll-target="#navegación">⬅️ Navegación</a></li>
+  <li><a href="#empezar-aquí" id="toc-empezar-aquí" class="nav-link active" data-scroll-target="#empezar-aquí">Empezar aquí</a></li>
+  <li><a href="#capítulos" id="toc-capítulos" class="nav-link" data-scroll-target="#capítulos">Capítulos</a></li>
+  <li><a href="#acceso-al-material" id="toc-acceso-al-material" class="nav-link" data-scroll-target="#acceso-al-material">Acceso al material</a></li>
+  <li><a href="#ejecución" id="toc-ejecución" class="nav-link" data-scroll-target="#ejecución">Ejecución</a></li>
+  <li><a href="#paquetes-requeridos" id="toc-paquetes-requeridos" class="nav-link" data-scroll-target="#paquetes-requeridos">Paquetes requeridos</a></li>
+  <li><a href="#progresión-conceptual" id="toc-progresión-conceptual" class="nav-link" data-scroll-target="#progresión-conceptual">Progresión conceptual</a></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/Javier-2712/libro_anvidea/blob/main/unidad_iii/index.qmd" class="toc-action">Ver el código</a></p><p><a href="https://github.com/Javier-2712/libro_anvidea/issues/new" class="toc-action">Informar de un problema</a></p></div></div></nav>
     </div>
@@ -196,7 +195,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Unidad III. Ecología de comunidades</h1>
+<h1 class="title">Unidad III — Ecología de comunidades</h1>
 </div>
 
 
@@ -211,23 +210,50 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 </header>
 
-<div style="text-align: center; margin-top: 10px; margin-bottom: 20px;">
-<p><img src="Logo_GIEN.png" alt="GIEN - Grupo de Investigación en Ecología Neotropical" width="280"></p>
+<div style="text-align:center; margin: 1.5rem 0 2rem;">
+<img src="../Logo_GIEN.png" alt="GIEN" style="width:64px; border-radius:50%;">
+<p style="color:#4a6282; font-size:0.9rem; margin-top:0.5rem;">
+Material reproducible · ANVIDEA
+</p>
 </div>
-<p>Material reproducible del libro <strong>ANVIDEA</strong> para trabajar en R.</p>
+<p>Esta unidad integra herramientas modernas para el análisis de la <strong>diversidad biológica</strong> desde sus tres dimensiones: taxonómica, funcional y filogenética.</p>
 <hr>
 <section id="empezar-aquí" class="level2">
-<h2 class="anchored" data-anchor-id="empezar-aquí">🚀 Empezar aquí</h2>
-<ol type="1">
-<li>Descarga el repositorio</li>
-<li>Abre la carpeta <code>unidad_iii/</code> en RStudio</li>
-<li>Ejecuta:</li>
-</ol>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_unidad3.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<hr>
-</section>
-<section id="cómo-usar-este-material" class="level2">
-<h2 class="anchored" data-anchor-id="cómo-usar-este-material">💻 ¿Cómo usar este material?</h2>
+<h2 class="anchored" data-anchor-id="empezar-aquí">Empezar aquí</h2>
+<div class="pasos">
+<div class="paso">
+<div class="paso-num">
+1
+</div>
+<p>
+Descarga el material y descomprímelo
+</p>
+</div>
+<div class="paso">
+<div class="paso-num">
+2
+</div>
+<p>
+Abre <code>unidad_iii/</code> en RStudio
+</p>
+</div>
+<div class="paso">
+<div class="paso-num">
+3
+</div>
+<p>
+Instala los paquetes requeridos
+</p>
+</div>
+<div class="paso">
+<div class="paso-num">
+4
+</div>
+<p>
+Ejecuta <code>run_unidad3.R</code>
+</p>
+</div>
+</div>
 <div class="callout-note callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -238,71 +264,48 @@ Nota
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Este portal no ejecuta código directamente.</p>
-<p>Para trabajar con los análisis de esta unidad:</p>
-<ol type="1">
-<li>Descarga el repositorio o abre la carpeta en GitHub</li>
-<li>Guarda los archivos en tu computador</li>
-<li>Abre la carpeta <code>unidad_iii/</code> en RStudio</li>
-<li>Ejecuta el script principal desde esa carpeta:</li>
-</ol>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_unidad3.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>👉 Todos los análisis se realizan de forma local en R</p>
+<p>Este portal no ejecuta código. Todos los análisis se realizan de forma local en RStudio.</p>
 </div>
 </div>
 <hr>
 </section>
-<section id="acceso-al-código" class="level2">
-<h2 class="anchored" data-anchor-id="acceso-al-código">📂 Acceso al código</h2>
-<div style="margin-top: 0.5em; margin-bottom: 1em;">
-<p><a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii" target="_blank" style="display:inline-block; padding:0.6em 1em; margin-right:0.6em; background:#2b8cbe; color:white; text-decoration:none; border-radius:8px;">Ver código en GitHub</a> <a href="https://github.com/Javier-2712/libro_anvidea/archive/refs/heads/main.zip" target="_blank" style="display:inline-block; padding:0.6em 1em; background:#238b45; color:white; text-decoration:none; border-radius:8px;">Descargar repositorio (ZIP)</a></p>
+<section id="capítulos" class="level2">
+<h2 class="anchored" data-anchor-id="capítulos">Capítulos</h2>
+<div class="card-unidad">
+<h3 class="anchored">
+Capítulo 7 — Diversidad taxonómica
+</h3>
+<p>
+Índices clásicos, curvas rango-abundancia, GLMs, PERMANOVAs, diversidad beta y números de Hill taxonómicos.
+</p>
+<p><span class="badge-cap">Alfa · Beta · Gamma</span> <span class="badge-tema">iNEXT</span> <span class="badge-tema">iNEXT.3D</span> <span class="badge-tema">iNEXTbeta3D</span> <span class="badge-tema">vegan</span><br> <a class="btn-anvidea" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii/cap7-diversidad-taxonomica" target="_blank" style="margin-top:0.8rem;">Ver carpeta en GitHub →</a></p>
+</div>
+<div class="card-unidad">
+<h3 class="anchored">
+Capítulo 8 — Diversidad funcional y filogenética
+</h3>
+<p>
+Métricas funcionales (FRic, FEve, FDiv, FDis, RaoQ), partición de Rao y números de Hill funcionales y filogenéticos.
+</p>
+<p><span class="badge-cap">TD · FD · PD</span> <span class="badge-tema">FD</span> <span class="badge-tema">iNEXT.3D</span> <span class="badge-tema">iNEXTbeta3D</span> <span class="badge-tema">ape · taxize</span><br> <a class="btn-anvidea" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii/cap8-diversidad-funcional-filogenetica" target="_blank" style="margin-top:0.8rem;">Ver carpeta en GitHub →</a></p>
 </div>
 <hr>
 </section>
-<section id="selecciona-un-capítulo" class="level2">
-<h2 class="anchored" data-anchor-id="selecciona-un-capítulo">📘 Selecciona un capítulo</h2>
-<section id="capítulo-7-diversidad-taxonómica" class="level3">
-<h3 class="anchored" data-anchor-id="capítulo-7-diversidad-taxonómica">🔹 Capítulo 7 — Diversidad taxonómica</h3>
-<ul>
-<li>📁 <a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii/cap7-diversidad-taxonomica">Abrir carpeta del capítulo</a></li>
-<li>📄 Incluye:
-<ul>
-<li>Diversidad alfa clásica (q = 0, 1, 2) y curvas rango-abundancia</li>
-<li>GLMs multivariados y PERMANOVAs</li>
-<li>Números de Hill alfa (iNEXT, iNEXT.4steps, iNEXT.3D)</li>
-<li>Diversidad beta clásica y descomposición de varianza (LCBD, SCBD)</li>
-<li>Recambio y diferencia de riqueza (Podani &amp; Schmera, 2011)</li>
-<li>Números de Hill beta (iNEXTbeta3D)</li>
-</ul></li>
-</ul>
+<section id="acceso-al-material" class="level2">
+<h2 class="anchored" data-anchor-id="acceso-al-material">Acceso al material</h2>
+<p><a class="btn-anvidea btn-verde" href="https://github.com/Javier-2712/libro_anvidea/archive/refs/heads/main.zip" target="_blank">⬇ Descargar repositorio completo (ZIP)</a> <a class="btn-anvidea btn-outline" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii" target="_blank">Ver Unidad III en GitHub</a></p>
 <hr>
 </section>
-<section id="capítulo-8-diversidad-funcional-y-filogenética" class="level3">
-<h3 class="anchored" data-anchor-id="capítulo-8-diversidad-funcional-y-filogenética">🔹 Capítulo 8 — Diversidad funcional y filogenética</h3>
-<ul>
-<li>📁 <a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii/cap8-diversidad-funcional-filogenetica">Abrir carpeta del capítulo</a></li>
-<li>📄 Incluye:
-<ul>
-<li>Métricas funcionales alfa: FRic, FEve, FDiv, FDis, RaoQ</li>
-<li>Community Weighted Means (CWM)</li>
-<li>Partición aditiva de Rao (TD, FD, PD)</li>
-<li>Números de Hill funcional y filogenético — alfa (iNEXT.3D)</li>
-<li>Números de Hill funcional y filogenético — beta (iNEXTbeta3D)</li>
-</ul></li>
-</ul>
-<hr>
-</section>
-</section>
-<section id="ejecución-rápida" class="level2">
-<h2 class="anchored" data-anchor-id="ejecución-rápida">▶️ Ejecución rápida</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Toda la unidad (desde unidad_iii/)</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_unidad3.R"</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Solo capítulo 7 (desde cap7-diversidad-taxonomica/)</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_cap7.R"</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Solo capítulo 8 (desde cap8-diversidad-funcional-filogenetica/)</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_cap8.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="ejecución" class="level2">
+<h2 class="anchored" data-anchor-id="ejecución">Ejecución</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Toda la unidad desde unidad_iii/</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_unidad3.R"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Solo capítulo 7 — desde cap7-diversidad-taxonomica/</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_cap7.R"</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Solo capítulo 8 — desde cap8-diversidad-funcional-filogenetica/</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_cap8.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="callout-tip callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -313,60 +316,29 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Esta unidad avanza desde la diversidad taxonómica hacia enfoques funcionales y filogenéticos. Se recomienda ejecutar primero el Capítulo 7 y luego el Capítulo 8.</p>
+<p>Ejecuta primero el Capítulo 7 y luego el Capítulo 8. La progresión conceptual es: <strong>Taxonomía → Función → Filogenia</strong>.</p>
 </div>
 </div>
 <hr>
 </section>
-<section id="ℹ-información-de-la-unidad" class="level2">
-<h2 class="anchored" data-anchor-id="ℹ-información-de-la-unidad">ℹ️ Información de la unidad</h2>
-<section id="propósito" class="level3">
-<h3 class="anchored" data-anchor-id="propósito">Propósito</h3>
-<p>Esta unidad integra herramientas modernas para el análisis de la biodiversidad desde una perspectiva taxonómica, funcional y filogenética, acompañando la lectura del libro <strong>ANVIDEA</strong> con scripts reproducibles y bases de datos de ejemplo.</p>
-</section>
-<section id="progresión-conceptual" class="level3">
-<h3 class="anchored" data-anchor-id="progresión-conceptual">Progresión conceptual</h3>
-<p><strong>Taxonomía → Función → Filogenia</strong></p>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Dimensión</th>
-<th>Capítulo</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Taxonómica (TD): identidad y abundancia</td>
-<td>7</td>
-</tr>
-<tr class="even">
-<td>Funcional (FD): rasgos ecológicos</td>
-<td>8</td>
-</tr>
-<tr class="odd">
-<td>Filogenética (PD): historia evolutiva</td>
-<td>8</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="prerrequisitos" class="level3">
-<h3 class="anchored" data-anchor-id="prerrequisitos">Prerrequisitos</h3>
-<ul>
-<li>conocimientos básicos de R y RStudio</li>
-<li>manejo elemental de objetos, scripts y directorios de trabajo</li>
-<li>nociones introductorias de diversidad alfa, beta y gamma</li>
-<li>familiaridad básica con archivos <code>.xlsx</code> y <code>.rds</code></li>
-</ul>
-</section>
-<section id="recomendaciones-de-ejecución" class="level3">
-<h3 class="anchored" data-anchor-id="recomendaciones-de-ejecución">Recomendaciones de ejecución</h3>
-<ul>
-<li>Ejecuta primero <code>00_setup.R</code> de cada capítulo si trabajas por partes</li>
-<li>Trabaja siempre desde el directorio raíz del capítulo o la unidad</li>
-<li>Conserva sin cambios la estructura de carpetas <code>R/</code>, <code>data/raw/</code> y <code>outputs/</code></li>
-<li>Confirma que los paquetes requeridos estén instalados</li>
-</ul>
+<section id="paquetes-requeridos" class="level2">
+<h2 class="anchored" data-anchor-id="paquetes-requeridos">Paquetes requeridos</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Capítulo 7</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"tidyverse"</span>, <span class="st">"readxl"</span>, <span class="st">"writexl"</span>, <span class="st">"vegan"</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"adespatial"</span>, <span class="st">"betapart"</span>, <span class="st">"ade4"</span>, <span class="st">"kableExtra"</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"mvabund"</span>, <span class="st">"MASS"</span>, <span class="st">"glmmTMB"</span>, <span class="st">"RVAideMemoire"</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>))</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Capítulo 8</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"tidyverse"</span>, <span class="st">"readxl"</span>, <span class="st">"writexl"</span>, <span class="st">"FD"</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ape"</span>, <span class="st">"taxize"</span>, <span class="st">"vegan"</span>, <span class="st">"ade4"</span>, <span class="st">"kableExtra"</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>))</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Desde GitHub (ambos capítulos)</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"AnneChao/iNEXT.3D"</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"AnneChao/iNEXTbeta3D"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="callout-warning callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -377,21 +349,43 @@ Advertencia
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Los errores más frecuentes al ejecutar los scripts suelen deberse a:</p>
-<ul>
-<li>rutas alteradas por mover carpetas o archivos</li>
-<li>nombres de archivos modificados</li>
-<li>paquetes no instalados</li>
-<li>desajustes entre matrices de abundancia, rasgos y filogenia (especialmente en el Cap. 8)</li>
-</ul>
+<p><strong>Errores frecuentes:</strong> rutas alteradas al mover carpetas, nombres de archivos modificados, paquetes no instalados, o desajustes entre matrices de abundancia, rasgos y filogenia (Cap. 8). Consulta el README de cada capítulo antes de ejecutar.</p>
 </div>
 </div>
 <hr>
 </section>
-</section>
-<section id="navegación" class="level2">
-<h2 class="anchored" data-anchor-id="navegación">⬅️ Navegación</h2>
-<p>👉 <a href="../index.html">Volver a la página principal</a></p>
+<section id="progresión-conceptual" class="level2">
+<h2 class="anchored" data-anchor-id="progresión-conceptual">Progresión conceptual</h2>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Dimensión</th>
+<th>Descripción</th>
+<th style="text-align: center;">Capítulo</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Taxonómica (TD)</strong></td>
+<td>Identidad y abundancia de especies</td>
+<td style="text-align: center;">7</td>
+</tr>
+<tr class="even">
+<td><strong>Funcional (FD)</strong></td>
+<td>Rasgos ecológicos y estrategias de vida</td>
+<td style="text-align: center;">8</td>
+</tr>
+<tr class="odd">
+<td><strong>Filogenética (PD)</strong></td>
+<td>Historia evolutiva compartida</td>
+<td style="text-align: center;">8</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<div class="footer-anvidea">
+<p><a href="../index.html">← Volver a la página principal</a></p>
+</div>
 
 
 </section>
