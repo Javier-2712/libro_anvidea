@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="Logos.png" width="500">
+  <img src="Logo_GIEN.png" alt="GIEN - Grupo de Investigación en Ecología Neotropical" width="300">
 </p>
 
 # ANVIDEA — Material reproducible
@@ -166,7 +166,21 @@ remotes::install_github("AnneChao/iNEXTbeta3D")
 
 ## 👨‍🏫 Autor
 
-**Javier Rodríguez-Barrios**
+**Javier Rodríguez-Barrios**  
+Grupo de Investigación en Ecología Neotropical (GIEN)  
+Universidad del Magdalena · Santa Marta, Colombia
+
+---
+
+## 📌 Cómo citar este material
+
+**Libro:**
+
+> Rodríguez-Barrios, J. (2026). *Análisis y visualización de datos ecológicos y ambientales*. Editorial Unimagdalena. Santa Marta, Colombia. (En prensa)
+
+**Repositorio:**
+
+> Rodríguez-Barrios, J. (2026). *ANVIDEA: Material reproducible — Análisis y visualización de datos ecológicos y ambientales* [Repositorio de software]. GitHub. https://github.com/Javier-2712/libro_anvidea
 
 ---
 

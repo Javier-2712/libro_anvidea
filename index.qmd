@@ -75,6 +75,20 @@ Cada capítulo contiene:
 
 ---
 
+## Cómo citar este material
+
+Si usas este material en trabajos académicos, cítalo así:
+
+**Libro:**
+
+> Rodríguez-Barrios, J. (2026). *Análisis y visualización de datos ecológicos y ambientales*. Editorial Unimagdalena. Santa Marta, Colombia. (En prensa)
+
+**Repositorio:**
+
+> Rodríguez-Barrios, J. (2026). *ANVIDEA: Material reproducible — Análisis y visualización de datos ecológicos y ambientales* [Repositorio de software]. GitHub. https://github.com/Javier-2712/libro_anvidea
+
+---
+
 <div class="footer-anvidea">
   Javier Rodríguez-Barrios · Universidad del Magdalena · GIEN<br>
   Código: MIT License · Contenidos: CC BY-NC 4.0
