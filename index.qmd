@@ -8,10 +8,7 @@ format:
 ---
 
 <div class="hero-anvidea">
-  <div style="display:flex; justify-content:center; align-items:center; gap:1.5rem; margin-bottom:1.2rem; flex-wrap:wrap;">
-    <img src="logoUM.png" alt="Universidad del Magdalena" style="width:90px; border-radius:8px; background:white; padding:4px;">
-    <img src="Logo_GIEN.png" alt="GIEN" style="width:90px; border-radius:50%; background:rgba(255,255,255,0.15); padding:4px;">
-  </div>
+  <img src="Logos.png" alt="Universidad del Magdalena - GIEN" style="width:320px; margin-bottom:1.2rem;">
   <h1>ANVIDEA</h1>
   <p>Análisis y Visualización de Datos Ecológicos y Ambientales — scripts, datos y flujos de trabajo organizados por unidades y capítulos.</p>
   <a class="btn-anvidea btn-verde" href="https://github.com/Javier-2712/libro_anvidea/archive/refs/heads/main.zip" target="_blank">⬇ Descargar material (ZIP)</a>

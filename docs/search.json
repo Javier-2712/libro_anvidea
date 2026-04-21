@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "ANVIDEA — Material reproducible",
     "section": "",
-    "text": "<img src=\"logoUM.png\" alt=\"Universidad del Magdalena\" style=\"width:90px; border-radius:8px; background:white; padding:4px;\">\n<img src=\"Logo_GIEN.png\" alt=\"GIEN\" style=\"width:90px; border-radius:50%; background:rgba(255,255,255,0.15); padding:4px;\">\n\n\n\nAnálisis y Visualización de Datos Ecológicos y Ambientales — scripts, datos y flujos de trabajo organizados por unidades y capítulos.\n\n⬇ Descargar material (ZIP) Ver repositorio en GitHub"
+    "text": "Análisis y Visualización de Datos Ecológicos y Ambientales — scripts, datos y flujos de trabajo organizados por unidades y capítulos.\n\n⬇ Descargar material (ZIP) Ver repositorio en GitHub"
   },
   {
     "objectID": "index.html#primeros-pasos",
@@ -32,7 +32,7 @@
     "href": "unidad_i/index.html",
     "title": "Unidad I — Análisis de datos ecológicos",
     "section": "",
-    "text": "<img src=\"../logoUM.png\" alt=\"Universidad del Magdalena\" style=\"width:80px; border-radius:8px;\">\n<img src=\"../Logo_GIEN.png\" alt=\"GIEN\" style=\"width:80px; border-radius:50%;\">\n\n\nMaterial reproducible · ANVIDEA · Universidad del Magdalena\nEsta unidad desarrolla las herramientas fundamentales para el análisis y visualización de datos ecológicos y ambientales en R, desde la exploración inicial hasta el análisis de variables climáticas."
+    "text": "Material reproducible · ANVIDEA · Universidad del Magdalena\nEsta unidad desarrolla las herramientas fundamentales para el análisis y visualización de datos ecológicos y ambientales en R, desde la exploración inicial hasta el análisis de variables climáticas."
   },
   {
     "objectID": "unidad_i/index.html#empezar-aquí",
@@ -74,7 +74,7 @@
     "href": "unidad_ii/index.html",
     "title": "Unidad II — Ecología de poblaciones",
     "section": "",
-    "text": "<img src=\"../logoUM.png\" alt=\"Universidad del Magdalena\" style=\"width:80px; border-radius:8px;\">\n<img src=\"../Logo_GIEN.png\" alt=\"GIEN\" style=\"width:80px; border-radius:50%;\">\n\n\nMaterial reproducible · ANVIDEA · Universidad del Magdalena\nEsta unidad integra herramientas cuantitativas para el análisis de la dinámica poblacional, desde modelos de crecimiento hasta el análisis espacial de poblaciones."
+    "text": "Material reproducible · ANVIDEA · Universidad del Magdalena\nEsta unidad integra herramientas cuantitativas para el análisis de la dinámica poblacional, desde modelos de crecimiento hasta el análisis espacial de poblaciones."
   },
   {
     "objectID": "unidad_ii/index.html#empezar-aquí",
@@ -116,7 +116,7 @@
     "href": "unidad_iii/index.html",
     "title": "Unidad III — Ecología de comunidades",
     "section": "",
-    "text": "<img src=\"../logoUM.png\" alt=\"Universidad del Magdalena\" style=\"width:80px; border-radius:8px;\">\n<img src=\"../Logo_GIEN.png\" alt=\"GIEN\" style=\"width:80px; border-radius:50%;\">\n\n\nMaterial reproducible · ANVIDEA · Universidad del Magdalena\nEsta unidad integra herramientas modernas para el análisis de la diversidad biológica desde sus tres dimensiones: taxonómica, funcional y filogenética."
+    "text": "Material reproducible · ANVIDEA · Universidad del Magdalena\nEsta unidad integra herramientas modernas para el análisis de la diversidad biológica desde sus tres dimensiones: taxonómica, funcional y filogenética."
   },
   {
     "objectID": "unidad_iii/index.html#empezar-aquí",
