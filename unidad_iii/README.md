@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="Logos.png" width="500">
+  <img src="Logos.png" width="600">
 </p>
 
 # 🌿 Unidad III — Ecología de comunidades
