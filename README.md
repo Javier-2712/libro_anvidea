@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="Logo_GIEN.png" alt="GIEN - Grupo de Investigación en Ecología Neotropical" width="300">
+  <img src="Logos.png" alt="GIEN - Grupo de Investigación en Ecología Neotropical" width="300">
 </p>
 
 # ANVIDEA — Material reproducible

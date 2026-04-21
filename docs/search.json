@@ -25,7 +25,14 @@
     "href": "index.html#organización-del-material",
     "title": "ANVIDEA — Material reproducible",
     "section": "Organización del material",
-    "text": "Organización del material\nCada capítulo contiene:\n\nrun_capX.R — ejecuta el capítulo completo\nR/ — scripts organizados por casos\ndata/raw/ — datos de entrada listos para usar\noutputs/ — figuras, tablas y reportes generados\n\n\n\nJavier Rodríguez-Barrios · Universidad del Magdalena · GIEN Código: MIT License · Contenidos: CC BY-NC 4.0"
+    "text": "Organización del material\nCada capítulo contiene:\n\nrun_capX.R — ejecuta el capítulo completo\nR/ — scripts organizados por casos\ndata/raw/ — datos de entrada listos para usar\noutputs/ — figuras, tablas y reportes generados"
+  },
+  {
+    "objectID": "index.html#cómo-citar-este-material",
+    "href": "index.html#cómo-citar-este-material",
+    "title": "ANVIDEA — Material reproducible",
+    "section": "Cómo citar este material",
+    "text": "Cómo citar este material\nSi usas este material en trabajos académicos, cítalo así:\nLibro:\n\nRodríguez-Barrios, J. (2026). Análisis y visualización de datos ecológicos y ambientales. Editorial Unimagdalena. Santa Marta, Colombia. (En prensa)\n\nRepositorio:\n\nRodríguez-Barrios, J. (2026). ANVIDEA: Material reproducible — Análisis y visualización de datos ecológicos y ambientales [Repositorio de software]. GitHub. https://github.com/Javier-2712/libro_anvidea\n\n\n\nJavier Rodríguez-Barrios · Universidad del Magdalena · GIEN Código: MIT License · Contenidos: CC BY-NC 4.0"
   },
   {
     "objectID": "unidad_i/index.html",
