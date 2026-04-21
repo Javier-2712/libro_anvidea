@@ -1,6 +1,5 @@
 <p align="center">
-  <img src="Logo_GIEN.png" width="250">
-  <img src="logoUM.png" width="120">
+  <img src="Logos.png" width="250">
 </p>
 
 # 🌿 Unidad II — Ecología de poblaciones

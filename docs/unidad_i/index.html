@@ -210,9 +210,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </header>
 
 <div style="text-align:center; margin: 1.5rem 0 2rem;">
-<img src="../Logo_GIEN.png" alt="GIEN" style="width:64px; border-radius:50%;">
-<p style="color:#4a6282; font-size:0.9rem; margin-top:0.5rem;">
-Material reproducible · ANVIDEA
+<div style="display:inline-flex; align-items:center; gap:1.2rem; flex-wrap:wrap; justify-content:center;">
+<pre><code>&lt;img src="../logoUM.png" alt="Universidad del Magdalena" style="width:80px; border-radius:8px;"&gt;
+&lt;img src="../Logo_GIEN.png" alt="GIEN" style="width:80px; border-radius:50%;"&gt;</code></pre>
+</div>
+<p style="color:#4a6282; font-size:0.9rem; margin-top:0.7rem;">
+Material reproducible · ANVIDEA · Universidad del Magdalena
 </p>
 </div>
 <p>Esta unidad desarrolla las herramientas fundamentales para el <strong>análisis y visualización de datos ecológicos y ambientales</strong> en R, desde la exploración inicial hasta el análisis de variables climáticas.</p>
@@ -306,22 +309,22 @@ Procesamiento de series temporales climáticas y análisis de variables ambienta
 </section>
 <section id="ejecución" class="level2">
 <h2 class="anchored" data-anchor-id="ejecución">Ejecución</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Desde unidad_i/ en RStudio</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_unidad1.R"</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># O capítulo por capítulo</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"cap1-datos/run_cap1.R"</span>)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"cap2-visualizacion-exploratoria/run_cap2.R"</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"cap3-clima/run_cap3.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Desde unidad_i/ en RStudio</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"run_unidad1.R"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># O capítulo por capítulo</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"cap1-datos/run_cap1.R"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"cap2-visualizacion-exploratoria/run_cap2.R"</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"cap3-clima/run_cap3.R"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <hr>
 </section>
 <section id="paquetes-requeridos" class="level2">
 <h2 class="anchored" data-anchor-id="paquetes-requeridos">Paquetes requeridos</h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"tidyverse"</span>, <span class="st">"readxl"</span>, <span class="st">"writexl"</span>,</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ggplot2"</span>, <span class="st">"patchwork"</span>, <span class="st">"cowplot"</span>,</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"kableExtra"</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"tidyverse"</span>, <span class="st">"readxl"</span>, <span class="st">"writexl"</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ggplot2"</span>, <span class="st">"patchwork"</span>, <span class="st">"cowplot"</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"kableExtra"</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <hr>
 <div class="footer-anvidea">
 <p><a href="../index.html">← Volver a la página principal</a></p>
