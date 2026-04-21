@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="Logos.png" width="250">
+  <img src="Logos.png" width="500">
 </p>
 
 # 🌿 Unidad II — Ecología de poblaciones
