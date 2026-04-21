@@ -10,8 +10,11 @@ format:
 ---
 
 <div style="text-align:center; margin: 1.5rem 0 2rem;">
-  <img src="../Logo_GIEN.png" alt="GIEN" style="width:64px; border-radius:50%;">
-  <p style="color:#4a6282; font-size:0.9rem; margin-top:0.5rem;">Material reproducible · ANVIDEA</p>
+  <div style="display:inline-flex; align-items:center; gap:1.2rem; flex-wrap:wrap; justify-content:center;">
+    <img src="../logoUM.png" alt="Universidad del Magdalena" style="width:80px; border-radius:8px;">
+    <img src="../Logo_GIEN.png" alt="GIEN" style="width:80px; border-radius:50%;">
+  </div>
+  <p style="color:#4a6282; font-size:0.9rem; margin-top:0.7rem;">Material reproducible · ANVIDEA · Universidad del Magdalena</p>
 </div>
 
 Esta unidad integra herramientas modernas para el análisis de la **diversidad biológica** desde sus tres dimensiones: taxonómica, funcional y filogenética.
