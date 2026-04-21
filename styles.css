@@ -1,72 +1,308 @@
+/* =========================================================
+   ANVIDEA — Estilos del portal web
+   Paleta: azul marino institucional + verde ecológico
+   ========================================================= */
+
+/* --- Tipografía base --- */
 body {
-  font-family: "Georgia", "Times New Roman", serif;
+  font-family: "Helvetica Neue", Arial, sans-serif;
   line-height: 1.7;
   color: #222;
-  background-color: #fcfcfa;
+  background-color: #f5f6f8;
 }
 
 h1, h2, h3, h4 {
   font-family: "Helvetica Neue", Arial, sans-serif;
-  font-weight: 700;
-  color: #1f3c58;
-  margin-top: 1.5em;
-  margin-bottom: 0.6em;
+  font-weight: 600;
+  color: #1a3a5c;
+  margin-top: 1.6em;
+  margin-bottom: 0.5em;
 }
 
 h1.title {
-  font-size: 2.2rem;
-  margin-bottom: 0.8rem;
+  font-size: 2rem;
+  margin-bottom: 0.4rem;
 }
 
-p {
+p.subtitle {
+  color: #4a6282;
   font-size: 1.05rem;
 }
 
+p {
+  font-size: 1rem;
+}
+
 a {
-  color: #2b6c9c;
+  color: #1a6ea8;
   text-decoration: none;
 }
 
 a:hover {
   text-decoration: underline;
+  color: #1a3a5c;
 }
 
+/* --- Código --- */
 code {
-  background-color: #f3f3ef;
+  background-color: #eef2f7;
   color: #7a1f1f;
-  padding: 0.15em 0.35em;
+  padding: 0.15em 0.4em;
   border-radius: 4px;
-  font-size: 0.95em;
+  font-size: 0.9em;
 }
 
 pre code {
   display: block;
-  padding: 1em;
+  padding: 1em 1.2em;
   overflow-x: auto;
-  border: 1px solid #ddd;
-  background-color: #f8f8f6;
+  border: 1px solid #dde3ea;
+  background-color: #f8fafc;
+  border-radius: 6px;
+  color: #2d3748;
 }
 
+/* --- Navbar --- */
 .navbar {
-  font-family: "Helvetica Neue", Arial, sans-serif;
+  background-color: #1a3a5c !important;
+  border-bottom: 2px solid #2d7d5a;
 }
 
+.navbar-brand,
+.navbar .nav-link {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 500;
+}
+
+.navbar .nav-link:hover {
+  color: #ffffff !important;
+}
+
+/* --- Banner de título --- */
 .quarto-title-banner {
-  background: linear-gradient(90deg, #2b8cbe, #22577a);
+  background: linear-gradient(135deg, #1a3a5c 0%, #1e5080 100%);
+  padding: 2.5rem 0 2rem;
 }
 
 .quarto-title-banner .title,
-.quarto-title-banner .subtitle {
+.quarto-title-banner .subtitle,
+.quarto-title-banner p {
+  color: white !important;
+}
+
+/* --- Tarjetas de capítulos/unidades --- */
+.card-unidad {
+  background: #ffffff;
+  border: 1px solid #dde3ea;
+  border-radius: 10px;
+  padding: 1.4rem 1.6rem;
+  margin-bottom: 1rem;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.card-unidad:hover {
+  border-color: #1a6ea8;
+  box-shadow: 0 2px 12px rgba(26, 58, 92, 0.08);
+}
+
+.card-unidad h3 {
+  margin-top: 0;
+  color: #1a3a5c;
+  font-size: 1.1rem;
+}
+
+.card-unidad p {
+  color: #4a6282;
+  font-size: 0.95rem;
+  margin-bottom: 0.8rem;
+}
+
+/* --- Botones --- */
+.btn-anvidea {
+  display: inline-block;
+  background-color: #1a3a5c;
+  color: white !important;
+  padding: 0.55em 1.3em;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  margin-right: 0.5rem;
+  margin-bottom: 0.4rem;
+  transition: background-color 0.15s;
+}
+
+.btn-anvidea:hover {
+  background-color: #1e5080;
+  text-decoration: none;
+  color: white !important;
+}
+
+.btn-verde {
+  background-color: #2d7d5a;
+}
+
+.btn-verde:hover {
+  background-color: #236347;
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: #1a3a5c !important;
+  border: 1.5px solid #1a3a5c;
+}
+
+.btn-outline:hover {
+  background-color: #eef2f7;
+}
+
+/* --- Pasos numerados --- */
+.pasos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.paso {
+  background: #ffffff;
+  border: 1px solid #dde3ea;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.paso-num {
+  width: 32px;
+  height: 32px;
+  background: #1a3a5c;
   color: white;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.6rem;
 }
 
-ul li {
-  margin-bottom: 0.35em;
+.paso p {
+  font-size: 0.88rem;
+  color: #4a6282;
+  margin: 0;
+  line-height: 1.4;
 }
 
-blockquote {
-  border-left: 4px solid #2b8cbe;
-  padding-left: 1em;
-  color: #444;
-  background-color: #f7fbfd;
+/* --- Badge de etiquetas --- */
+.badge-tema {
+  display: inline-block;
+  background: #e8f4ec;
+  color: #1a5c36;
+  border: 1px solid #b8dfc5;
+  font-size: 0.78rem;
+  padding: 2px 10px;
+  border-radius: 12px;
+  margin-right: 4px;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.badge-cap {
+  display: inline-block;
+  background: #eef2f7;
+  color: #1a3a5c;
+  border: 1px solid #c8d4e3;
+  font-size: 0.78rem;
+  padding: 2px 10px;
+  border-radius: 12px;
+  margin-right: 4px;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+/* --- Callouts personalizados --- */
+.callout {
+  border-radius: 8px;
+}
+
+.callout-note {
+  border-left-color: #1a6ea8;
+}
+
+.callout-tip {
+  border-left-color: #2d7d5a;
+}
+
+.callout-warning {
+  border-left-color: #d97706;
+}
+
+/* --- Hero section (portada) --- */
+.hero-anvidea {
+  background: linear-gradient(135deg, #1a3a5c 0%, #1e5080 100%);
+  color: white;
+  padding: 3rem 2rem 2.5rem;
+  text-align: center;
+  border-radius: 0 0 12px 12px;
+  margin-bottom: 2rem;
+}
+
+.hero-anvidea h1 {
+  color: white;
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.hero-anvidea p {
+  color: rgba(255, 255, 255, 0.82);
+  max-width: 560px;
+  margin: 0 auto 1.5rem;
+}
+
+/* --- Divider --- */
+hr {
+  border: none;
+  border-top: 1px solid #dde3ea;
+  margin: 2rem 0;
+}
+
+/* --- Tablas --- */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.95rem;
+}
+
+th {
+  background-color: #eef2f7;
+  color: #1a3a5c;
+  font-weight: 600;
+  padding: 0.6em 1em;
+  text-align: left;
+  border-bottom: 2px solid #c8d4e3;
+}
+
+td {
+  padding: 0.5em 1em;
+  border-bottom: 1px solid #edf1f7;
+}
+
+/* --- Footer --- */
+.footer-anvidea {
+  text-align: center;
+  color: #6b7a8d;
+  font-size: 0.85rem;
+  padding: 1.5rem 0 0.5rem;
+  border-top: 1px solid #dde3ea;
+  margin-top: 3rem;
+}
+
+/* --- Responsivo --- */
+@media (max-width: 600px) {
+  .pasos {
+    grid-template-columns: 1fr 1fr;
+  }
+  h1.title {
+    font-size: 1.6rem;
+  }
 }

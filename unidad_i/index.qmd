@@ -1,174 +1,102 @@
 ---
-title: "Unidad I. Análisis de datos ecológicos"
-format: 
+title: "Unidad I — Análisis de datos ecológicos"
+format:
   html:
     toc: true
     toc-depth: 2
     theme: cosmo
     css: ../styles.css
     number-sections: false
-editor: 
-  markdown: 
-    wrap: 72
 ---
 
-<div style="text-align: center; margin-top: 10px; margin-bottom: 20px;">
-  <img src="Logo_GIEN.png" alt="GIEN - Grupo de Investigación en Ecología Neotropical" width="280">
+<div style="text-align:center; margin: 1.5rem 0 2rem;">
+  <img src="../Logo_GIEN.png" alt="GIEN" style="width:64px; border-radius:50%;">
+  <p style="color:#4a6282; font-size:0.9rem; margin-top:0.5rem;">Material reproducible · ANVIDEA</p>
 </div>
 
-Material reproducible del libro **ANVIDEA** para trabajar en R.
+Esta unidad desarrolla las herramientas fundamentales para el **análisis y visualización de datos ecológicos y ambientales** en R, desde la exploración inicial hasta el análisis de variables climáticas.
 
 ---
 
-## 🚀 Empezar aquí
+## Empezar aquí
 
-1. Descarga el repositorio
-2. Abre la carpeta `unidad_i/` en RStudio
-3. Ejecuta:
-
-```r
-source("run_unidad1.R")
-```
-
----
-
-## 💻 ¿Cómo usar este material?
+<div class="pasos">
+  <div class="paso"><div class="paso-num">1</div><p>Descarga el material y descomprímelo</p></div>
+  <div class="paso"><div class="paso-num">2</div><p>Abre <code>unidad_i/</code> en RStudio</p></div>
+  <div class="paso"><div class="paso-num">3</div><p>Instala los paquetes requeridos</p></div>
+  <div class="paso"><div class="paso-num">4</div><p>Ejecuta <code>run_unidad1.R</code></p></div>
+</div>
 
 ::: {.callout-note}
-
-Este portal no ejecuta código directamente.
-
-Para trabajar con los análisis de esta unidad:
-
-1. Descarga el repositorio o abre la carpeta en GitHub
-2. Guarda los archivos en tu computador
-3. Abre la carpeta `unidad_i/` en RStudio
-4. Ejecuta el script principal (`run_unidad1.R`)
-
-👉 Todos los análisis se realizan de forma local en R
-
+Este portal no ejecuta código. Todos los análisis se realizan de forma local en RStudio.
 :::
 
 ---
 
-## 📂 Acceso al código
+## Capítulos
 
-::: {style="margin-top: 0.5em; margin-bottom: 1em;"}
-<a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i" target="_blank" style="display:inline-block; padding:0.6em 1em; margin-right:0.6em; background:#2b8cbe; color:white; text-decoration:none; border-radius:8px;">Ver código en GitHub</a>
-<a href="https://github.com/Javier-2712/libro_anvidea/archive/refs/heads/main.zip" target="_blank" style="display:inline-block; padding:0.6em 1em; background:#238b45; color:white; text-decoration:none; border-radius:8px;">Descargar repositorio (ZIP)</a>
-:::
+<div class="card-unidad">
+  <h3>Capítulo 1 — Exploración y manipulación de datos</h3>
+  <p>Importación, limpieza y transformación de datos ecológicos con <code>tidyverse</code>.</p>
+  <span class="badge-tema">Importación</span>
+  <span class="badge-tema">Limpieza</span>
+  <span class="badge-tema">Transformación</span><br>
+  <a class="btn-anvidea" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap1-datos" target="_blank" style="margin-top:0.8rem;">Ver carpeta en GitHub →</a>
+</div>
 
----
+<div class="card-unidad">
+  <h3>Capítulo 2 — Visualización exploratoria</h3>
+  <p>Construcción e interpretación de figuras con <code>ggplot2</code> para datos ecológicos y ambientales.</p>
+  <span class="badge-tema">ggplot2</span>
+  <span class="badge-tema">Distribuciones</span>
+  <span class="badge-tema">Relaciones</span><br>
+  <a class="btn-anvidea" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap2-visualizacion-exploratoria" target="_blank" style="margin-top:0.8rem;">Ver carpeta en GitHub →</a>
+</div>
 
-## 📘 Selecciona un capítulo
-
-Explora cada capítulo de la unidad con acceso directo a sus scripts, datos y resultados:
-
-### 🔹 Capítulo 1 — Fundamentos de manipulación de datos
-
-Versión reproducible y descargable del capítulo, diseñada para ejecutar los códigos completos que complementan el texto del libro y generar un reporte HTML de validación.
-
-**Contenido del capítulo:**
-
-- `R/` scripts completos (casos A y B + funciones auxiliares + guardado + render)
-- `data/raw/` → `plancton.xlsx`, `invert.xlsx`
-- `run_cap1.R` → ejecución automática
-- `limpiar_outputs.R` → reinicio de salidas
-- `reporte_cap1.qmd` → validación en HTML
-
-**Ejecución:**
-
-```r
-source("run_cap1.R")
-```
-
-**Esto generará:**
-
-- tablas en `outputs/tablas/`
-- figuras en `outputs/figuras/`
-- reporte HTML en `outputs/reportes/`
-
-- 📁 [Abrir carpeta del capítulo](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap1-datos)
+<div class="card-unidad">
+  <h3>Capítulo 3 — Análisis climático</h3>
+  <p>Procesamiento de series temporales climáticas y análisis de variables ambientales.</p>
+  <span class="badge-tema">Series temporales</span>
+  <span class="badge-tema">Clima</span>
+  <span class="badge-tema">Balance hídrico</span><br>
+  <a class="btn-anvidea" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap3-clima" target="_blank" style="margin-top:0.8rem;">Ver carpeta en GitHub →</a>
+</div>
 
 ---
 
-### 🔹 Capítulo 2 — Visualización gráfica exploratoria
+## Acceso al material
 
-Versión reproducible del capítulo, con dos casos guiados que cubren correlogramas, histogramas, cajas y bigotes, y figuras de burbujas para datos ecológicos.
-
-**Contenido del capítulo:**
-
-- `R/` scripts completos (casos A y B + funciones auxiliares + guardado + render)
-- `data/raw/` → `plancton.xlsx`, `invert.xlsx`
-- `run_cap2.R` → ejecución automática
-- `limpiar_outputs.R` → reinicio de salidas
-- `reporte_cap2.qmd` → validación en HTML
-
-**Ejecución:**
-
-```r
-source("run_cap2.R")
-```
-
-**Esto generará:**
-
-- figuras en `outputs/figuras/`
-- tablas en `outputs/tablas/`
-- reporte HTML en `outputs/reportes/`
-
-- 📁 [Abrir carpeta del capítulo](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap2-visualizacion-exploratoria)
+<a class="btn-anvidea btn-verde" href="https://github.com/Javier-2712/libro_anvidea/archive/refs/heads/main.zip" target="_blank">⬇ Descargar repositorio completo (ZIP)</a>
+<a class="btn-anvidea btn-outline" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i" target="_blank">Ver Unidad I en GitHub</a>
 
 ---
 
-### 🔹 Capítulo 3 — Visualización gráfica de patrones climáticos
-
-Versión reproducible del capítulo, con un caso guiado que integra series temporales, climatogramas, índice de Lang, balance hídrico y clasificación ecológica.
-
-**Contenido del capítulo:**
-
-- `R/` scripts completos (caso guiado + funciones auxiliares + guardado + render)
-- `data/raw/` → `datos.c3.xlsx`, `bal_hid.R`
-- `run_cap3.R` → ejecución automática
-- `limpiar_outputs.R` → reinicio de salidas
-- `reporte_cap3.qmd` → validación en HTML
-
-**Ejecución:**
+## Ejecución
 
 ```r
-source("run_cap3.R")
-```
-
-**Esto generará:**
-
-- figuras en `outputs/figuras/`
-- tablas en `outputs/tablas/`
-- reporte HTML en `outputs/reportes/`
-
-- 📁 [Abrir carpeta del capítulo](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap3-clima)
-
----
-
-## ▶️ Ejecución rápida de toda la unidad
-
-```r
+# Desde unidad_i/ en RStudio
 source("run_unidad1.R")
+
+# O capítulo por capítulo
+source("cap1-datos/run_cap1.R")
+source("cap2-visualizacion-exploratoria/run_cap2.R")
+source("cap3-clima/run_cap3.R")
 ```
 
 ---
 
-## 🔽 Información de la unidad
+## Paquetes requeridos
 
-## Propósito
-
-La Unidad I busca fortalecer competencias en el **manejo, organización y
-exploración de datos ecológicos y ambientales**, usando flujos de
-trabajo reproducibles en R. A lo largo de esta unidad, el usuario
-aprenderá a importar, depurar, transformar y visualizar bases de datos
-reales, como paso previo a análisis más avanzados de ecología de
-poblaciones y comunidades.
+```r
+install.packages(c(
+  "tidyverse", "readxl", "writexl",
+  "ggplot2", "patchwork", "cowplot",
+  "kableExtra"
+))
+```
 
 ---
 
-## Enlace de retorno
-
-👉 [Volver a la página principal](../index.html)
+<div class="footer-anvidea">
+  <a href="../index.qmd">← Volver a la página principal</a>
+</div>

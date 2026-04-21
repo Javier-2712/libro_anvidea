@@ -1,5 +1,5 @@
 ---
-title: "Unidad III. Ecología de comunidades"
+title: "Unidad III — Ecología de comunidades"
 format:
   html:
     toc: true
@@ -9,150 +9,119 @@ format:
     number-sections: false
 ---
 
-<div style="text-align: center; margin-top: 10px; margin-bottom: 20px;">
-  <img src="Logo_GIEN.png" alt="GIEN - Grupo de Investigación en Ecología Neotropical" width="280">
+<div style="text-align:center; margin: 1.5rem 0 2rem;">
+  <img src="../Logo_GIEN.png" alt="GIEN" style="width:64px; border-radius:50%;">
+  <p style="color:#4a6282; font-size:0.9rem; margin-top:0.5rem;">Material reproducible · ANVIDEA</p>
 </div>
 
-Material reproducible del libro **ANVIDEA** para trabajar en R.
+Esta unidad integra herramientas modernas para el análisis de la **diversidad biológica** desde sus tres dimensiones: taxonómica, funcional y filogenética.
 
 ---
 
-## 🚀 Empezar aquí
+## Empezar aquí
 
-1. Descarga el repositorio
-2. Abre la carpeta `unidad_iii/` en RStudio
-3. Ejecuta:
-
-```r
-source("run_unidad3.R")
-```
-
----
-
-## 💻 ¿Cómo usar este material?
+<div class="pasos">
+  <div class="paso"><div class="paso-num">1</div><p>Descarga el material y descomprímelo</p></div>
+  <div class="paso"><div class="paso-num">2</div><p>Abre <code>unidad_iii/</code> en RStudio</p></div>
+  <div class="paso"><div class="paso-num">3</div><p>Instala los paquetes requeridos</p></div>
+  <div class="paso"><div class="paso-num">4</div><p>Ejecuta <code>run_unidad3.R</code></p></div>
+</div>
 
 ::: {.callout-note}
-
-Este portal no ejecuta código directamente.
-
-Para trabajar con los análisis de esta unidad:
-
-1. Descarga el repositorio o abre la carpeta en GitHub
-2. Guarda los archivos en tu computador
-3. Abre la carpeta `unidad_iii/` en RStudio
-4. Ejecuta el script principal desde esa carpeta:
-
-```r
-source("run_unidad3.R")
-```
-
-👉 Todos los análisis se realizan de forma local en R
-
+Este portal no ejecuta código. Todos los análisis se realizan de forma local en RStudio.
 :::
 
 ---
 
-## 📂 Acceso al código
+## Capítulos
 
-<div style="margin-top: 0.5em; margin-bottom: 1em;">
-  <a href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii" target="_blank" style="display:inline-block; padding:0.6em 1em; margin-right:0.6em; background:#2b8cbe; color:white; text-decoration:none; border-radius:8px;">Ver código en GitHub</a>
-  <a href="https://github.com/Javier-2712/libro_anvidea/archive/refs/heads/main.zip" target="_blank" style="display:inline-block; padding:0.6em 1em; background:#238b45; color:white; text-decoration:none; border-radius:8px;">Descargar repositorio (ZIP)</a>
+<div class="card-unidad">
+  <h3>Capítulo 7 — Diversidad taxonómica</h3>
+  <p>Índices clásicos, curvas rango-abundancia, GLMs, PERMANOVAs, diversidad beta y números de Hill taxonómicos.</p>
+  <span class="badge-cap">Alfa · Beta · Gamma</span>
+  <span class="badge-tema">iNEXT</span>
+  <span class="badge-tema">iNEXT.3D</span>
+  <span class="badge-tema">iNEXTbeta3D</span>
+  <span class="badge-tema">vegan</span><br>
+  <a class="btn-anvidea" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii/cap7-diversidad-taxonomica" target="_blank" style="margin-top:0.8rem;">Ver carpeta en GitHub →</a>
+</div>
+
+<div class="card-unidad">
+  <h3>Capítulo 8 — Diversidad funcional y filogenética</h3>
+  <p>Métricas funcionales (FRic, FEve, FDiv, FDis, RaoQ), partición de Rao y números de Hill funcionales y filogenéticos.</p>
+  <span class="badge-cap">TD · FD · PD</span>
+  <span class="badge-tema">FD</span>
+  <span class="badge-tema">iNEXT.3D</span>
+  <span class="badge-tema">iNEXTbeta3D</span>
+  <span class="badge-tema">ape · taxize</span><br>
+  <a class="btn-anvidea" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii/cap8-diversidad-funcional-filogenetica" target="_blank" style="margin-top:0.8rem;">Ver carpeta en GitHub →</a>
 </div>
 
 ---
 
-## 📘 Selecciona un capítulo
+## Acceso al material
 
-### 🔹 Capítulo 7 — Diversidad taxonómica
-
-- 📁 [Abrir carpeta del capítulo](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii/cap7-diversidad-taxonomica)
-- 📄 Incluye:
-  - Diversidad alfa clásica (q = 0, 1, 2) y curvas rango-abundancia
-  - GLMs multivariados y PERMANOVAs
-  - Números de Hill alfa (iNEXT, iNEXT.4steps, iNEXT.3D)
-  - Diversidad beta clásica y descomposición de varianza (LCBD, SCBD)
-  - Recambio y diferencia de riqueza (Podani & Schmera, 2011)
-  - Números de Hill beta (iNEXTbeta3D)
+<a class="btn-anvidea btn-verde" href="https://github.com/Javier-2712/libro_anvidea/archive/refs/heads/main.zip" target="_blank">⬇ Descargar repositorio completo (ZIP)</a>
+<a class="btn-anvidea btn-outline" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii" target="_blank">Ver Unidad III en GitHub</a>
 
 ---
 
-### 🔹 Capítulo 8 — Diversidad funcional y filogenética
-
-- 📁 [Abrir carpeta del capítulo](https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii/cap8-diversidad-funcional-filogenetica)
-- 📄 Incluye:
-  - Métricas funcionales alfa: FRic, FEve, FDiv, FDis, RaoQ
-  - Community Weighted Means (CWM)
-  - Partición aditiva de Rao (TD, FD, PD)
-  - Números de Hill funcional y filogenético — alfa (iNEXT.3D)
-  - Números de Hill funcional y filogenético — beta (iNEXTbeta3D)
-
----
-
-## ▶️ Ejecución rápida
+## Ejecución
 
 ```r
-# Toda la unidad (desde unidad_iii/)
+# Toda la unidad desde unidad_iii/
 source("run_unidad3.R")
 
-# Solo capítulo 7 (desde cap7-diversidad-taxonomica/)
+# Solo capítulo 7 — desde cap7-diversidad-taxonomica/
 source("run_cap7.R")
 
-# Solo capítulo 8 (desde cap8-diversidad-funcional-filogenetica/)
+# Solo capítulo 8 — desde cap8-diversidad-funcional-filogenetica/
 source("run_cap8.R")
 ```
 
 ::: {.callout-tip}
-
-Esta unidad avanza desde la diversidad taxonómica hacia enfoques funcionales y filogenéticos.
-Se recomienda ejecutar primero el Capítulo 7 y luego el Capítulo 8.
-
+Ejecuta primero el Capítulo 7 y luego el Capítulo 8. La progresión conceptual es: **Taxonomía → Función → Filogenia**.
 :::
 
 ---
 
-## ℹ️ Información de la unidad
+## Paquetes requeridos
 
-### Propósito
+```r
+# Capítulo 7
+install.packages(c(
+  "tidyverse", "readxl", "writexl", "vegan",
+  "adespatial", "betapart", "ade4", "kableExtra",
+  "mvabund", "MASS", "glmmTMB", "RVAideMemoire"
+))
 
-Esta unidad integra herramientas modernas para el análisis de la biodiversidad desde una perspectiva taxonómica, funcional y filogenética, acompañando la lectura del libro **ANVIDEA** con scripts reproducibles y bases de datos de ejemplo.
+# Capítulo 8
+install.packages(c(
+  "tidyverse", "readxl", "writexl", "FD",
+  "ape", "taxize", "vegan", "ade4", "kableExtra"
+))
 
-### Progresión conceptual
-
-**Taxonomía → Función → Filogenia**
-
-| Dimensión | Capítulo |
-|---|---|
-| Taxonómica (TD): identidad y abundancia | 7 |
-| Funcional (FD): rasgos ecológicos | 8 |
-| Filogenética (PD): historia evolutiva | 8 |
-
-### Prerrequisitos
-
-- conocimientos básicos de R y RStudio
-- manejo elemental de objetos, scripts y directorios de trabajo
-- nociones introductorias de diversidad alfa, beta y gamma
-- familiaridad básica con archivos `.xlsx` y `.rds`
-
-### Recomendaciones de ejecución
-
-- Ejecuta primero `00_setup.R` de cada capítulo si trabajas por partes
-- Trabaja siempre desde el directorio raíz del capítulo o la unidad
-- Conserva sin cambios la estructura de carpetas `R/`, `data/raw/` y `outputs/`
-- Confirma que los paquetes requeridos estén instalados
+# Desde GitHub (ambos capítulos)
+remotes::install_github("AnneChao/iNEXT.3D")
+remotes::install_github("AnneChao/iNEXTbeta3D")
+```
 
 ::: {.callout-warning}
-
-Los errores más frecuentes al ejecutar los scripts suelen deberse a:
-
-- rutas alteradas por mover carpetas o archivos
-- nombres de archivos modificados
-- paquetes no instalados
-- desajustes entre matrices de abundancia, rasgos y filogenia (especialmente en el Cap. 8)
-
+**Errores frecuentes:** rutas alteradas al mover carpetas, nombres de archivos modificados, paquetes no instalados, o desajustes entre matrices de abundancia, rasgos y filogenia (Cap. 8). Consulta el README de cada capítulo antes de ejecutar.
 :::
 
 ---
 
-## ⬅️ Navegación
+## Progresión conceptual
 
-👉 [Volver a la página principal](../index.html)
+| Dimensión | Descripción | Capítulo |
+|---|---|:---:|
+| **Taxonómica (TD)** | Identidad y abundancia de especies | 7 |
+| **Funcional (FD)** | Rasgos ecológicos y estrategias de vida | 8 |
+| **Filogenética (PD)** | Historia evolutiva compartida | 8 |
+
+---
+
+<div class="footer-anvidea">
+  <a href="../index.qmd">← Volver a la página principal</a>
+</div>

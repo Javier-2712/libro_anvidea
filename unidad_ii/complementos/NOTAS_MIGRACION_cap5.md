@@ -1,7 +1,0 @@
-- Origen: `5_t.v_edad_estado.qmd`.
-- Se separó el contenido en tres bloques:
-  - Caso A: tablas de vida por edades
-  - Caso B: matrices de Leslie
-  - Caso C: matrices por estados
-- Se conservaron funciones nucleares de tabla de vida, proyección y análisis matricial.
-- Algunas visualizaciones editoriales y bloques de texto quedaron fuera por no ser necesarios en el flujo de scripts.

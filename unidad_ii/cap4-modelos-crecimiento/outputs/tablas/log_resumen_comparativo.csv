@@ -1,6 +1,0 @@
-Aspecto,Modelo exponencial,Modelo logístico
-Supuesto central,No hay limitación ambiental,Existe limitación por recursos
-Parámetro clave,r o λ,r y K
-Forma de la curva,J,Sigmoide
-Regulación densidad,No,Sí
-Aplicación conceptual,Potencial biótico,Crecimiento regulado

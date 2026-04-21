@@ -1,5 +1,0 @@
-- Origen: `6_distrib_den.qmd`.
-- Se reorganizó el contenido en dos scripts:
-  - Caso A: comparación Poisson vs Binomial Negativa e índices de dispersión
-  - Caso B: métodos de densidad por distancias (Holgate, King y Hayne)
-- Se mantuvieron cálculos esenciales y una estructura clara para reutilización docente.

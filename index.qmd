@@ -4,128 +4,78 @@ format:
   html:
     toc: false
     theme: cosmo
+    css: styles.css
 ---
 
-<div style="text-align: center; margin-top: 10px; margin-bottom: 20px;">
-  <img src="Logo_GIEN.png" alt="GIEN - Grupo de Investigación en Ecología Neotropical" width="280">
+<div class="hero-anvidea">
+  <img src="Logo_GIEN.png" alt="GIEN" style="width:72px; border-radius:50%; margin-bottom:1rem; opacity:0.9;">
+  <h1>ANVIDEA</h1>
+  <p>Análisis y Visualización de Datos Ecológicos y Ambientales — scripts, datos y flujos de trabajo organizados por unidades y capítulos.</p>
+  <a class="btn-anvidea btn-verde" href="https://github.com/Javier-2712/libro_anvidea/archive/refs/heads/main.zip" target="_blank">⬇ Descargar material (ZIP)</a>
+  <a class="btn-anvidea btn-outline" href="https://github.com/Javier-2712/libro_anvidea" target="_blank" style="border-color:rgba(255,255,255,0.5); color:white !important;">Ver repositorio en GitHub</a>
 </div>
 
-## Bienvenido
-
-Este portal reúne los **materiales reproducibles** del libro:
-
-**Análisis y Visualización de Datos Ecológicos y Ambientales — ANVIDEA**
-
-*Material complementario para la ejecución práctica del libro en R*
-
-Aquí puedes acceder a los scripts, datos y flujos de trabajo organizados por unidades y capítulos.
-
-
 ::: {.callout-warning}
-## ⚠️ Importante
-
-Este portal es un espacio de navegación y consulta.
-
-Los códigos en R **no se ejecutan aquí en la web**.
-
-Para trabajar con el material es necesario:
-
-1. Descargar el repositorio o los archivos del capítulo
-2. Abrirlos en RStudio o Quarto
-3. Ejecutar los scripts de forma local
+**Uso local.** Este portal es de navegación y consulta. Los scripts en R se ejecutan en RStudio, no en el navegador.
 :::
 
 ---
 
-## 📘 Unidades del libro
+## Primeros pasos
 
-### Unidad I — Análisis de datos ecológicos
-
-- Manipulación de datos  
-- Visualización exploratoria  
-- Análisis climático  
-
-👉 [Ir a Unidad I](unidad_i/index.qmd)
-
----
-
-### Unidad II — Ecología de poblaciones
-
-- Modelos de crecimiento  
-- Tablas de vida  
-- Modelos matriciales  
-- Distribución y densidad  
-
-👉 [Ir a Unidad II](unidad_ii/index.qmd)
+<div class="pasos">
+  <div class="paso"><div class="paso-num">1</div><p>Descarga el ZIP y descomprímelo en tu computador</p></div>
+  <div class="paso"><div class="paso-num">2</div><p>Abre la carpeta raíz en RStudio</p></div>
+  <div class="paso"><div class="paso-num">3</div><p>Instala los paquetes requeridos de cada capítulo</p></div>
+  <div class="paso"><div class="paso-num">4</div><p>Ejecuta <code>source("run_libro.R")</code></p></div>
+</div>
 
 ---
 
-### Unidad III — Ecología de comunidades
+## Unidades del libro
 
-- Diversidad taxonómica  
-- Diversidad funcional  
-- Diversidad filogenética  
+<div class="card-unidad">
+  <h3>Unidad I — Análisis de datos ecológicos</h3>
+  <p>Manipulación de datos, visualización exploratoria y análisis climático.</p>
+  <span class="badge-cap">Cap. 1 · Datos</span>
+  <span class="badge-cap">Cap. 2 · Visualización</span>
+  <span class="badge-cap">Cap. 3 · Clima</span><br>
+  <a class="btn-anvidea" href="unidad_i/index.qmd" style="margin-top:0.8rem;">Ver Unidad I →</a>
+</div>
 
-👉 [Ir a Unidad III](unidad_iii/index.qmd)
+<div class="card-unidad">
+  <h3>Unidad II — Ecología de poblaciones</h3>
+  <p>Modelos de crecimiento, tablas de vida, modelos matriciales y análisis espacial.</p>
+  <span class="badge-cap">Cap. 4 · Crecimiento</span>
+  <span class="badge-cap">Cap. 5 · Tablas de vida</span>
+  <span class="badge-cap">Cap. 6 · Distribución</span><br>
+  <a class="btn-anvidea" href="unidad_ii/index.qmd" style="margin-top:0.8rem;">Ver Unidad II →</a>
+</div>
+
+<div class="card-unidad">
+  <h3>Unidad III — Ecología de comunidades</h3>
+  <p>Diversidad taxonómica, funcional y filogenética con métodos clásicos y números de Hill.</p>
+  <span class="badge-cap">Cap. 7 · Diversidad TD</span>
+  <span class="badge-cap">Cap. 8 · Diversidad FD y PD</span>
+  <span class="badge-tema">iNEXT.3D</span>
+  <span class="badge-tema">iNEXTbeta3D</span><br>
+  <a class="btn-anvidea" href="unidad_iii/index.qmd" style="margin-top:0.8rem;">Ver Unidad III →</a>
+</div>
 
 ---
 
-## ▶️ Cómo usar el material
-
-### Ejecutar una unidad completa
-
-```r
-source("unidad_i/run_unidad1.R")
-```
-
-### Ejecutar un capítulo
-
-```r
-source("R/00_setup.R")
-```
-
----
-
-## 📂 Organización
+## Organización del material
 
 Cada capítulo contiene:
 
-- Scripts en `R/`  
-- Datos en `data/raw/`  
-- Resultados en `outputs/`  
+- `run_capX.R` — ejecuta el capítulo completo
+- `R/` — scripts organizados por casos
+- `data/raw/` — datos de entrada listos para usar
+- `outputs/` — figuras, tablas y reportes generados
 
 ---
 
-## 🧠 Propósito
-
-Este material permite:
-
-- Reproducir los análisis del libro  
-- Aprender flujos de trabajo en R  
-- Aplicar técnicas ecológicas a nuevos datos  
-
----
-
-## 📎 Repositorio
-
-Accede al código completo en GitHub:
-
-👉 *[Ver_repositorio_ANVIDEA](https://github.com/Javier-2712/libro_anvidea)*
-
-
----
-
-## 📄  Licencias:
-
-Código en R: MIT
-
-Contenidos: CC BY-NC 4.0
-
-
----
-
-## 👨‍🏫 Autores
-
-Javier Rodríguez-Barrios  
-Kenedith Méndez  
-Javier de la Hoz
+<div class="footer-anvidea">
+  Javier Rodríguez-Barrios · Universidad del Magdalena · GIEN<br>
+  Código: MIT License · Contenidos: CC BY-NC 4.0
+</div>
