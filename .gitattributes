@@ -1,0 +1,10 @@
+# Excluir del ZIP de descarga
+docs/                export-ignore
+Logos.png            export-ignore
+Logos1.png           export-ignore
+styles.css           export-ignore
+_quarto.yml          export-ignore
+LICENSE.md           export-ignore
+LICENSE-CONTENT.md   export-ignore
+README.md            export-ignore
+"Nuevo documento de texto.txt"  export-ignore
