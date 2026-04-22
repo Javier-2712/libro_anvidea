@@ -9,9 +9,15 @@ format:
     number-sections: false
 ---
 
-<div style="text-align:center; margin: 1.5rem 0 2rem;">
-  <img src="Logos.png" alt="Universidad del Magdalena - GIEN" style="width:400px;">
+<div style="text-align:center; margin: 1.5rem 0 1rem;">
+  <img src="Logos.png" alt="Universidad del Magdalena - GIEN" style="width:320px;">
   <p style="color:#4a6282; font-size:0.9rem; margin-top:0.7rem;">Material reproducible · ANVIDEA · Universidad del Magdalena</p>
+</div>
+
+<div style="margin-bottom:2rem;">
+  <img src="../assets/portadas/unidad_iii_banner.png"
+       alt="Unidad III — Ecología de comunidades"
+       style="width:100%; border-radius:10px; max-height:320px; object-fit:cover;">
 </div>
 
 Esta unidad integra herramientas modernas para el análisis de la **diversidad biológica** desde sus tres dimensiones: taxonómica, funcional y filogenética.
@@ -36,25 +42,33 @@ Este portal no ejecuta código. Todos los análisis se realizan de forma local e
 ## Capítulos
 
 <div class="card-unidad">
-  <h3>Capítulo 7 — Diversidad taxonómica</h3>
-  <p>Índices clásicos, curvas rango-abundancia, GLMs, PERMANOVAs, diversidad beta y números de Hill taxonómicos.</p>
-  <span class="badge-cap">Alfa · Beta · Gamma</span>
-  <span class="badge-tema">iNEXT</span>
-  <span class="badge-tema">iNEXT.3D</span>
-  <span class="badge-tema">iNEXTbeta3D</span>
-  <span class="badge-tema">vegan</span><br>
-  <a class="btn-anvidea" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii/cap7-diversidad-taxonomica" target="_blank" style="margin-top:0.8rem;">Ver carpeta en GitHub →</a>
+  <div style="display:grid; grid-template-columns:180px 1fr; gap:1.2rem; align-items:start;">
+    <img src="../assets/portadas/unidad_iii_cap7.png" alt="Cap. 7" style="width:100%; border-radius:8px;">
+    <div>
+      <h3 style="margin-top:0;">Capítulo 7 — Diversidad taxonómica</h3>
+      <p>Índices clásicos, curvas rango-abundancia, GLMs, PERMANOVAs, diversidad beta y números de Hill taxonómicos.</p>
+      <span class="badge-cap">Alfa · Beta · Gamma</span>
+      <span class="badge-tema">iNEXT</span>
+      <span class="badge-tema">iNEXT.3D</span>
+      <span class="badge-tema">vegan</span><br>
+      <a class="btn-anvidea" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii/cap7-diversidad-taxonomica" target="_blank" style="margin-top:0.8rem;">Ver carpeta →</a>
+    </div>
+  </div>
 </div>
 
 <div class="card-unidad">
-  <h3>Capítulo 8 — Diversidad funcional y filogenética</h3>
-  <p>Métricas funcionales (FRic, FEve, FDiv, FDis, RaoQ), partición de Rao y números de Hill funcionales y filogenéticos.</p>
-  <span class="badge-cap">TD · FD · PD</span>
-  <span class="badge-tema">FD</span>
-  <span class="badge-tema">iNEXT.3D</span>
-  <span class="badge-tema">iNEXTbeta3D</span>
-  <span class="badge-tema">ape · taxize</span><br>
-  <a class="btn-anvidea" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii/cap8-diversidad-funcional-filogenetica" target="_blank" style="margin-top:0.8rem;">Ver carpeta en GitHub →</a>
+  <div style="display:grid; grid-template-columns:180px 1fr; gap:1.2rem; align-items:start;">
+    <img src="../assets/portadas/unidad_iii_cap8.png" alt="Cap. 8" style="width:100%; border-radius:8px;">
+    <div>
+      <h3 style="margin-top:0;">Capítulo 8 — Diversidad funcional y filogenética</h3>
+      <p>Métricas funcionales (FRic, FEve, FDiv, FDis, RaoQ), partición de Rao y números de Hill funcionales y filogenéticos.</p>
+      <span class="badge-cap">TD · FD · PD</span>
+      <span class="badge-tema">FD</span>
+      <span class="badge-tema">iNEXT.3D</span>
+      <span class="badge-tema">ape · taxize</span><br>
+      <a class="btn-anvidea" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii/cap8-diversidad-funcional-filogenetica" target="_blank" style="margin-top:0.8rem;">Ver carpeta →</a>
+    </div>
+  </div>
 </div>
 
 ---

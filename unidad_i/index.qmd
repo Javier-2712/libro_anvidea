@@ -9,9 +9,15 @@ format:
     number-sections: false
 ---
 
-<div style="text-align:center; margin: 1.5rem 0 2rem;">
-  <img src="Logos.png" alt="Universidad del Magdalena - GIEN" style="width:400px;">
+<div style="text-align:center; margin: 1.5rem 0 1rem;">
+  <img src="Logos.png" alt="Universidad del Magdalena - GIEN" style="width:320px;">
   <p style="color:#4a6282; font-size:0.9rem; margin-top:0.7rem;">Material reproducible · ANVIDEA · Universidad del Magdalena</p>
+</div>
+
+<div style="margin-bottom:2rem;">
+  <img src="../assets/portadas/unidad_i_banner.png"
+       alt="Unidad I — Análisis de datos ecológicos"
+       style="width:100%; border-radius:10px; max-height:320px; object-fit:cover;">
 </div>
 
 Esta unidad desarrolla las herramientas fundamentales para el **análisis y visualización de datos ecológicos y ambientales** en R, desde la exploración inicial hasta el análisis de variables climáticas.
@@ -36,30 +42,45 @@ Este portal no ejecuta código. Todos los análisis se realizan de forma local e
 ## Capítulos
 
 <div class="card-unidad">
-  <h3>Capítulo 1 — Exploración y manipulación de datos</h3>
-  <p>Importación, limpieza y transformación de datos ecológicos con <code>tidyverse</code>.</p>
-  <span class="badge-tema">Importación</span>
-  <span class="badge-tema">Limpieza</span>
-  <span class="badge-tema">Transformación</span><br>
-  <a class="btn-anvidea" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap1-datos" target="_blank" style="margin-top:0.8rem;">Ver carpeta en GitHub →</a>
+  <div style="display:grid; grid-template-columns:180px 1fr; gap:1.2rem; align-items:start;">
+    <img src="../assets/portadas/unidad_i_cap1.png" alt="Cap. 1" style="width:100%; border-radius:8px;">
+    <div>
+      <h3 style="margin-top:0;">Capítulo 1 — Exploración y manipulación de datos</h3>
+      <p>Importación, limpieza y transformación de datos ecológicos con <code>tidyverse</code>.</p>
+      <span class="badge-tema">Importación</span>
+      <span class="badge-tema">Limpieza</span>
+      <span class="badge-tema">Transformación</span><br>
+      <a class="btn-anvidea" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap1-datos" target="_blank" style="margin-top:0.8rem;">Ver carpeta →</a>
+    </div>
+  </div>
 </div>
 
 <div class="card-unidad">
-  <h3>Capítulo 2 — Visualización exploratoria</h3>
-  <p>Construcción e interpretación de figuras con <code>ggplot2</code> para datos ecológicos y ambientales.</p>
-  <span class="badge-tema">ggplot2</span>
-  <span class="badge-tema">Distribuciones</span>
-  <span class="badge-tema">Relaciones</span><br>
-  <a class="btn-anvidea" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap2-visualizacion-exploratoria" target="_blank" style="margin-top:0.8rem;">Ver carpeta en GitHub →</a>
+  <div style="display:grid; grid-template-columns:180px 1fr; gap:1.2rem; align-items:start;">
+    <img src="../assets/portadas/unidad_i_cap2.png" alt="Cap. 2" style="width:100%; border-radius:8px;">
+    <div>
+      <h3 style="margin-top:0;">Capítulo 2 — Visualización exploratoria</h3>
+      <p>Construcción e interpretación de figuras con <code>ggplot2</code> para datos ecológicos y ambientales.</p>
+      <span class="badge-tema">ggplot2</span>
+      <span class="badge-tema">Distribuciones</span>
+      <span class="badge-tema">Relaciones</span><br>
+      <a class="btn-anvidea" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap2-visualizacion-exploratoria" target="_blank" style="margin-top:0.8rem;">Ver carpeta →</a>
+    </div>
+  </div>
 </div>
 
 <div class="card-unidad">
-  <h3>Capítulo 3 — Análisis climático</h3>
-  <p>Procesamiento de series temporales climáticas y análisis de variables ambientales.</p>
-  <span class="badge-tema">Series temporales</span>
-  <span class="badge-tema">Clima</span>
-  <span class="badge-tema">Balance hídrico</span><br>
-  <a class="btn-anvidea" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap3-clima" target="_blank" style="margin-top:0.8rem;">Ver carpeta en GitHub →</a>
+  <div style="display:grid; grid-template-columns:180px 1fr; gap:1.2rem; align-items:start;">
+    <img src="../assets/portadas/unidad_i_cap3.png" alt="Cap. 3" style="width:100%; border-radius:8px;">
+    <div>
+      <h3 style="margin-top:0;">Capítulo 3 — Análisis climático</h3>
+      <p>Procesamiento de series temporales climáticas y análisis de variables ambientales.</p>
+      <span class="badge-tema">Series temporales</span>
+      <span class="badge-tema">Clima</span>
+      <span class="badge-tema">Balance hídrico</span><br>
+      <a class="btn-anvidea" href="https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap3-clima" target="_blank" style="margin-top:0.8rem;">Ver carpeta →</a>
+    </div>
+  </div>
 </div>
 
 ---
@@ -76,11 +97,6 @@ Este portal no ejecuta código. Todos los análisis se realizan de forma local e
 ```r
 # Desde unidad_i/ en RStudio
 source("run_unidad1.R")
-
-# O capítulo por capítulo
-source("cap1-datos/run_cap1.R")
-source("cap2-visualizacion-exploratoria/run_cap2.R")
-source("cap3-clima/run_cap3.R")
 ```
 
 ---
@@ -90,8 +106,7 @@ source("cap3-clima/run_cap3.R")
 ```r
 install.packages(c(
   "tidyverse", "readxl", "writexl",
-  "ggplot2", "patchwork", "cowplot",
-  "kableExtra"
+  "ggplot2", "patchwork", "cowplot", "kableExtra"
 ))
 ```
 
@@ -100,3 +115,4 @@ install.packages(c(
 <div class="footer-anvidea">
   <a href="../index.qmd">← Volver a la página principal</a>
 </div>
+
