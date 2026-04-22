@@ -41,6 +41,7 @@ Este portal no ejecuta código. Todos los análisis se realizan de forma local e
 
 ## Capítulos
 
+```{=html}
 <div class="card-unidad">
   <div style="display:grid; grid-template-columns:180px 1fr; gap:1.2rem; align-items:start;">
     <img src="../assets/portadas/unidad_i_cap1.png" alt="Cap. 1" style="width:100%; border-radius:8px;">
@@ -82,6 +83,7 @@ Este portal no ejecuta código. Todos los análisis se realizan de forma local e
     </div>
   </div>
 </div>
+```
 
 ---
 
@@ -115,4 +117,3 @@ install.packages(c(
 <div class="footer-anvidea">
   <a href="../index.qmd">← Volver a la página principal</a>
 </div>
-
