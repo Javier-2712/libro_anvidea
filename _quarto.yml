@@ -36,5 +36,8 @@ format:
 
 lang: es
 
+resources:
+  - assets/
+
 execute:
   freeze: auto
