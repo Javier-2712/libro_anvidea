@@ -53,7 +53,7 @@
     "href": "unidad_i/index.html#capítulos",
     "title": "Unidad I — Análisis de datos ecológicos",
     "section": "Capítulos",
-    "text": "Capítulos\n\n\n<img src=\"../assets/portadas/unidad_i_cap1.png\" alt=\"Cap. 1\" style=\"width:100%; border-radius:8px;\">\n<div>\n  <h3 style=\"margin-top:0;\">Capítulo 1 — Exploración y manipulación de datos</h3>\n  <p>Importación, limpieza y transformación de datos ecológicos con <code>tidyverse</code>.</p>\n  <span class=\"badge-tema\">Importación</span>\n  <span class=\"badge-tema\">Limpieza</span>\n  <span class=\"badge-tema\">Transformación</span><br>\n  <a class=\"btn-anvidea\" href=\"https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap1-datos\" target=\"_blank\" style=\"margin-top:0.8rem;\">Ver carpeta →</a>\n</div>\n\n\n\n\n<img src=\"../assets/portadas/unidad_i_cap2.png\" alt=\"Cap. 2\" style=\"width:100%; border-radius:8px;\">\n<div>\n  <h3 style=\"margin-top:0;\">Capítulo 2 — Visualización exploratoria</h3>\n  <p>Construcción e interpretación de figuras con <code>ggplot2</code> para datos ecológicos y ambientales.</p>\n  <span class=\"badge-tema\">ggplot2</span>\n  <span class=\"badge-tema\">Distribuciones</span>\n  <span class=\"badge-tema\">Relaciones</span><br>\n  <a class=\"btn-anvidea\" href=\"https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap2-visualizacion-exploratoria\" target=\"_blank\" style=\"margin-top:0.8rem;\">Ver carpeta →</a>\n</div>\n\n\n\n\n<img src=\"../assets/portadas/unidad_i_cap3.png\" alt=\"Cap. 3\" style=\"width:100%; border-radius:8px;\">\n<div>\n  <h3 style=\"margin-top:0;\">Capítulo 3 — Análisis climático</h3>\n  <p>Procesamiento de series temporales climáticas y análisis de variables ambientales.</p>\n  <span class=\"badge-tema\">Series temporales</span>\n  <span class=\"badge-tema\">Clima</span>\n  <span class=\"badge-tema\">Balance hídrico</span><br>\n  <a class=\"btn-anvidea\" href=\"https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_i/cap3-clima\" target=\"_blank\" style=\"margin-top:0.8rem;\">Ver carpeta →</a>\n</div>"
+    "text": "Capítulos\n\n  \n    \n    \n      Capítulo 1 — Exploración y manipulación de datos\n      Importación, limpieza y transformación de datos ecológicos con tidyverse.\n      Importación\n      Limpieza\n      Transformación\n      Ver carpeta →\n    \n  \n\n\n\n  \n    \n    \n      Capítulo 2 — Visualización exploratoria\n      Construcción e interpretación de figuras con ggplot2 para datos ecológicos y ambientales.\n      ggplot2\n      Distribuciones\n      Relaciones\n      Ver carpeta →\n    \n  \n\n\n\n  \n    \n    \n      Capítulo 3 — Análisis climático\n      Procesamiento de series temporales climáticas y análisis de variables ambientales.\n      Series temporales\n      Clima\n      Balance hídrico\n      Ver carpeta →"
   },
   {
     "objectID": "unidad_i/index.html#acceso-al-material",
@@ -95,7 +95,7 @@
     "href": "unidad_ii/index.html#capítulos",
     "title": "Unidad II — Ecología de poblaciones",
     "section": "Capítulos",
-    "text": "Capítulos\n\n\n<img src=\"../assets/portadas/unidad_ii_cap4.png\" alt=\"Cap. 4\" style=\"width:100%; border-radius:8px;\">\n<div>\n  <h3 style=\"margin-top:0;\">Capítulo 4 — Modelos de crecimiento poblacional</h3>\n  <p>Crecimiento exponencial, discreto y logístico. Modelación y ajuste de parámetros demográficos.</p>\n  <span class=\"badge-tema\">Exponencial</span>\n  <span class=\"badge-tema\">Logístico</span>\n  <span class=\"badge-tema\">Discreto</span><br>\n  <a class=\"btn-anvidea\" href=\"https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_ii/cap4-modelos-crecimiento\" target=\"_blank\" style=\"margin-top:0.8rem;\">Ver carpeta →</a>\n</div>\n\n\n\n\n<img src=\"../assets/portadas/unidad_ii_cap5.png\" alt=\"Cap. 5\" style=\"width:100%; border-radius:8px;\">\n<div>\n  <h3 style=\"margin-top:0;\">Capítulo 5 — Tablas de vida y modelos matriciales</h3>\n  <p>Tablas de vida por edades y estados, proyecciones con matrices de Leslie y Lefkovitch.</p>\n  <span class=\"badge-tema\">Tablas de vida</span>\n  <span class=\"badge-tema\">Leslie</span>\n  <span class=\"badge-tema\">Lefkovitch</span><br>\n  <a class=\"btn-anvidea\" href=\"https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_ii/cap5-tablas-vida\" target=\"_blank\" style=\"margin-top:0.8rem;\">Ver carpeta →</a>\n</div>\n\n\n\n\n<img src=\"../assets/portadas/unidad_ii_cap6.png\" alt=\"Cap. 6\" style=\"width:100%; border-radius:8px;\">\n<div>\n  <h3 style=\"margin-top:0;\">Capítulo 6 — Distribución espacial y densidad</h3>\n  <p>Análisis de patrones de distribución y estimación de densidad poblacional.</p>\n  <span class=\"badge-tema\">Distribución espacial</span>\n  <span class=\"badge-tema\">Densidad</span>\n  <span class=\"badge-tema\">Transectos</span><br>\n  <a class=\"btn-anvidea\" href=\"https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_ii/cap6-distribucion-densidad\" target=\"_blank\" style=\"margin-top:0.8rem;\">Ver carpeta →</a>\n</div>"
+    "text": "Capítulos\n\n  \n    \n    \n      Capítulo 4 — Modelos de crecimiento poblacional\n      Crecimiento exponencial, discreto y logístico. Modelación y ajuste de parámetros demográficos.\n      Exponencial\n      Logístico\n      Discreto\n      Ver carpeta →\n    \n  \n\n\n\n  \n    \n    \n      Capítulo 5 — Tablas de vida y modelos matriciales\n      Tablas de vida por edades y estados, proyecciones con matrices de Leslie y Lefkovitch.\n      Tablas de vida\n      Leslie\n      Lefkovitch\n      Ver carpeta →\n    \n  \n\n\n\n  \n    \n    \n      Capítulo 6 — Distribución espacial y densidad\n      Análisis de patrones de distribución y estimación de densidad poblacional.\n      Distribución espacial\n      Densidad\n      Transectos\n      Ver carpeta →"
   },
   {
     "objectID": "unidad_ii/index.html#acceso-al-material",
@@ -109,46 +109,11 @@
     "href": "unidad_ii/index.html#ejecución",
     "title": "Unidad II — Ecología de poblaciones",
     "section": "Ejecución",
-    "text": "Ejecución\n# Desde unidad_ii/ en RStudio\nsource(\"run_unidad2.R\")"
+    "text": "Ejecución\n# Desde unidad_ii/ en RStudio\nsource(\"run_unidad2.R\")\n\n# O capítulo por capítulo\nsource(\"cap4-modelos-crecimiento/run_cap4.R\")\nsource(\"cap5-tablas-vida/run_cap5.R\")\nsource(\"cap6-distribucion-densidad/run_cap6.R\")"
   },
   {
     "objectID": "unidad_ii/index.html#paquetes-requeridos",
     "href": "unidad_ii/index.html#paquetes-requeridos",
-    "title": "Unidad II — Ecología de poblaciones",
-    "section": "Paquetes requeridos",
-    "text": "Paquetes requeridos\ninstall.packages(c(\n  \"tidyverse\", \"readxl\", \"writexl\",\n  \"patchwork\", \"kableExtra\", \"MASS\", \"broom\"\n))\n\n\n← Volver a la página principal"
-  },
-  {
-    "objectID": "unidad_ii/index.html#empezar-aquí-1",
-    "href": "unidad_ii/index.html#empezar-aquí-1",
-    "title": "Unidad II — Ecología de poblaciones",
-    "section": "Empezar aquí",
-    "text": "Empezar aquí\n\n\n\n1\n\n\nDescarga el material y descomprímelo\n\n\n\n\n2\n\n\nAbre unidad_ii/ en RStudio\n\n\n\n\n3\n\n\nInstala los paquetes requeridos\n\n\n\n\n4\n\n\nEjecuta run_unidad2.R\n\n\n\n\n\n\n\n\n\nNota\n\n\n\nEste portal no ejecuta código. Todos los análisis se realizan de forma local en RStudio."
-  },
-  {
-    "objectID": "unidad_ii/index.html#capítulos-1",
-    "href": "unidad_ii/index.html#capítulos-1",
-    "title": "Unidad II — Ecología de poblaciones",
-    "section": "Capítulos",
-    "text": "Capítulos\n\n\nCapítulo 4 — Modelos de crecimiento poblacional\n\n\nCrecimiento exponencial, discreto y logístico. Modelación y ajuste de parámetros.\n\nExponencial Logístico Discreto Ver carpeta en GitHub →\n\n\n\nCapítulo 5 — Tablas de vida y modelos matriciales\n\n\nTablas de vida por edades y estados, proyecciones con matrices de Leslie y Lefkovitch.\n\nTablas de vida Leslie Lefkovitch Ver carpeta en GitHub →\n\n\n\nCapítulo 6 — Distribución espacial y densidad\n\n\nAnálisis de patrones de distribución y estimación de densidad poblacional.\n\nDistribución espacial Densidad Transectos Ver carpeta en GitHub →"
-  },
-  {
-    "objectID": "unidad_ii/index.html#acceso-al-material-1",
-    "href": "unidad_ii/index.html#acceso-al-material-1",
-    "title": "Unidad II — Ecología de poblaciones",
-    "section": "Acceso al material",
-    "text": "Acceso al material\n⬇ Descargar repositorio completo (ZIP) Ver Unidad II en GitHub"
-  },
-  {
-    "objectID": "unidad_ii/index.html#ejecución-1",
-    "href": "unidad_ii/index.html#ejecución-1",
-    "title": "Unidad II — Ecología de poblaciones",
-    "section": "Ejecución",
-    "text": "Ejecución\n# Desde unidad_ii/ en RStudio\nsource(\"run_unidad2.R\")\n\n# O capítulo por capítulo\nsource(\"cap4-modelos-crecimiento/run_cap4.R\")\nsource(\"cap5-tablas-vida/run_cap5.R\")\nsource(\"cap6-distribucion-densidad/run_cap6.R\")"
-  },
-  {
-    "objectID": "unidad_ii/index.html#paquetes-requeridos-1",
-    "href": "unidad_ii/index.html#paquetes-requeridos-1",
     "title": "Unidad II — Ecología de poblaciones",
     "section": "Paquetes requeridos",
     "text": "Paquetes requeridos\ninstall.packages(c(\n  \"tidyverse\", \"readxl\", \"writexl\",\n  \"patchwork\", \"kableExtra\", \"MASS\", \"broom\"\n))\n\n\n← Volver a la página principal"
@@ -172,7 +137,7 @@
     "href": "unidad_iii/index.html#capítulos",
     "title": "Unidad III — Ecología de comunidades",
     "section": "Capítulos",
-    "text": "Capítulos\n\n\n<img src=\"../assets/portadas/unidad_iii_cap7.png\" alt=\"Cap. 7\" style=\"width:100%; border-radius:8px;\">\n<div>\n  <h3 style=\"margin-top:0;\">Capítulo 7 — Diversidad taxonómica</h3>\n  <p>Índices clásicos, curvas rango-abundancia, GLMs, PERMANOVAs, diversidad beta y números de Hill taxonómicos.</p>\n  <span class=\"badge-cap\">Alfa · Beta · Gamma</span>\n  <span class=\"badge-tema\">iNEXT</span>\n  <span class=\"badge-tema\">iNEXT.3D</span>\n  <span class=\"badge-tema\">vegan</span><br>\n  <a class=\"btn-anvidea\" href=\"https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii/cap7-diversidad-taxonomica\" target=\"_blank\" style=\"margin-top:0.8rem;\">Ver carpeta →</a>\n</div>\n\n\n\n\n<img src=\"../assets/portadas/unidad_iii_cap8.png\" alt=\"Cap. 8\" style=\"width:100%; border-radius:8px;\">\n<div>\n  <h3 style=\"margin-top:0;\">Capítulo 8 — Diversidad funcional y filogenética</h3>\n  <p>Métricas funcionales (FRic, FEve, FDiv, FDis, RaoQ), partición de Rao y números de Hill funcionales y filogenéticos.</p>\n  <span class=\"badge-cap\">TD · FD · PD</span>\n  <span class=\"badge-tema\">FD</span>\n  <span class=\"badge-tema\">iNEXT.3D</span>\n  <span class=\"badge-tema\">ape · taxize</span><br>\n  <a class=\"btn-anvidea\" href=\"https://github.com/Javier-2712/libro_anvidea/tree/main/unidad_iii/cap8-diversidad-funcional-filogenetica\" target=\"_blank\" style=\"margin-top:0.8rem;\">Ver carpeta →</a>\n</div>"
+    "text": "Capítulos\n\n  \n    \n    \n      Capítulo 7 — Diversidad taxonómica\n      Índices clásicos, curvas rango-abundancia, GLMs, PERMANOVAs, diversidad beta y números de Hill taxonómicos.\n      Alfa · Beta · Gamma\n      iNEXT\n      iNEXT.3D\n      vegan\n      Ver carpeta →\n    \n  \n\n\n\n  \n    \n    \n      Capítulo 8 — Diversidad funcional y filogenética\n      Métricas funcionales (FRic, FEve, FDiv, FDis, RaoQ), partición de Rao y números de Hill funcionales y filogenéticos.\n      TD · FD · PD\n      FD\n      iNEXT.3D\n      ape · taxize\n      Ver carpeta →"
   },
   {
     "objectID": "unidad_iii/index.html#acceso-al-material",
